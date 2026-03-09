@@ -945,8 +945,9 @@ function setupWordDisplay(wordData) {
     // โค้ดสำหรับตรวจสอบว่าเป็นสระบน/ล่าง หรือวรรณยุกต์ หรือทัณฑฆาต (ตัวการันต์) หรือพินทุ หรือนิคหิต
     const isUpperLowerVowelOrTone = (char) => {
         const code = char.charCodeAt(0);
-        return (code >= 0x0E31 && code <= 0x0E3A) || // สระบน ล่าง พินทุ
-               (code >= 0x0E47 && code <= 0x0E4E);   // ไม้ไต่คู้ วรรณยุกต์ ทัณฑฆาต นิคหิต
+        return code === 0x0E31 ||                      // ไม้หันอากาศ
+               (code >= 0x0E34 && code <= 0x0E3A) ||   // สระอิ ถึง พินทุ (สระบน/ล่าง)
+               (code >= 0x0E47 && code <= 0x0E4E);     // ไม้ไต่คู้ ถึง ยามักการ (วรรณยุกต์/เครื่องหมาย)
     };
 
     let clusterIndex = -1;
@@ -1698,4 +1699,3 @@ function createConfetti() {
     }
 }
 
-// Initialize on load - removed, handled by authentication system above
