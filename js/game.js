@@ -1699,3 +1699,4 @@ function createConfetti() {
     }
 }
 
+// Initialize on load - removed, handled by authentication system above
