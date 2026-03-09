@@ -933,16 +933,48 @@ function setupWordDisplay(wordData) {
         this.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"%3E%3Crect width="400" height="300" fill="%23f0f0f0"/%3E%3Ctext x="200" y="150" font-size="24" text-anchor="middle" fill="%23999"%3E' + encodeURIComponent(wordData.word) + '%3C/text%3E%3C/svg%3E';
     };
 
-    // Generate answer slots - จำนวนช่องเท่ากับจำนวนตัวอักษร
+    // Generate answer slots - จัดกลุ่มพยัญชนะกับสระ/วรรณยุกต์
     const slotsContainer = document.getElementById('answerSlots');
     slotsContainer.innerHTML = '';
     currentAnswer = [];
     
-    const wordChars = wordData.word.split('');
-    for (let i = 0; i < wordChars.length; i++) {
+    // Logic จัดกลุ่มคำไทย (Cluster)
+    const wordStr = wordData.word;
+    window.currentWordClusters = []; // เก็บโครงสร้างว่าแต่ละ slot รับตัวอักษรไหนบ้าง
+    
+    // โค้ดสำหรับตรวจสอบว่าเป็นสระบน/ล่าง หรือวรรณยุกต์ หรือทัณฑฆาต (ตัวการันต์) หรือพินทุ หรือนิคหิต
+    const isUpperLowerVowelOrTone = (char) => {
+        const code = char.charCodeAt(0);
+        return (code >= 0x0E31 && code <= 0x0E3A) || // สระบน ล่าง พินทุ
+               (code >= 0x0E47 && code <= 0x0E4E);   // ไม้ไต่คู้ วรรณยุกต์ ทัณฑฆาต นิคหิต
+    };
+
+    let clusterIndex = -1;
+    let charToClusterMap = []; // map ว่า ตัวอักษร index นี้ อยู่ใน cluster หน้าจอไหน
+
+    for (let i = 0; i < wordStr.length; i++) {
+        const char = wordStr[i];
+        if (i === 0 || !isUpperLowerVowelOrTone(char)) {
+            // เริ่มบล็อคใหม่ (พยัญชนะ หรือ สระหน้า/หลัง)
+            clusterIndex++;
+            window.currentWordClusters.push({ chars: [char], maxLen: 1 });
+        } else {
+            // เอาไปเกาะกับบล็อคก่อนหน้า
+            if(clusterIndex >= 0) {
+                window.currentWordClusters[clusterIndex].chars.push(char);
+                window.currentWordClusters[clusterIndex].maxLen++;
+            }
+        }
+        charToClusterMap.push(clusterIndex);
+    }
+    
+    window.charToClusterMap = charToClusterMap; // บันทึกไว้ใช้ตอนพิมพ์
+
+    // สร้างกล่องตามจำนวน cluster
+    for (let i = 0; i < window.currentWordClusters.length; i++) {
         const slot = document.createElement('div');
-        slot.className = 'answer-slot answer-slot-char';
-        slot.id = `slot-${i}`;
+        slot.className = 'answer-slot answer-slot-char combined-slot';
+        slot.id = `slot-cluster-${i}`;
         slotsContainer.appendChild(slot);
     }
 
@@ -968,14 +1000,10 @@ function setupWordDisplay(wordData) {
 
 // แสดงคำสะกด/คำอ่าน + เล่นเสียงสะกดคำ
 function showSpelling() {
-    const levelData = gameData[currentLevel];
-    const wordData = levelData.words[currentWordIndex];
-    const spellingText = wordData.spelling || wordData.word;
-    
+    // ซ่อนคำอ่านตามที่ User ร้องขอ (ได้ยินแค่เสียง)
     const spellingDisplay = document.getElementById('spellingDisplay');
     if (spellingDisplay) {
-        spellingDisplay.textContent = spellingText;
-        spellingDisplay.style.display = 'block';
+        spellingDisplay.style.display = 'none';
     }
     
     // เล่นเสียงสะกดคำจากโฟลเดอร์ เสียงสะกดคำ/ด่านที่X/N_คำ.mp3
@@ -1312,16 +1340,32 @@ function selectCharacter(char, button) {
     playCharacterSound(char);
 }
 
-// อัปเดตช่องแสดงผลแต่ละช่อง
+// อัปเดตช่องแสดงผลแต่ละช่อง เป็นแบบ Cluster (ตัวซ้อน)
 function updateAnswerSlots() {
-    const levelData = gameData[currentLevel];
-    const wordData = levelData.words[currentWordIndex];
-    const totalSlots = wordData.word.split('').length;
+    // ล้างกล่องทั้งหมดก่อน
+    if (!window.currentWordClusters) return;
     
-    for (let i = 0; i < totalSlots; i++) {
-        const slot = document.getElementById(`slot-${i}`);
+    for (let i = 0; i < window.currentWordClusters.length; i++) {
+        const slot = document.getElementById(`slot-cluster-${i}`);
         if (slot) {
-            slot.textContent = currentAnswer[i] || '';
+            slot.innerHTML = ''; // Clear prior spans
+        }
+    }
+    
+    // วาดตัวอักษรที่พิมพ์ลงไปในกล่องที่มันควรอยู่
+    for (let i = 0; i < currentAnswer.length; i++) {
+        const char = currentAnswer[i];
+        const targetClusterIndex = window.charToClusterMap[i];
+        
+        if (targetClusterIndex !== undefined) {
+            const slot = document.getElementById(`slot-cluster-${targetClusterIndex}`);
+            if (slot) {
+                // ใส่ตัวอักษรลงในกล่อง เรียงต่อกันไป (CSS จะจัดการซ้อนให้เองถ้าตั้งค่าไว้)
+                const charSpan = document.createElement('span');
+                charSpan.className = 'stacked-char';
+                charSpan.textContent = char;
+                slot.appendChild(charSpan);
+            }
         }
     }
 }
