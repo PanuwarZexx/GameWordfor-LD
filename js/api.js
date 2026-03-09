@@ -1,5 +1,5 @@
 // API Client for Thai Word Game
-const API_BASE_URL = 'https://games-word-thai.onrender.com/api';
+const API_BASE_URL = 'https://gamewordfor-ld.onrender.com/api';
 
 class GameAPI {
     constructor() {
