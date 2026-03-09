@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>LD Reading Learning Project</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<style>
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(40px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+body {
+    margin: 0;
+    font-family: 'Prompt', sans-serif;
+    background-color: #f5f5f5;
+    color: #1f2933;
+    animation: fadeIn 1.2s ease-in;
+}
+
+/* ---------- HEADER ---------- */
+header {
+    background: linear-gradient(135deg,#0d47a1 0%,#1e88e5 55%,#ffb74d 100%);
+    padding: 40px 20px 50px;
+    text-align: center;
+    color: #ffffff;
+    animation: slideDown 1.1s ease;
+}
+
+/* ---------- LOGO ---------- */
+.logo-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 18px;
+    margin-bottom: 25px;
+}
+
+.logo-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.logo-main {
+    width: 120px;
+    height: 120px;
+}
+
+.logo-secondary {
+    width: 105px;
+    height: 105px;
+    border-radius: 50%;
+}
+
+.logo-box img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    transition: transform 0.3s ease;
+}
+
+.logo-box img:hover {
+    transform: scale(1.06);
+}
+
+/* ---------- TITLE ---------- */
+.project-title h1 {
+    font-size: 36px;
+    font-weight: 700;
+}
+
+.project-title p {
+    font-size: 18px;
+    color: #e3f2fd;
+}
+
+/* ---------- BUTTON ---------- */
+.enter-game {
+    margin-top: 30px;
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.btn {
+    background-color: #ffffff;
+    color: #0d47a1;
+    padding: 12px 26px;
+    border-radius: 30px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+.btn:hover {
+    background-color: #e3f2fd;
+    transform: translateY(-3px);
+}
+
+/* ---------- SECTION ---------- */
+section {
+    padding: 60px 20px;
+    text-align: center;
+    background-color: #ffffff;
+    animation: slideUp 1s ease;
+}
+
+section:nth-of-type(even) {
+    background-color: #f5f5f5;
+}
+
+section h2 {
+    font-size: 26px;
+    font-weight: 700;
+    color: #1565c0;
+}
+
+section h3 {
+    font-size: 18px;
+    margin-bottom: 40px;
+    color: #444;
+}
+
+/* ---------- CARD ---------- */
+.card-container {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 70px;
+}
+
+.advisor-gap {
+    gap: 90px;
+}
+
+.card {
+    width: 220px;
+}
+
+.card img {
+    width: 100%;
+    border-radius: 15px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+    transition: transform 0.35s ease, box-shadow 0.35s ease;
+}
+
+.card img:hover {
+    transform: scale(1.08);
+    box-shadow: 0 14px 32px rgba(0,0,0,0.25);
+}
+
+.name-th {
+    margin-top: 15px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.name-en,
+.detail {
+    font-size: 14px;
+    color: #555;
+}
+
+/* ---------- FOOTER ---------- */
+footer {
+    background: linear-gradient(135deg,#ffb74d 0%,#1e88e5 45%,#0d47a1 100%);
+    padding: 25px 20px;
+    text-align: center;
+}
+
+footer a {
+    color: #ffffff;
+    font-weight: 600;
+    text-decoration: none;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <div class="logo-container">
+        <div class="logo-box logo-main">
+            <img src="images/logo/logo 1.png">
+        </div>
+        <div class="logo-box logo-secondary">
+            <img src="images/logo/logo 2.png">
+        </div>
+    </div>
+
+    <div class="project-title">
+        <h1>📖✨ การพัฒนาสื่อการเรียนรู้ด้านการอ่านสำหรับเด็ก LD 🧠🌈</h1>
+        <p>Developing reading learning materials for children with learning disabilities (LD)</p>
+    </div>
+
+    <div class="enter-game">
+        <a href="index1.html" class="btn">🎮 เข้าสู่ตัวเกม</a>
+
+        <!-- ปุ่มดาวน์โหลดคู่มือเกม (Google Drive เปิดแท็บใหม่) -->
+        <a href="https://drive.google.com/file/d/1SvQ8dwh7N2M4L3rZKX8wlWIXJNIUvuhV/view?usp=sharing"
+           class="btn"
+           target="_blank"
+           rel="noopener noreferrer">
+           📘 ดาวน์โหลดคู่มือเกม
+        </a>
+    </div>
+</header>
+
+<section>
+    <h2>👨‍💻🎨 PROJECT DEVELOPER</h2>
+    <h3>ทีมพัฒนาระบบสื่อการเรียนรู้ 💡</h3>
+
+    <div class="card-container">
+        <div class="card">
+            <img src="images/developers/P1.png" class="sound">
+            <div class="name-th">ภานุวัฒน์ คุณแรง</div>
+            <div class="name-en">Panuwat Kunrang</div>
+            <div class="name-en">65322970108</div>
+        </div>
+
+        <div class="card">
+            <img src="images/developers/T1.png" class="sound">
+            <div class="name-th">ธีรดล พอบาล</div>
+            <div class="name-en">Teeradol Phoban</div>
+            <div class="name-en">65322970107</div>
+        </div>
+
+        <div class="card">
+            <img src="images/developers/C1.png" class="sound">
+            <div class="name-th">ชัยมงคล ทาสมบูรณ์</div>
+            <div class="name-en">Chaimongkol Thsomboon</div>
+            <div class="name-en">64322970109</div>
+        </div>
+    </div>
+</section>
+
+<section>
+    <h2>🎓 PROJECT PRODUCER</h2>
+    <h3>อาจารย์ที่ปรึกษาโครงงาน</h3>
+
+    <div class="card-container advisor-gap">
+        <div class="card">
+            <img src="images/advisors/S1.jpeg" class="sound">
+            <div class="name-th">ผู้ช่วยศาสตราจารย์สุระเจตน์ อ่อนฤทธิ์</div>
+            <div class="detail">อาจารย์ที่ปรึกษาโครงงาน</div>
+        </div>
+
+        <div class="card">
+            <img src="images/advisors/A1.jpeg" class="sound">
+            <div class="name-th">ผู้ช่วยศาสตราจารย์ ดร.เอกราช ธรรมษา</div>
+            <div class="detail">อาจารย์ที่ปรึกษาโครงงาน</div>
+        </div>
+    </div>
+</section>
+
+<section>
+    <h2>🤝 COORDINATING PROFESSOR</h2>
+    <h3>อาจารย์ผู้ประสานงาน</h3>
+
+    <div class="card-container">
+        <div class="card">
+            <img src="images/coordinator/A2.jpeg" class="sound">
+            <div class="name-th">ผู้ช่วยศาสตราจารย์อรอุมา เนียมหอม</div>
+            <div class="detail">อาจารย์ผู้ประสานงาน</div>
+        </div>
+    </div>
+</section>
+
+<footer>
+    <a href="http://com-tech.ubru.ac.th/" target="_blank" class="sound">
+        🌐 www.com-tech.ubru.ac.th
+        <div class="name-en">💻 กลุ่มวิชาเทคโนโลยีคอมพิวเตอร์</div>
+    </a>
+</footer>
+
+<script>
+const popSound = document.getElementById("popSound");
+document.querySelectorAll(".sound").forEach(el => {
+    el.addEventListener("mouseenter", () => {
+        if (popSound) {
+            popSound.currentTime = 0;
+            popSound.play();
+        }
+    });
+});
+</script>
+
+</body>
+</html>

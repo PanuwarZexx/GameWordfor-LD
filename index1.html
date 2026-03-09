@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>เกมส์เติมคำ - LET'S PLAY</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+    <!-- Floating shapes -->
+    <div class="floating-shape"></div>
+    <div class="floating-shape"></div>
+    <div class="floating-shape"></div>
+    <div class="floating-shape"></div>
+    <div class="floating-shape"></div>
+    <div class="floating-shape"></div>
+    <div class="floating-shape"></div>
+    <div class="floating-shape"></div>
+    <div class="floating-shape"></div>
+    <div class="floating-shape"></div>
+    <div class="floating-shape"></div>
+    <div class="floating-shape"></div>
+    <div class="floating-shape"></div>
+    <div class="floating-shape"></div>
+    <div class="floating-shape"></div>
+
+    <!-- Login Screen -->
+    <div class="screen active" id="loginScreen">
+        <div class="auth-container">
+            <img src="ปุ่ม button/Logo.png" alt="Let's Play เกมส์เติมคำ" class="game-logo">
+            <h2 class="auth-title">เข้าสู่ระบบ</h2>
+            <input type="text" id="loginUsername" class="auth-input" placeholder="ชื่อผู้ใช้" autocomplete="off">
+            <input type="password" id="loginPassword" class="auth-input" placeholder="รหัสผ่าน" autocomplete="off">
+            <button class="start-button" onclick="login()">เข้าสู่ระบบ</button>
+            <p class="auth-link">ยังไม่มีบัญชี? <span onclick="showRegister()">สมัครสมาชิก</span></p>
+        </div>
+    </div>
+
+    <!-- Register Screen -->
+    <div class="screen" id="registerScreen">
+        <div class="auth-container">
+            <img src="ปุ่ม button/Logo.png" alt="Let's Play เกมส์เติมคำ" class="game-logo">
+            <h2 class="auth-title">สมัครสมาชิก</h2>
+            <input type="text" id="registerUsername" class="auth-input" placeholder="ชื่อผู้ใช้" autocomplete="off">
+            <input type="password" id="registerPassword" class="auth-input" placeholder="รหัสผ่าน" autocomplete="off">
+            <input type="password" id="registerConfirmPassword" class="auth-input" placeholder="ยืนยันรหัสผ่าน" autocomplete="off">
+            <button class="start-button" onclick="register()">สมัครสมาชิก</button>
+            <p class="auth-link">มีบัญชีแล้ว? <span onclick="showLogin()">เข้าสู่ระบบ</span></p>
+        </div>
+    </div>
+
+    <!-- Character Selection Screen -->
+    <div class="screen" id="characterScreen">
+        <div class="character-container">
+            <h2 class="auth-title">เลือกตัวละครและตั้งชื่อ</h2>
+            <input type="text" id="playerName" class="auth-input" placeholder="ชื่อของคุณ" maxlength="20" autocomplete="off">
+            <div class="character-grid">
+                <div class="character-option" data-character="1">
+                    <img src="css/01.jpg" alt="ตัวละคร 1">
+                </div>
+                <div class="character-option" data-character="2">
+                    <img src="css/02.jpg" alt="ตัวละคร 2">
+                </div>
+                <div class="character-option" data-character="3">
+                    <img src="css/03.jpg" alt="ตัวละคร 3">
+                </div>
+                <div class="character-option" data-character="4">
+                    <img src="css/04.jpg" alt="ตัวละคร 4">
+                </div>
+                <div class="character-option" data-character="5">
+                    <img src="css/05.jpg" alt="ตัวละคร 5">
+                </div>
+                <div class="character-option" data-character="6">
+                    <img src="css/06.jpg" alt="ตัวละคร 6">
+                </div>
+            </div>
+            <button class="start-button" id="confirmCharacter" onclick="confirmCharacter()" disabled>เริ่มเล่น</button>
+        </div>
+    </div>
+
+    <!-- Edit Profile Screen -->
+    <div class="screen" id="editProfileScreen">
+        <div class="character-container">
+            <h2 class="auth-title">แก้ไขโปรไฟล์</h2>
+            <input type="text" id="editPlayerName" class="auth-input" placeholder="ชื่อของคุณ" maxlength="20" autocomplete="off">
+            <div class="character-grid">
+                <div class="character-option edit-character" data-character="1">
+                    <img src="css/01.jpg" alt="ตัวละคร 1">
+                </div>
+                <div class="character-option edit-character" data-character="2">
+                    <img src="css/02.jpg" alt="ตัวละคร 2">
+                </div>
+                <div class="character-option edit-character" data-character="3">
+                    <img src="css/03.jpg" alt="ตัวละคร 3">
+                </div>
+                <div class="character-option edit-character" data-character="4">
+                    <img src="css/04.jpg" alt="ตัวละคร 4">
+                </div>
+                <div class="character-option edit-character" data-character="5">
+                    <img src="css/05.jpg" alt="ตัวละคร 5">
+                </div>
+                <div class="character-option edit-character" data-character="6">
+                    <img src="css/06.jpg" alt="ตัวละคร 6">
+                </div>
+            </div>
+            <div class="edit-buttons">
+                <button class="edit-button save-button" onclick="updateProfile()">บันทึก</button>
+                <button class="edit-button cancel-button" onclick="showMainMenu()">ยกเลิก</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Menu Screen -->
+    <div class="screen" id="mainMenu">
+        <div class="main-menu">
+            <div class="sound-icon" onclick="toggleSound()">🔊</div>
+            <div class="user-info" onclick="showEditProfile()" style="cursor: pointer;">
+                <img id="userAvatar" src="" alt="Avatar" class="user-avatar">
+                <span id="userName" class="user-name"></span>
+            </div>
+            <button class="logout-button" onclick="logout()">ออกจากระบบ</button>
+            <img src="ปุ่ม button/Logo.png" alt="Let's Play เกมส์เติมคำ" class="game-logo">
+            <button class="start-button" onclick="showLevelSelect()">เริ่มเกม</button>
+            <button class="results-button" onclick="showUsersSummary()">📊 ดูผลการเล่นรวม</button>
+        </div>
+    </div>
+
+    <!-- Level Selection Screen -->
+    <div class="screen" id="levelSelect">
+        <div class="level-select">
+            <div class="summary-header">
+                <div class="level-title">สรุปผลการเล่นเกม</div>
+                <div class="player-summary-info" id="playerSummaryInfo">
+                    <img id="summaryPlayerAvatar" src="" alt="Avatar" class="summary-avatar">
+                    <span class="summary-player-name" id="summaryPlayerName"></span>
+                    <span class="summary-player-id">(<span id="summaryPlayerId"></span>)</span>
+                </div>
+                <div class="summary-stats">
+                    <div class="stat-card">
+                        <div class="stat-label">เปอร์เซ็นต์การเล่นเกม</div>
+                        <div class="stat-value" id="totalScore">0%</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">จำนวนด่านที่ปลดล็อค</div>
+                        <div class="stat-value" id="unlockedCount">1/10</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">จำนวนข้อที่ตอบได้</div>
+                        <div class="stat-value" id="answeredFraction">0/10</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label"> ระดับทักษะ </div>
+                        <div class="stat-value" id="gradeLevel">-</div>
+                    </div>
+                    <button class="home-button" onclick="showMainMenu()"><img src="ปุ่ม button/3.png" alt="Home"></button>
+                </div>
+            </div>
+            
+            <div class="levels-grid">
+                <!-- Level 1 -->
+                <div class="level-card">
+                    <div class="level-card-title">ด่าน 1 : หมวดสัตว์</div>
+                    <div class="word-grid" id="level1Words"></div>
+                    <div class="level-score" id="level1Score">0/10</div>
+                    <button id="startLevel1" class="start-button" style="font-size: 1.5em; padding: 15px 40px; margin-top: 15px;" onclick="startLevel(1)">เล่นด่าน 1</button>
+                </div>
+
+                <!-- Level 2 -->
+                <div class="level-card">
+                    <div class="level-card-title">ด่าน 2 : หมวดสิ่งของ</div>
+                    <div class="word-grid" id="level2Words"></div>
+                    <div class="level-score" id="level2Score">0/10</div>
+                    <button id="startLevel2" class="start-button" style="font-size: 1.5em; padding: 15px 40px; margin-top: 15px;" onclick="startLevel(2)">เล่นด่าน 2</button>
+                </div>
+
+                <!-- Level 3 -->
+                <div class="level-card">
+                    <div class="level-card-title">ด่าน 3 : หมวดร่างกาย</div>
+                    <div class="word-grid" id="level3Words"></div>
+                    <div class="level-score" id="level3Score">0/10</div>
+                    <button id="startLevel3" class="start-button" style="font-size: 1.5em; padding: 15px 40px; margin-top: 15px;" onclick="startLevel(3)">เล่นด่าน 3</button>
+                </div>
+
+                <!-- Level 4 -->
+                <div class="level-card">
+                    <div class="level-card-title">ด่าน 4 : หมวดธรรมชาติ </div>
+                    <div class="word-grid" id="level4Words"></div>
+                    <div class="level-score" id="level4Score">0/10</div>
+                    <button id="startLevel4" class="start-button" style="font-size: 1.5em; padding: 15px 40px; margin-top: 15px;" onclick="startLevel(4)">เล่นด่าน 4</button>
+                </div>
+
+                <!-- Level 5 -->
+                <div class="level-card">
+                    <div class="level-card-title">ด่าน 5 : หมวดคนในครอบครัว / คนรอบตัว</div>
+                    <div class="word-grid" id="level5Words"></div>
+                    <div class="level-score" id="level5Score">0/10</div>
+                    <button id="startLevel5" class="start-button" style="font-size: 1.5em; padding: 15px 40px; margin-top: 15px;" onclick="startLevel(5)">เล่นด่าน 5</button>
+                </div>
+
+                <!-- Level 6 -->
+                <div class="level-card">
+                    <div class="level-card-title">ด่าน 6 : คำง่ายมาก เห็นภาพได้ทันที</div>
+                    <div class="word-grid" id="level6Words"></div>
+                    <div class="level-score" id="level6Score">0/10</div>
+                    <button id="startLevel6" class="start-button" style="font-size: 1.5em; padding: 15px 40px; margin-top: 15px;" onclick="startLevel(6)">เล่นด่าน 6</button>
+                </div>
+
+                <!-- Level 7 -->
+                <div class="level-card">
+                    <div class="level-card-title">ด่าน 7 : คำอาหารและผลไม้ + คำทั่วไป</div>
+                    <div class="word-grid" id="level7Words"></div>
+                    <div class="level-score" id="level7Score">0/10</div>
+                    <button id="startLevel7" class="start-button" style="font-size: 1.5em; padding: 15px 40px; margin-top: 15px;" onclick="startLevel(7)">เล่นด่าน 7</button>
+                </div>
+
+                <!-- Level 8 -->
+                <div class="level-card">
+                    <div class="level-card-title">ด่าน 8 : หมวดธรรมชาติ + สิ่งของ + สัตว์ผสม </div>
+                    <div class="word-grid" id="level8Words"></div>
+                    <div class="level-score" id="level8Score">0/10</div>
+                    <button id="startLevel8" class="start-button" style="font-size: 1.5em; padding: 15px 40px; margin-top: 15px;" onclick="startLevel(8)">เล่นด่าน 8</button>
+                </div>
+
+                <!-- Level 9 -->
+                <div class="level-card">
+                    <div class="level-card-title">ด่าน 9 : หมวดโรงเรียน + ชีวิตประจำวัน</div>
+                    <div class="word-grid" id="level9Words"></div>
+                    <div class="level-score" id="level9Score">0/10</div>
+                    <button id="startLevel9" class="start-button" style="font-size: 1.5em; padding: 15px 40px; margin-top: 15px;" onclick="startLevel(9)">เล่นด่าน 9</button>
+                </div>
+
+                <!-- Level 10 -->
+                <div class="level-card">
+                    <div class="level-card-title">ด่าน 10 : คำยาวขึ้นเล็กน้อย แต่ความหมายชัด</div>
+                    <div class="word-grid" id="level10Words"></div>
+                    <div class="level-score" id="level10Score">0/10</div>
+                    <button id="startLevel10" class="start-button" style="font-size: 1.5em; padding: 15px 40px; margin-top: 15px;" onclick="startLevel(10)">เล่นด่าน 10</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Screen -->
+    <div class="screen" id="gameScreen">
+        <div class="game-screen">
+            <div class="game-header">
+                <div class="player-info">
+                    <img id="gameUserAvatar" src="" alt="Player" class="player-avatar">
+                    <div class="player-stats">
+                        <div class="player-label">ผู้เล่น : <span id="gameUserName" style="color: #2563a8; font-weight: bold;"></span></div>
+                        <div class="player-label score-display">ด่านนี้ : <span class="player-value" id="currentScore">0</span> | รวม : <span class="player-value" id="gameTotalScore" style="color: #e85d9e;">0</span></div>
+                    </div>
+                </div>
+                <div class="word-counter-display">
+                    <span class="word-counter-label">ข้อ</span>
+                    <span class="word-counter-value" id="wordCounter">1/10</span>
+                </div>
+                <div class="game-buttons">
+                    <button class="menu-button" onclick="showLevelSelect()">เมนู</button>
+                    <button class="home-button" onclick="showMainMenu()"><img src="ปุ่ม button/3.png" alt="Home"></button>
+                    <button class="skip-button" onclick="skipWord()"><img src="ปุ่ม button/9.png" alt="Skip"></button>
+                </div>
+            </div>
+
+            <div class="game-content">
+                <div class="game-left">
+                    <div class="keyboard-section">
+                        <div class="thai-keyboard" id="thaiKeyboard">
+                            <!-- Keys will be generated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="game-right">
+                    <div class="level-indicator">
+                        <h2 id="currentWord" style="color: #4fb848; font-size: 2em; margin: 0; text-shadow: 2px 2px 4px rgba(0,0,0,0.1);">ด่าน 1</h2>
+                    </div>
+                    <div class="image-section">
+                        <img id="wordImage" src="" alt="Word Image" class="word-image">
+                    </div>
+                    <div class="answer-section">
+                        <div class="answer-slots" id="answerSlots">
+                            <!-- Slots will be generated by JavaScript -->
+                        </div>
+                    </div>
+                    <div class="game-controls">
+                        <button class="play-sound-button" onclick="playWordSound()">🔊 ฟังเสียง</button>
+                        <button class="spelling-button" onclick="showSpelling()">📖🔊 คำสะกด</button>
+                        <button class="delete-char-button" onclick="deleteLastChar()">⌫ ลบตัวอักษร</button>
+                        <button class="check-button" onclick="checkAnswer()">✔️ ตรวจสอบ</button>
+                        <button class="next-button" id="nextButton" onclick="nextWord()">🎯 ถัดไป ➜</button>
+                    </div>
+                    <div class="spelling-display" id="spellingDisplay" style="display:none;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Correct/Wrong Answer -->
+    <div class="modal" id="resultModal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeModal()">✕</button>
+            <div class="modal-icon" id="modalIcon">✓</div>
+            <div class="modal-title" id="modalTitle">คำตอบถูกต้อง</div>
+            <button class="modal-close" onclick="closeModal()">ปิด</button>
+        </div>
+    </div>
+
+    <!-- Custom Alert Modal -->
+    <div class="custom-alert-overlay" id="customAlertOverlay">
+        <div class="custom-alert-box">
+            <div class="custom-alert-icon" id="customAlertIcon">ℹ️</div>
+            <div class="custom-alert-message" id="customAlertMessage">ข้อความแจ้งเตือน</div>
+            <button class="custom-alert-button" onclick="closeCustomAlert()">ตกลง</button>
+        </div>
+    </div>
+
+    <!-- Users Summary Modal -->
+    <div class="users-summary-modal" id="usersSummaryModal">
+        <div class="users-summary-content">
+            <div class="users-summary-header">
+                <h2>📊 สรุปผลการเล่นรวม (30 คนล่าสุด)</h2>
+                <button class="close-summary-btn" onclick="closeUsersSummary()">✕</button>
+            </div>
+            <div class="summary-loading" id="summaryLoading">
+                <div class="loading-spinner"></div>
+                <p>กำลังโหลดข้อมูล...</p>
+            </div>
+            <div class="summary-table-wrapper">
+                <table class="summary-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>ผู้เล่น</th>
+                            <th>ตอบถูก</th>
+                            <th>ด่าน</th>
+                            <th>ระดับ</th>
+                            <th>รายละเอียด (ด่าน:คะแนน)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="summaryTableBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/game.js"></script>
+</body>
+</html>

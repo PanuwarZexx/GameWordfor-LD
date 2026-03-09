@@ -1,0 +1,7 @@
+เกมส์
+https://games-word-thai.netlify.app/
+
+เก็บงาน Githup
+https://github.com/SlOVVliKE/games-word-thai.git
+
+Database
