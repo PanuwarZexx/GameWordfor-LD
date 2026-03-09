@@ -844,9 +844,9 @@ body::before {
 .start-button {
     background: linear-gradient(145deg, #b8e986 0%, #7fb83e 100%);
     color: white;
-    font-size: 1.3em;
+    font-size: 1.5em; /* ขยายขนาดตัวหนังสือ */
     font-weight: bold;
-    padding: 12px 40px;
+    padding: 15px 50px; /* ขยายขนาดปุ่ม */
     border: none;
     border-radius: 35px;
     cursor: pointer;
@@ -865,8 +865,8 @@ body::before {
 
 @media (max-width: 768px) {
     .start-button {
-        font-size: 1.1em;
-        padding: 10px 32px;
+        font-size: 1.25em;
+        padding: 12px 40px;
         border-radius: 30px;
         margin-top: 8px;
         max-width: 90%;
@@ -875,8 +875,8 @@ body::before {
 
 @media (max-width: 480px) {
     .start-button {
-        font-size: 0.95em;
-        padding: 9px 24px;
+        font-size: 1.1em;
+        padding: 11px 30px;
         border-radius: 28px;
         margin-top: 6px;
         max-width: 85%;
@@ -3095,7 +3095,7 @@ body::before {
                 0 4px 8px rgba(0, 0, 0, 0.15),
                 inset 0 -3px 0 rgba(0, 0, 0, 0.2);
     font-family: 'Kanit', 'Prompt', sans-serif;
-    margin-top: 10px;
+    margin-top: 35px; /* ขยับปุ่มลงมาด้านล่างมากขึ้น */
     position: relative;
     overflow: hidden;
 }
@@ -3129,6 +3129,7 @@ body::before {
     .results-button {
         font-size: 1.1em;
         padding: 14px 30px;
+        margin-top: 25px; /* ขยับปุ่มลงมาในมือถือด้วย */
     }
 }
 
