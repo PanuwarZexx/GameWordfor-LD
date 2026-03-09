@@ -1,1702 +1,3543 @@
-// User Management
-let currentUser = null;
-let currentUserData = null;
-let selectedCharacterId = null;
-let tempRegisterData = null;
-// Track which levels are available to unlock manually (answered >=5)
-let unlockAvailableLevels = {};
-// Track unlock notification UI: pending level to notify and per-level shown flag
-let pendingUnlockNotificationLevel = null;
-let unlockNotificationShown = {};
-// Load shown-notification flags from localStorage so user won't see the same notice after reload
-try {
-    const stored = localStorage.getItem('unlockNotificationShown');
-    if (stored) unlockNotificationShown = JSON.parse(stored) || {};
-} catch (e) {
-    unlockNotificationShown = {};
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
 }
 
-// Character image mapping (ใช้ร่วมกัน)
-const characterImages = {
-    1: '01.jpg',
-    2: '02.jpg',
-    3: '03.jpg',
-    4: '04.jpg',
-    5: '05.jpg',
-    6: '06.jpg'
-};
-
-// Check if user is logged in
-window.onload = async () => {
-    setupCharacterSelection();
-    setupEditCharacterSelection();
-    startBackgroundMusic(); // เริ่มเล่นเพลงพื้นหลังตั้งแต่โหลดหน้า
+@media (max-width: 480px) {
+    * {
+        max-width: 100%;
+    }
     
-    // Check if user has token
-    if (gameAPI.token) {
-        try {
-            const userData = await gameAPI.getUserProfile();
-            currentUser = userData.username;
-            currentUserData = userData;
-            await loadUserData();
-            init();
-            showScreen('mainMenu');
-        } catch (error) {
-            console.error('Auto-login failed:', error);
-            gameAPI.clearToken();
-            showScreen('loginScreen');
-        }
-    } else {
-        showScreen('loginScreen');
-    }
-};
-
-function showLogin() {
-    showScreen('loginScreen');
-}
-
-function showRegister() {
-    showScreen('registerScreen');
-}
-
-async function register() {
-    const username = document.getElementById('registerUsername').value.trim();
-    const password = document.getElementById('registerPassword').value;
-    const confirmPassword = document.getElementById('registerConfirmPassword').value;
-
-    if (!username || !password) {
-        showCustomAlert('กรุณากรอกชื่อผู้ใช้และรหัสผ่าน', '⚠️');
-        return;
-    }
-
-    if (password !== confirmPassword) {
-        showCustomAlert('รหัสผ่านไม่ตรงกัน', '❌');
-        return;
-    }
-
-    // Show character selection first (will register after character is selected)
-    currentUser = username;
-    tempRegisterData = { username, password };
-    showScreen('characterScreen');
-}
-
-async function login() {
-    const username = document.getElementById('loginUsername').value.trim();
-    const password = document.getElementById('loginPassword').value;
-
-    if (!username || !password) {
-        showCustomAlert('กรุณากรอกชื่อผู้ใช้และรหัสผ่าน', '⚠️');
-        return;
-    }
-
-    try {
-        const response = await gameAPI.login(username, password);
-        currentUser = username;
-        currentUserData = response.user;
-        await loadUserData();
-        init();
-        showScreen('mainMenu');
-    } catch (error) {
-        showCustomAlert(error.message || 'เข้าสู่ระบบไม่สำเร็จ', '❌');
+    html {
+        overflow-x: hidden;
     }
 }
 
-function setupCharacterSelection() {
-    document.querySelectorAll('.character-option').forEach(option => {
-        option.addEventListener('click', function() {
-            const characterId = parseInt(this.getAttribute('data-character'));
-            selectedCharacterId = characterId;
-            
-            // Remove selected class from all
-            document.querySelectorAll('.character-option').forEach(opt => {
-                opt.classList.remove('selected');
-            });
-            
-            // Add selected class to clicked one
-            this.classList.add('selected');
-            
-            // Enable confirm button
-            const confirmBtn = document.getElementById('confirmCharacter');
-            if (confirmBtn) confirmBtn.disabled = false;
-        });
-    });
+body {
+    font-family: 'Kanit', 'Prompt', sans-serif;
+    background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 50%, #ffecd2 100%);
+    height: 100vh;
+    overflow: hidden;
+    position: relative;
 }
 
-async function confirmCharacter() {
-    const playerName = document.getElementById('playerName').value.trim();
-    
-    if (!playerName) {
-        showCustomAlert('กรุณาใส่ชื่อของคุณ', '⚠️');
-        return;
-    }
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+        radial-gradient(ellipse at 20% 30%, rgba(255, 182, 193, 0.4) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 70%, rgba(255, 218, 185, 0.4) 0%, transparent 60%),
+        radial-gradient(ellipse at 50% 50%, rgba(221, 160, 221, 0.3) 0%, transparent 70%),
+        radial-gradient(circle at 10% 80%, rgba(255, 200, 220, 0.3) 0%, transparent 50%);
+    animation: backgroundMove 20s ease-in-out infinite;
+    z-index: 0;
+    pointer-events: none;
+    filter: blur(40px);
+}
 
-    if (!selectedCharacterId) {
-        showCustomAlert('กรุณาเลือกตัวละคร', '⚠️');
-        return;
+@keyframes backgroundMove {
+    0%, 100% { 
+        transform: translate(0, 0) scale(1);
+        opacity: 0.5;
     }
-
-    try {
-        // Register with API
-        const response = await gameAPI.register(
-            tempRegisterData.username,
-            tempRegisterData.password,
-            playerName,
-            selectedCharacterId
-        );
-        
-        currentUser = tempRegisterData.username;
-        currentUserData = response.user;
-        tempRegisterData = null;
-        
-        await loadUserData();
-        init();
-        showScreen('mainMenu');
-    } catch (error) {
-        showCustomAlert(error.message || 'สมัครสมาชิกไม่สำเร็จ', '❌');
+    50% { 
+        transform: translate(20px, -20px) scale(1.1);
+        opacity: 0.8;
     }
 }
 
-function logout() {
-    showConfirm('คุณต้องการออกจากระบบหรือไม่?', () => {
-        gameAPI.clearToken();
-        currentUser = null;
-        currentUserData = null;
-        showScreen('loginScreen');
-    });
+.screen {
+    position: relative;
+    z-index: 1;
 }
 
-function showEditProfile() {
-    if (!currentUser || !currentUserData) return;
-    
-    document.getElementById('editPlayerName').value = currentUserData.displayName || '';
-    selectedCharacterId = currentUserData.characterId;
-    
-    // Highlight selected character
-    document.querySelectorAll('.edit-character').forEach(option => {
-        const charId = parseInt(option.getAttribute('data-character'));
-        if (charId === currentUserData.characterId) {
-            option.classList.add('selected');
-        } else {
-            option.classList.remove('selected');
-        }
-    });
-    
-    showScreen('editProfileScreen');
-}
-
-// Setup edit character selection (เรียกครั้งเดียวตอน load)
-function setupEditCharacterSelection() {
-    document.querySelectorAll('.edit-character').forEach(option => {
-        option.addEventListener('click', function() {
-            selectedCharacterId = parseInt(this.getAttribute('data-character'));
-            document.querySelectorAll('.edit-character').forEach(opt => {
-                opt.classList.remove('selected');
-            });
-            this.classList.add('selected');
-        });
-    });
-}
-
-async function updateProfile() {
-    const newPlayerName = document.getElementById('editPlayerName').value.trim();
-    
-    if (!newPlayerName) {
-        showCustomAlert('กรุณาใส่ชื่อของคุณ', '⚠️');
-        return;
-    }
-
-    if (!selectedCharacterId) {
-        showCustomAlert('กรุณาเลือกตัวละคร', '⚠️');
-        return;
-    }
-
-    try {
-        const response = await gameAPI.updateUserProfile(newPlayerName, selectedCharacterId);
-        currentUserData = response.user;
-        loadUserData();
-        showCustomAlert('บันทึกข้อมูลเรียบร้อยแล้ว! ✨', '✅');
-        setTimeout(() => {
-            showScreen('mainMenu');
-        }, 1500);
-    } catch (error) {
-        showCustomAlert(error.message || 'บันทึกข้อมูลไม่สำเร็จ', '❌');
+@media (max-width: 480px) {
+    .screen {
+        padding: 0 5px;
+        margin: 0 auto;
+        max-width: 100vw;
+        overflow-x: hidden;
+        box-sizing: border-box;
     }
 }
 
-// Custom Alert Function
-function showCustomAlert(message, icon = 'ℹ️') {
-    const overlay = document.getElementById('customAlertOverlay');
-    const messageEl = document.getElementById('customAlertMessage');
-    const iconEl = document.getElementById('customAlertIcon');
-    
-    if (!overlay || !messageEl || !iconEl) {
-        // Fallback to native alert if custom elements don't exist
-        alert(message);
-        return;
+/* Floating shapes in background */
+.floating-shape {
+    position: fixed;
+    animation: floatShape 20s infinite ease-in-out;
+    pointer-events: none;
+    z-index: 0;
+    filter: blur(1px);
+}
+
+.floating-shape:nth-child(1) {
+    width: 100px;
+    height: 100px;
+    top: 10%;
+    left: 10%;
+    animation-delay: 0s;
+}
+
+.floating-shape:nth-child(1)::before {
+    content: '⭐';
+    font-size: 60px;
+    position: absolute;
+    animation: rotate 8s linear infinite;
+}
+
+.floating-shape:nth-child(2) {
+    width: 80px;
+    height: 80px;
+    top: 70%;
+    left: 80%;
+    animation-delay: 5s;
+}
+
+.floating-shape:nth-child(2)::before {
+    content: '🌟';
+    font-size: 50px;
+    position: absolute;
+    animation: rotate 10s linear infinite reverse;
+}
+
+.floating-shape:nth-child(3) {
+    width: 90px;
+    height: 90px;
+    top: 50%;
+    left: 50%;
+    animation-delay: 10s;
+}
+
+.floating-shape:nth-child(3)::before {
+    content: '✨';
+    font-size: 55px;
+    position: absolute;
+    animation: rotate 12s linear infinite;
+}
+
+.floating-shape:nth-child(4) {
+    width: 110px;
+    height: 110px;
+    top: 20%;
+    right: 20%;
+    animation-delay: 15s;
+}
+
+.floating-shape:nth-child(4)::before {
+    content: '💫';
+    font-size: 65px;
+    position: absolute;
+    animation: rotate 9s linear infinite reverse;
+}
+
+.floating-shape:nth-child(5) {
+    width: 70px;
+    height: 70px;
+    top: 30%;
+    left: 25%;
+    animation-delay: 3s;
+}
+
+.floating-shape:nth-child(5)::before {
+    content: '🌈';
+    font-size: 45px;
+    position: absolute;
+    animation: rotate 15s linear infinite;
+}
+
+.floating-shape:nth-child(6) {
+    width: 95px;
+    height: 95px;
+    top: 80%;
+    left: 50%;
+    animation-delay: 7s;
+}
+
+.floating-shape:nth-child(6)::before {
+    content: '☀️';
+    font-size: 58px;
+    position: absolute;
+    animation: rotate 11s linear infinite;
+}
+
+.floating-shape:nth-child(7) {
+    width: 85px;
+    height: 85px;
+    top: 15%;
+    left: 70%;
+    animation-delay: 12s;
+}
+
+.floating-shape:nth-child(7)::before {
+    content: '🎈';
+    font-size: 52px;
+    position: absolute;
+    animation: rotate 13s linear infinite reverse;
+}
+
+.floating-shape:nth-child(8) {
+    width: 75px;
+    height: 75px;
+    top: 60%;
+    left: 15%;
+    animation-delay: 18s;
+}
+
+.floating-shape:nth-child(8)::before {
+    content: '🎨';
+    font-size: 48px;
+    position: absolute;
+    animation: rotate 14s linear infinite;
+}
+
+.floating-shape:nth-child(9) {
+    width: 90px;
+    height: 90px;
+    top: 40%;
+    right: 15%;
+    animation-delay: 9s;
+}
+
+.floating-shape:nth-child(9)::before {
+    content: '🎵';
+    font-size: 55px;
+    position: absolute;
+    animation: rotate 10s linear infinite reverse;
+}
+
+.floating-shape:nth-child(10) {
+    width: 80px;
+    height: 80px;
+    top: 85%;
+    right: 30%;
+    animation-delay: 6s;
+}
+
+.floating-shape:nth-child(10)::before {
+    content: '🌸';
+    font-size: 50px;
+    position: absolute;
+    animation: rotate 16s linear infinite;
+}
+
+.floating-shape:nth-child(11) {
+    width: 70px;
+    height: 70px;
+    top: 25%;
+    left: 45%;
+    animation-delay: 14s;
+}
+
+.floating-shape:nth-child(11)::before {
+    content: '🦋';
+    font-size: 45px;
+    position: absolute;
+    animation: rotate 9s linear infinite reverse;
+}
+
+.floating-shape:nth-child(12) {
+    width: 100px;
+    height: 100px;
+    top: 55%;
+    right: 10%;
+    animation-delay: 11s;
+}
+
+.floating-shape:nth-child(12)::before {
+    content: '🎯';
+    font-size: 60px;
+    position: absolute;
+    animation: rotate 12s linear infinite;
+}
+
+.floating-shape:nth-child(13) {
+    width: 65px;
+    height: 65px;
+    top: 5%;
+    left: 55%;
+    animation-delay: 4s;
+}
+
+.floating-shape:nth-child(13)::before {
+    content: '🎪';
+    font-size: 42px;
+    position: absolute;
+    animation: rotate 17s linear infinite reverse;
+}
+
+.floating-shape:nth-child(14) {
+    width: 85px;
+    height: 85px;
+    top: 75%;
+    left: 35%;
+    animation-delay: 8s;
+}
+
+.floating-shape:nth-child(14)::before {
+    content: '🎁';
+    font-size: 52px;
+    position: absolute;
+    animation: rotate 13s linear infinite;
+}
+
+.floating-shape:nth-child(15) {
+    width: 95px;
+    height: 95px;
+    top: 45%;
+    left: 85%;
+    animation-delay: 16s;
+}
+
+.floating-shape:nth-child(15)::before {
+    content: '🌟';
+    font-size: 58px;
+    position: absolute;
+    animation: rotate 11s linear infinite reverse;
+}
+
+@keyframes floatShape {
+    0% {
+        transform: translate(0, 0) rotate(0deg) scale(1);
     }
-    
-    messageEl.textContent = message;
-    iconEl.textContent = icon;
-    overlay.classList.add('active');
-}
-
-function closeCustomAlert() {
-    const overlay = document.getElementById('customAlertOverlay');
-    if (overlay) overlay.classList.remove('active');
-}
-
-// Update game screen user info
-function updateGameUserInfo() {
-    if (currentUser && currentUserData) {
-        const gameAvatarEl = document.getElementById('gameUserAvatar');
-        const gameNameEl = document.getElementById('gameUserName');
-        
-        if (gameAvatarEl) {
-            gameAvatarEl.src = `css/${characterImages[currentUserData.characterId]}`;
-        }
-        if (gameNameEl) {
-            gameNameEl.textContent = currentUserData.displayName;
-        }
+    25% {
+        transform: translate(100px, -80px) rotate(90deg) scale(1.2);
     }
-}
-
-// Custom Confirm Function
-let confirmCallback = null;
-function showConfirm(message, callback) {
-    confirmCallback = callback;
-    const overlay = document.getElementById('customAlertOverlay');
-    const messageEl = document.getElementById('customAlertMessage');
-    const iconEl = document.getElementById('customAlertIcon');
-    const buttonEl = overlay.querySelector('.custom-alert-button');
-    
-    messageEl.textContent = message;
-    iconEl.textContent = '❓';
-    buttonEl.textContent = 'ยืนยัน';
-    buttonEl.onclick = function() {
-        closeCustomAlert();
-        if (confirmCallback) {
-            confirmCallback();
-            confirmCallback = null;
-        }
-        buttonEl.textContent = 'ตกลง';
-        buttonEl.onclick = closeCustomAlert;
-    };
-    overlay.classList.add('active');
-    
-    // Add cancel button temporarily
-    if (!overlay.querySelector('.cancel-button')) {
-        const cancelBtn = document.createElement('button');
-        cancelBtn.className = 'custom-alert-button cancel-button';
-        cancelBtn.textContent = 'ยกเลิก';
-        cancelBtn.style.background = 'linear-gradient(135deg, #e74c3c 0%, #c0392b 100%)';
-        cancelBtn.style.marginLeft = '10px';
-        cancelBtn.onclick = function() {
-            closeCustomAlert();
-            confirmCallback = null;
-            buttonEl.textContent = 'ตกลง';
-            buttonEl.onclick = closeCustomAlert;
-            this.remove();
-        };
-        buttonEl.parentNode.appendChild(cancelBtn);
+    50% {
+        transform: translate(-50px, 100px) rotate(180deg) scale(0.8);
     }
-}
-
-async function loadUserData() {
-    if (!currentUser || !currentUserData) return;
-    
-    try {
-        // Get progress from API
-        const progress = await gameAPI.getProgress();
-        
-        // แสดงชื่อและ avatar (ตรวจสอบ element ก่อนใช้งาน)
-        const userNameEl = document.getElementById('userName');
-        const userAvatarEl = document.getElementById('userAvatar');
-        
-        if (userNameEl) userNameEl.textContent = currentUserData.displayName;
-        const avatarSrc = `css/${characterImages[currentUserData.characterId]}`;
-        if (userAvatarEl) userAvatarEl.src = avatarSrc;
-        
-        // อัพเดทใน level select screen ด้วย
-        const levelUserAvatar = document.getElementById('levelUserAvatar');
-        const levelUserName = document.getElementById('levelUserName');
-        const levelUserScore = document.getElementById('levelUserScore');
-        
-        if (levelUserAvatar) levelUserAvatar.src = avatarSrc;
-        if (levelUserName) levelUserName.textContent = currentUserData.displayName;
-
-        // โหลดความคืบหน้า - MongoDB returns Objects, not Maps
-        levelScores = progress.levelScores || {};
-        
-        // Normalize answeredWords: convert keys to strings and values to numbers
-        const rawAnsweredWords = progress.answeredWords || {};
-        answeredWords = {};
-        for (let key in rawAnsweredWords) {
-            const levelKey = String(key);
-            // Convert all values to numbers (in case they're strings)
-            answeredWords[levelKey] = Array.isArray(rawAnsweredWords[key]) 
-                ? rawAnsweredWords[key].map(v => typeof v === 'string' ? parseInt(v) : v)
-                : [];
-        }
-        
-        unlockedLevels = Array.isArray(progress.unlockedLevels) && progress.unlockedLevels.length > 0 
-            ? progress.unlockedLevels[progress.unlockedLevels.length - 1] 
-            : 1;
-        // If the current highest unlocked level has >=5 answered, mark next level as available to unlock
-        try {
-            const curKey = String(unlockedLevels);
-            if (answeredWords[curKey] && answeredWords[curKey].length >= 5 && unlockedLevels < 10) {
-                unlockAvailableLevels[unlockedLevels] = true;
-                const nextLevel = unlockedLevels + 1;
-                if (!unlockNotificationShown[nextLevel]) {
-                    pendingUnlockNotificationLevel = nextLevel;
-                }
-            }
-        } catch (e) {
-            console.warn('Error computing pending unlock from loaded progress', e);
-        }
-        
-        console.log('Loaded from MongoDB (after normalize):');
-        console.log('answeredWords:', answeredWords);
-        
-        // คำนวณคะแนนรวม
-        score = 0;
-        for (let level in levelScores) {
-            score += levelScores[level] || 0;
-        }
-        
-        // อัพเดทคะแนนใน level select
-        if (levelUserScore) levelUserScore.textContent = score;
-    } catch (error) {
-        console.error('Load user data error:', error);
-        // Use default values if API fails
-        levelScores = {};
-        answeredWords = {};
-        unlockedLevels = 1;
-        score = 0;
+    75% {
+        transform: translate(80px, 50px) rotate(270deg) scale(1.1);
     }
-}
-
-async function saveUserData() {
-    if (!currentUser) return;
-    
-    try {
-        // Get all unlocked levels as array
-        const unlockedLevelsArray = [];
-        for (let i = 1; i <= unlockedLevels; i++) {
-            unlockedLevelsArray.push(i);
-        }
-        
-        await gameAPI.updateProgress({
-            unlockedLevels: unlockedLevelsArray,
-            levelScores: levelScores,
-            answeredWords: answeredWords,
-            currentLevel: currentLevel || 1,
-            totalStars: 0 // Calculate if needed
-        });
-    } catch (error) {
-        console.error('Save user data error:', error);
-    }
-}
-
-// Game Data
-const gameData = {
-    1: {
-        name: "หมวดสัตว์",
-        folder: "เสียงคำตอบ/สัตว์",
-        words: [
-            { word: "กา", image: "ภาพประกอบ คำศัพท์/2.png", spelling: "กอ อา กา" },
-            { word: "งู", image: "ภาพประกอบ คำศัพท์/3.png", spelling: "งอ อู งู" },
-            { word: "ม้า", image: "ภาพประกอบ คำศัพท์/4.png", spelling: "มอ อา ม้า" },
-            { word: "ปลา", image: "ภาพประกอบ คำศัพท์/5.png", spelling: "ปอ ลอ อา ปลา" },
-            { word: "หมา", image: "ภาพประกอบ คำศัพท์/6.png", spelling: "หอ มอ อา หมา" },
-            { word: "แมว", image: "ภาพประกอบ คำศัพท์/7.png", spelling: "มอ แอ วอ แมว" },
-            { word: "กบ", image: "ภาพประกอบ คำศัพท์/8.png", spelling: "กอ บอ กบ" },
-            { word: "เต่า", image: "ภาพประกอบ คำศัพท์/9.png", spelling: "ตอ เอ อา เต่า" },
-            { word: "นก", image: "ภาพประกอบ คำศัพท์/10.png", spelling: "นอ กอ นก" },
-            { word: "มด", image: "ภาพประกอบ คำศัพท์/11.png", spelling: "มอ ดอ มด" }
-        ]
-    },
-    2: {
-        name: "หมวดสิ่งของ",
-        folder: "เสียงคำตอบ/สิ่งของ",
-        words: [
-            { word: "รถ", image: "ภาพประกอบ คำศัพท์/13.png", spelling: "รอ ถอ รถ" },
-            { word: "ถัง", image: "ภาพประกอบ คำศัพท์/14.png", spelling: "ถอ อั งอ ถัง" },
-            { word: "ไม้", image: "ภาพประกอบ คำศัพท์/15.png", spelling: "มอ ไอ ไม้" },
-            { word: "ตู้", image: "ภาพประกอบ คำศัพท์/16.png", spelling: "ตอ อู ตู้" },
-            { word: "โต๊ะ", image: "ภาพประกอบ คำศัพท์/17.png", spelling: "ตอ โอ อะ โต๊ะ" },
-            { word: "ถ้วย", image: "ภาพประกอบ คำศัพท์/18.png", spelling: "ถอ อั วอ ยอ ถ้วย" },
-            { word: "ส้อม", image: "ภาพประกอบ คำศัพท์/19.png", spelling: "สอ ออ มอ ส้อม" },
-            { word: "หม้อ", image: "ภาพประกอบ คำศัพท์/20.png", spelling: "หอ มอ ออ หม้อ" },
-            { word: "ช้อน", image: "ภาพประกอบ คำศัพท์/21.png", spelling: "ชอ ออ นอ ช้อน" },
-            { word: "แก้ว", image: "ภาพประกอบ คำศัพท์/22.png", spelling: "กอ แอ วอ แก้ว" }
-        ]
-    },
-    3: {
-        name: "หมวดร่างกาย",
-        folder: "เสียงคำตอบ/ร่างกาย",
-        words: [
-            { word: "ตา", image: "ภาพประกอบ คำศัพท์/24.png", spelling: "ตอ อา ตา" },
-            { word: "หู", image: "ภาพประกอบ คำศัพท์/25.png", spelling: "หอ อู หู" },
-            { word: "ปาก", image: "ภาพประกอบ คำศัพท์/26.png", spelling: "ปอ อา กอ ปาก" },
-            { word: "มือ", image: "ภาพประกอบ คำศัพท์/27.png", spelling: "มอ อือ มือ" },
-            { word: "เท้า", image: "ภาพประกอบ คำศัพท์/28.png", spelling: "ทอ เอ อา เท้า" },
-            { word: "ขา", image: "ภาพประกอบ คำศัพท์/29.png", spelling: "ขอ อา ขา" },
-            { word: "ผม", image: "ภาพประกอบ คำศัพท์/30.png", spelling: "ผอ มอ ผม" },
-            { word: "ฟัน", image: "ภาพประกอบ คำศัพท์/31.png", spelling: "ฟอ อั นอ ฟัน" },
-            { word: "คอ", image: "ภาพประกอบ คำศัพท์/32.png", spelling: "คอ ออ คอ" },
-            { word: "จมูก", image: "ภาพประกอบ คำศัพท์/33.png", spelling: "จอ มอ อู กอ จมูก" }
-        ]
-    },
-    4: {
-        name: "หมวดธรรมชาติ",
-        folder: "เสียงคำตอบ/ธรรมชาติ",
-        words: [
-            { word: "ฟ้า", image: "ภาพประกอบ คำศัพท์/35.png", spelling: "ฟอ อา ฟ้า" },
-            { word: "ดิน", image: "ภาพประกอบ คำศัพท์/36.png", spelling: "ดอ อิ นอ ดิน" },
-            { word: "น้ำ", image: "ภาพประกอบ คำศัพท์/37.png", spelling: "นอ อำ น้ำ" },
-            { word: "ไฟ", image: "ภาพประกอบ คำศัพท์/38.png", spelling: "ฟอ ไอ ไฟ" },
-            { word: "ลม", image: "ภาพประกอบ คำศัพท์/39.png", spelling: "ลอ มอ ลม" },
-            { word: "เมฆ", image: "ภาพประกอบ คำศัพท์/40.png", spelling: "มอ เอ ขอ เมฆ" },
-            { word: "ดาว", image: "ภาพประกอบ คำศัพท์/41.png", spelling: "ดอ อา วอ ดาว" },
-            { word: "ภูเขา", image: "ภาพประกอบ คำศัพท์/42.png", spelling: "ภอ อู เอ ขอ อา ภูเขา" },
-            { word: "หนาว", image: "ภาพประกอบ คำศัพท์/43.png", spelling: "หอ นอ อา วอ หนาว" },
-            { word: "ร้อน", image: "ภาพประกอบ คำศัพท์/44.png", spelling: "รอ ออ นอ ร้อน" }
-        ]
-    },
-    5: {
-        name: "หมวดคนรอบตัว",
-        folder: "เสียงคำตอบ/คนรอบตัว",
-        words: [
-            { word: "พ่อ", image: "ภาพประกอบ คำศัพท์/46.png", spelling: "พอ ออ พ่อ" },
-            { word: "แม่", image: "ภาพประกอบ คำศัพท์/47.png", spelling: "มอ แอ แม่" },
-            { word: "ป้า", image: "ภาพประกอบ คำศัพท์/48.png", spelling: "ปอ อา ป้า" },
-            { word: "ลุง", image: "ภาพประกอบ คำศัพท์/49.png", spelling: "ลอ อุ งอ ลุง" },
-            { word: "น้า", image: "ภาพประกอบ คำศัพท์/50.png", spelling: "นอ อา น้า" },
-            { word: "พี่", image: "ภาพประกอบ คำศัพท์/51.png", spelling: "พอ อี พี่" },
-            { word: "น้อง", image: "ภาพประกอบ คำศัพท์/52.png", spelling: "นอ ออ งอ น้อง" },
-            { word: "ครู", image: "ภาพประกอบ คำศัพท์/53.png", spelling: "คอ รอ อู ครู" },
-            { word: "เพื่อน", image: "ภาพประกอบ คำศัพท์/54.png", spelling: "พอ เอ อือ ออ นอ เพื่อน" },
-            { word: "ยาย", image: "ภาพประกอบ คำศัพท์/55.png", spelling: "ยอ อา ยอ ยาย" }
-        ]
-    },
-    6: {
-        name: "คำ 2 พยางค์",
-        folder: "เสียงคำตอบ/คำ 2 พยางค์",
-        words: [
-            { word: "ดอกไม้", image: "ภาพประกอบ คำศัพท์/57.png", spelling: "ดอ ออ กอ ไอ มอ ดอกไม้" },
-            { word: "ต้นไม้", image: "ภาพประกอบ คำศัพท์/58.png", spelling: "ตอ นอ ไอ มอ ต้นไม้" },
-            { word: "กระเป๋า", image: "ภาพประกอบ คำศัพท์/59.png", spelling: "กอ รอ อะ เอ ปอ อา กระเป๋า" },
-            { word: "ดินสอ", image: "ภาพประกอบ คำศัพท์/60.png", spelling: "ดอ อิ นอ สอ ออ ดินสอ" },
-            { word: "ยางลบ", image: "ภาพประกอบ คำศัพท์/61.png", spelling: "ยอ อา งอ ลอ บอ ยางลบ" },
-            { word: "รถไฟ", image: "ภาพประกอบ คำศัพท์/62.png", spelling: "รอ ถอ ไอ ฟอ รถไฟ" },
-            { word: "ลำโพง", image: "ภาพประกอบ คำศัพท์/63.png", spelling: "ลอ อำ โอ พอ งอ ลำโพง" },
-            { word: "เต้นรำ", image: "ภาพประกอบ คำศัพท์/64.png", spelling: "ตอ เอ นอ รอ อำ เต้นรำ" },
-            { word: "แต่งงาน", image: "ภาพประกอบ คำศัพท์/65.png", spelling: "ตอ แอ งอ งอ อา นอ แต่งงาน" },
-            { word: "ปลูกผัก", image: "ภาพประกอบ คำศัพท์/66.png", spelling: "ปอ ลอ อู กอ ผอ อั กอ ปลูกผัก" }
-        ]
-    },
-    7: {
-        name: "คำอาหารและผลไม้",
-        folder: "เสียงคำตอบ/คำอาหารและผลไม้ + คำทั่วไป",
-        words: [
-            { word: "มะนาว", image: "ภาพประกอบ คำศัพท์/68.png", spelling: "มอ อะ นอ อา วอ มะนาว" },
-            { word: "มะม่วง", image: "ภาพประกอบ คำศัพท์/69.png", spelling: "มอ อะ มอ วอ งอ มะม่วง" },
-            { word: "มะเขือ", image: "ภาพประกอบ คำศัพท์/70.png", spelling: "มอ อะ เอ ขอ อือ ออ มะเขือ" },
-            { word: "กล้วย", image: "ภาพประกอบ คำศัพท์/71.png", spelling: "กอ ลอ วอ ยอ กล้วย" },
-            { word: "ขนมปัง", image: "ภาพประกอบ คำศัพท์/72.png", spelling: "ขอ นอ มอ ปอ อั งอ ขนมปัง" },
-            { word: "ไก่ทอด", image: "ภาพประกอบ คำศัพท์/73.png", spelling: "ไอ กอ ทอ ออ ดอ ไก่ทอด" },
-            { word: "บ้านเล็ก", image: "ภาพประกอบ คำศัพท์/74.png", spelling: "บอ อา นอ เอ ลอ กอ บ้านเล็ก" },
-            { word: "แมวน้อย", image: "ภาพประกอบ คำศัพท์/75.png", spelling: "มอ แอ วอ นอ ออ ยอ แมวน้อย" },
-            { word: "หมาใหญ่", image: "ภาพประกอบ คำศัพท์/76.png", spelling: "หอ มอ อา ใอ หอ ยอ หมาใหญ่" },
-            { word: "น้ำหวาน", image: "ภาพประกอบ คำศัพท์/77.png", spelling: "นอ อำ หอ วอ อา นอ น้ำหวาน" }
-        ]
-    },
-    8: {
-        name: "หมวดผสม",
-        folder: "เสียงคำตอบ/หมวดธรรมชาติ + สิ่งของ + สัตว์ผสม",
-        words: [
-            { word: "ผีเสื้อ", image: "ภาพประกอบ คำศัพท์/79.png", spelling: "ผอ อี เอ สอ อือ ออ ผีเสื้อ" },
-            { word: "แมงมุม", image: "ภาพประกอบ คำศัพท์/80.png", spelling: "มอ แอ งอ มอ อุ มอ แมงมุม" },
-            { word: "เต่าทอง", image: "ภาพประกอบ คำศัพท์/81.png", spelling: "ตอ เอ อา ทอ ออ งอ เต่าทอง" },
-            { word: "หลอดไฟ", image: "ภาพประกอบ คำศัพท์/82.png", spelling: "หอ ลอ ออ ดอ ไอ ฟอ หลอดไฟ" },
-            { word: "ดวงจันทร์", image: "ภาพประกอบ คำศัพท์/83.png", spelling: "ดอ วอ งอ จอ อั นอ ทอ รอ ดวงจันทร์" },
-            { word: "ทะเล", image: "ภาพประกอบ คำศัพท์/84.png", spelling: "ทอ อะ เอ ลอ ทะเล" },
-            { word: "ภูเขาไฟ", image: "ภาพประกอบ คำศัพท์/85.png", spelling: "ภอ อู เอ ขอ อา ไอ ฟอ ภูเขาไฟ" },
-            { word: "หนังสือ", image: "ภาพประกอบ คำศัพท์/86.png", spelling: "หอ นอ อั งอ สอ อือ ออ หนังสือ" },
-            { word: "กล่อง", image: "ภาพประกอบ คำศัพท์/87.png", spelling: "กอ ลอ ออ งอ กล่อง" },
-            { word: "เสื้อกันฝน", image: "ภาพประกอบ คำศัพท์/88.png", spelling: "สอ เอ อือ ออ กอ อั นอ ฝอ นอ เสื้อกันฝน" }
-        ]
-    },
-    9: {
-        name: "หมวดโรงเรียน",
-        folder: "เสียงคำตอบ/หมวดโรงเรียน + ชีวิตประจำวัน",
-        words: [
-            { word: "สมุด", image: "ภาพประกอบ คำศัพท์/90.png", spelling: "สอ มอ อุ ดอ สมุด" },
-            { word: "โต๊ะเรียน", image: "ภาพประกอบ คำศัพท์/91.png", spelling: "ตอ โอ อะ เอ รอ อี ยอ นอ โต๊ะเรียน" },
-            { word: "กระดานดำ", image: "ภาพประกอบ คำศัพท์/92.png", spelling: "กอ รอ อะ ดอ อา นอ ดอ อำ กระดานดำ" },
-            { word: "ปากกาแดง", image: "ภาพประกอบ คำศัพท์/93.png", spelling: "ปอ อา กอ กอ อา แอ ดอ งอ ปากกาแดง" },
-            { word: "ขวดน้ำ", image: "ภาพประกอบ คำศัพท์/94.png", spelling: "ขอ วอ ดอ นอ อำ ขวดน้ำ" },
-            { word: "กล่องข้าว", image: "ภาพประกอบ คำศัพท์/95.png", spelling: "กอ ลอ ออ งอ ขอ อา วอ กล่องข้าว" },
-            { word: "รองเท้า", image: "ภาพประกอบ คำศัพท์/96.png", spelling: "รอ ออ งอ เอ ทอ อา รองเท้า" },
-            { word: "กระถาง", image: "ภาพประกอบ คำศัพท์/97.png", spelling: "กอ รอ อะ ถอ อา งอ กระถาง" },
-            { word: "รถบัส", image: "ภาพประกอบ คำศัพท์/98.png", spelling: "รอ ถอ บอ อั สอ รถบัส" },
-            { word: "รถถัง", image: "ภาพประกอบ คำศัพท์/99.png", spelling: "รอ ถอ ถอ อั งอ รถถัง" }
-        ]
-    },
-    10: {
-        name: "คำยาวขึ้น",
-        folder: "เสียงคำตอบ/คำยาวขึ้นเล็กน้อย แต่ความหมายชัด",
-        words: [
-            { word: "หุ่นยนต์", image: "ภาพประกอบ คำศัพท์/101.png", spelling: "หอ อุ นอ ยอ นอ ตอ หุ่นยนต์" },
-            { word: "เครื่องบิน", image: "ภาพประกอบ คำศัพท์/102.png", spelling: "คอ เอ รอ อือ ออ งอ บอ อิ นอ เครื่องบิน" },
-            { word: "จักรยาน", image: "ภาพประกอบ คำศัพท์/103.png", spelling: "จอ อั กอ รอ ยอ อา นอ จักรยาน" },
-            { word: "มอเตอร์ไซค์", image: "ภาพประกอบ คำศัพท์/104.png", spelling: "มอ ออ เอ ตอ ออ รอ ไอ ซอ คอ มอเตอร์ไซค์" },
-            { word: "ดอกทานตะวัน", image: "ภาพประกอบ คำศัพท์/105.png", spelling: "ดอ ออ กอ ทอ อา นอ ตอ อะ วอ อั นอ ดอกทานตะวัน" },
-            { word: "บ้านสองชั้น", image: "ภาพประกอบ คำศัพท์/106.png", spelling: "บอ อา นอ สอ ออ งอ ชอ อั นอ บ้านสองชั้น" },
-            { word: "เรือดำน้ำ", image: "ภาพประกอบ คำศัพท์/107.png", spelling: "เอ รอ อือ ออ ดอ อำ นอ อำ เรือดำน้ำ" },
-            { word: "หมีขั้วโลก", image: "ภาพประกอบ คำศัพท์/108.png", spelling: "หอ มอ อี ขอ อั วอ โอ ลอ กอ หมีขั้วโลก" },
-            { word: "แม่น้ำ", image: "ภาพประกอบ คำศัพท์/109.png", spelling: "มอ แอ นอ อำ แม่น้ำ" },
-            { word: "พระอาทิตย์", image: "ภาพประกอบ คำศัพท์/110.png", spelling: "พอ รอ อะ ออ อา ทอ อิ ตอ ยอ พระอาทิตย์" }
-        ]
-    }
-};
-
-// Thai characters for keyboard
-const thaiConsonants = ['ก', 'ข', 'ค', 'ง', 'จ', 'ฉ', 'ช', 'ซ', 'ฌ', 'ญ', 'ฎ', 'ฏ', 'ฐ', 'ฑ', 'ฒ', 'ณ', 'ด', 'ต', 'ถ', 'ท', 'ธ', 'น', 'บ', 'ป', 'ผ', 'ฝ', 'พ', 'ฟ', 'ภ', 'ม', 'ย', 'ร', 'ล', 'ว', 'ศ', 'ษ', 'ส', 'ห', 'ฬ', 'อ', 'ฮ'];
-// รวมสระและวรรณยุกต์ทั้งหมดที่ใช้ในเกม (เฉพาะที่ปรากฏในคำ)
-const thaiVowels = ['ะ', 'า', 'ิ', 'ี', 'ึ', 'ื', 'ุ', 'ู', 'เ', 'แ', 'โ', 'ใ', 'ไ', 'ำ', 'ั', '่', '้', '๊', '๋'];
-
-let currentLevel = 1;
-let currentWordIndex = 0;
-let currentAnswer = [];
-let score = 0;
-let soundEnabled = true; // ควบคุมเสียงคำและปุ่ม
-let backgroundMusicEnabled = true; // ควบคุมเสียงเพลงพื้นหลังแยกต่างหาก
-let levelScores = {};
-let answeredWords = {};
-let unlockedLevels = 1;
-let currentAudio = null; // เก็บ audio object ทึ่กำลังเล่นอยู่
-let backgroundMusic = null; // เก็บเสียงเพลงพื้นหลัง
-
-// Initialize the game
-function init() {
-    updateLevelDisplay();
-    startBackgroundMusic();
-}
-
-// เริ่มเล่นเพลงพื้นหลัง
-function startBackgroundMusic() {
-    if (!backgroundMusic) {
-        backgroundMusic = new Audio('เสียงคำตอบ/เพลง.mp3');
-        backgroundMusic.volume = 0.08; // ปรับความดังให้เบา (8%)
-        backgroundMusic.loop = true; // เล่นวนลูป
-        
-        if (backgroundMusicEnabled) {
-            backgroundMusic.play().catch(error => {
-                console.log('Background music playback failed:', error);
-            });
-        }
+    100% {
+        transform: translate(0, 0) rotate(360deg) scale(1);
     }
 }
 
-function showScreen(screenId) {
-    document.querySelectorAll('.screen').forEach(screen => {
-        screen.classList.remove('active');
-    });
-    document.getElementById(screenId).classList.add('active');
+.screen {
+    display: none;
+    animation: fadeIn 0.5s;
+    height: 100vh;
+    overflow-y: auto;
 }
 
-function showMainMenu() {
-    showScreen('mainMenu');
+.screen.active {
+    display: block;
 }
 
-function showLevelSelect() {
-    updateLevelDisplay();
-    showScreen('levelSelect');
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
 }
 
-function updateLevelDisplay() {
-    // Update level cards with word preview
-    for (let level = 1; level <= 10; level++) {
-        const wordsContainer = document.getElementById(`level${level}Words`);
-        const levelCard = wordsContainer?.closest('.level-card');
-        const startButton = document.getElementById(`startLevel${level}`);
-        
-        // Determine if this level can be manually unlocked (previous level answered >=5)
-        const canUnlockThisLevel = (unlockAvailableLevels[level - 1] === true) && (level === unlockedLevels + 1);
-
-        // ล็อคด่านที่ยังไม่ได้ปลดล็อค
-        if (level > unlockedLevels) {
-            if (canUnlockThisLevel) {
-                // Keep the level card faded like locked, but make the start button an active unlock action
-                if (levelCard) levelCard.classList.add('unlockable');
-                if (startButton) {
-                    startButton.disabled = false;
-                    startButton.style.opacity = '1';
-                    startButton.style.cursor = 'pointer';
-                    startButton.classList.add('unlock-action');
-                    startButton.innerHTML = 'ปลดล็อค';
-                    startButton.onclick = async (e) => {
-                        e.preventDefault();
-                        unlockedLevels = level;
-                        // clear availability for this unlock
-                        if (unlockAvailableLevels[level - 1]) delete unlockAvailableLevels[level - 1];
-                        // remove visual flags
-                        if (levelCard) levelCard.classList.remove('unlockable');
-                        startButton.classList.remove('unlock-action');
-                        await saveUserData();
-                        updateLevelDisplay();
-                        showCustomAlert('ปลดล็อคด่านเรียบร้อย', '✅');
-                    };
-                }
-            } else {
-                if (levelCard) {
-                    levelCard.classList.remove('unlockable');
-                    levelCard.classList.add('locked');
-                }
-                if (startButton) {
-                    startButton.disabled = true;
-                    startButton.style.opacity = '0.5';
-                    startButton.style.cursor = 'not-allowed';
-                    startButton.innerHTML = '🔒 ล็อค';
-                    startButton.onclick = null;
-                    startButton.classList.remove('unlock-action');
-                }
-            }
-        } else {
-            if (levelCard) {
-                levelCard.classList.remove('unlockable');
-                levelCard.classList.remove('locked');
-            }
-            if (startButton) {
-                startButton.disabled = false;
-                startButton.style.opacity = '1';
-                startButton.style.cursor = 'pointer';
-                startButton.innerHTML = `เล่นด่าน ${level}`;
-                startButton.onclick = () => startLevel(level);
-                startButton.classList.remove('unlock-action');
-            }
-        }
-        
-        if (wordsContainer && gameData[level]) {
-            wordsContainer.innerHTML = '';
-            const displayWords = gameData[level].words.slice(0, 10);
-            const levelAnswered = answeredWords[String(level)] || [];
-            
-            displayWords.forEach((item, index) => {
-                const wordDiv = document.createElement('div');
-                wordDiv.className = 'word-item';
-                
-                // เปลี่ยนสีตามสถานะ
-                if (levelAnswered.includes(index)) {
-                    wordDiv.classList.add('answered'); // ตอบแล้ว - เขียว
-                } else {
-                    wordDiv.classList.add('unanswered'); // ยังไม่ตอบ - แดง
-                }
-                
-                wordDiv.innerHTML = `
-                    <span class="word-text">${index + 1}. ${item.word}</span>
-                    <span class="sound-icon-word" style="font-size: 0.9em; opacity: 0.8; cursor: pointer; padding: 4px; margin-left: 8px;">🔊</span>
-                `;
-                wordDiv.style.display = 'flex';
-                wordDiv.style.alignItems = 'center';
-                wordDiv.style.justifyContent = 'space-between';
-                
-                // กดที่คำเพื่อเข้าด่าน
-                const wordText = wordDiv.querySelector('.word-text');
-                wordText.style.flex = '1';
-                wordText.style.cursor = 'pointer';
-                wordText.onclick = () => {
-                    startLevelAtWord(level, index);
-                };
-                
-                // กดที่ไอคอนลำโพงเพื่อฟังเสียงอย่างเดียว
-                const soundIcon = wordDiv.querySelector('.sound-icon-word');
-                soundIcon.onclick = (e) => {
-                    e.stopPropagation();
-                    playWordSoundDirect(level, index);
-                };
-                
-                wordsContainer.appendChild(wordDiv);
-            });
-        }
-
-        // Update scores
-        const scoreElement = document.getElementById(`level${level}Score`);
-        if (scoreElement) {
-            const answered = answeredWords[level] ? answeredWords[level].length : 0;
-            scoreElement.textContent = `${answered}/10`;
-        }
-        
-    }
-    
-    // หากมีการแจ้งเตือนการปลดล็อคค้างอยู่ ให้แสดงเฉพาะเมื่ออยู่ในหน้ารายการด่าน และแสดงครั้งเดียว
-    const pending = pendingUnlockNotificationLevel;
-    if (pending && !unlockNotificationShown[pending]) {
-        const activeScreenId = document.querySelector('.screen.active')?.id;
-        // ไม่แสดงขณะเล่นด่านเดียวกัน — แสดงเฉพาะในหน้ารายการด่าน
-        if (activeScreenId === 'levelSelect') {
-            // แสดงข้อความแจ้งเตือน (ผู้เล่นต้องกดตกลงเพื่อยืนยัน)
-            showCustomAlert('คุณสามารถปลดล็อคด่านถัดไปได้แล้ว ไปที่หน้ารายการด่านเพื่อปลดล็อค', '✅');
-            const overlay = document.getElementById('customAlertOverlay');
-            if (overlay) {
-                const btn = overlay.querySelector('.custom-alert-button');
-                if (btn) {
-                    // ตั้งค่า handler ชั่วคราว: เมื่อกดจะบันทึกว่าแสดงแล้วและปิด dialog
-                    btn.onclick = function() {
-                        unlockNotificationShown[pending] = true;
-                        try { localStorage.setItem('unlockNotificationShown', JSON.stringify(unlockNotificationShown)); } catch (e) {}
-                        pendingUnlockNotificationLevel = null;
-                        closeCustomAlert();
-                    };
-                }
-            }
-        }
-    }
-
-    // คำนวณคะแนนรวมและระดับ
-    updateTotalScore();
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+    40% { transform: translateY(-20px); }
+    60% { transform: translateY(-10px); }
 }
 
-function updateTotalScore() {
-    // อัพเดทข้อมูลผู้เล่นในหน้าสรุปผล
-    if (currentUser && currentUserData) {
-        const summaryAvatar = document.getElementById('summaryPlayerAvatar');
-        const summaryName = document.getElementById('summaryPlayerName');
-        const summaryId = document.getElementById('summaryPlayerId');
-        
-        if (summaryAvatar) {
-            summaryAvatar.src = `css/${characterImages[currentUserData.characterId]}`;
-        }
-        if (summaryName) {
-            summaryName.textContent = currentUserData.displayName;
-        }
-        if (summaryId) {
-            summaryId.textContent = currentUser;
-        }
-    }
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
 
-    let totalAnswered = 0;
-    let totalPossible = 0;
-    
-    // นับเฉพาะด่านที่ปลดล็อคแล้ว
-    for (let level = 1; level <= unlockedLevels; level++) {
-        const answered = answeredWords[String(level)] ? answeredWords[String(level)].length : 0;
-        totalAnswered += answered;
-        totalPossible += 10; // แต่ละด่านมี 10 คำ
-    }
-    
-    // คำนวณเปอร์เซ็นต์
-    const percentage = totalPossible > 0 ? Math.round((totalAnswered / totalPossible) * 100) : 0;
-    
-    // แสดงเปอร์เซ็นต์
-    const totalScoreElement = document.getElementById('totalScore');
-    if (totalScoreElement) {
-        totalScoreElement.textContent = `${percentage}%`;
-    }
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+    20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
 
-    // แสดงจำนวนด่านที่ปลดล็อค (เช่น 5/10)
-    const unlockedEl = document.getElementById('unlockedCount');
-    if (unlockedEl) {
-        const maxLevels = Object.keys(gameData).length || 10;
-        unlockedEl.textContent = `${unlockedLevels}/${maxLevels}`;
-    }
+@keyframes glow {
+    0%, 100% { box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
+    50% { box-shadow: 0 4px 20px rgba(255, 200, 0, 0.6); }
+}
 
-    // แสดงจำนวนข้อที่ตอบได้เทียบกับจำนวนข้อรวมตามด่านที่ปลดล็อค (เช่น 25/50)
-    const answeredEl = document.getElementById('answeredFraction');
-    if (answeredEl) {
-        // totalPossible already computed based on unlockedLevels
-        answeredEl.textContent = `${totalAnswered}/${totalPossible}`;
+@keyframes slideInUp {
+    from { transform: translateY(50px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Auth Screens */
+.auth-container {
+    text-align: center;
+    max-width: 380px;
+    margin: 0 auto;
+    padding: 20px 20px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.auth-title {
+    font-size: 1.8em;
+    color: #2563a8;
+    font-weight: bold;
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+}
+
+.auth-input {
+    width: 100%;
+    max-width: 320px;
+    padding: 12px 16px;
+    font-size: 1.05em;
+    border: 3px solid rgba(255, 182, 193, 0.6);
+    border-radius: 12px;
+    margin-bottom: 12px;
+    font-family: 'Kanit', 'Prompt', sans-serif;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+}
+
+.auth-input:focus {
+    outline: none;
+    border-color: #f4b235;
+    box-shadow: 0 6px 12px rgba(244, 178, 53, 0.3);
+    transform: translateY(-2px);
+}
+
+.auth-link {
+    margin-top: 15px;
+    font-size: 1em;
+    color: #666;
+}
+
+.auth-link span {
+    color: #2563a8;
+    font-weight: bold;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.auth-link span:hover {
+    color: #f4b235;
+}
+
+/* Character Selection */
+.character-container {
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.character-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin: 30px 0;
+    max-width: 100%;
+}
+
+.character-option {
+    width: 120px;
+    height: 120px;
+    border-radius: 20px;
+    overflow: hidden;
+    cursor: pointer;
+    border: 4px solid transparent;
+    transition: all 0.3s ease;
+    background: white;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+@media (max-width: 480px) {
+    .character-container {
+        padding: 30px 15px;
     }
     
-    // กำหนดระดับและสี
-    let grade = '';
-    let gradeColor = '';
-    
-    if (percentage >= 80) {
-        grade = 'ดีมาก 🌟';
-        gradeColor = '#4fb848'; // เขียว
-    } else if (percentage >= 50) {
-        grade = 'ดี 👍';
-        gradeColor = '#f4b235'; // ส้ม
-    } else if (totalAnswered > 0) {
-        grade = 'ปรับปรุง 💪';
-        gradeColor = '#e85d9e'; // ชมพู
-    } else {
-        grade = '-';
-        gradeColor = '#999';
+    .character-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
+        margin: 25px 0;
     }
     
-    // แสดงระดับ
-    const gradeLevelElement = document.getElementById('gradeLevel');
-    if (gradeLevelElement) {
-        gradeLevelElement.textContent = grade;
-        gradeLevelElement.style.color = gradeColor;
+    .character-option {
+        width: 95px;
+        height: 95px;
+        border-radius: 18px;
+        border: 3px solid transparent;
+    }
+    
+    .character-option.selected {
+        border-width: 3px;
     }
 }
 
-function startLevel(level) {
-    // ตรวจสอบว่าด่านปลดล็อคหรือยัง
-    if (level > unlockedLevels) {
-        showCustomAlert(`กรุณาผ่านด่าน ${unlockedLevels} ให้ได้อย่างน้อย 5 ข้อก่อน`, '🔒');
-        return;
-    }
-    
-    currentLevel = level;
-    score = levelScores[level] || 0;
-    
-    // หาข้อที่ยังไม่ได้ทำ
-    const levelWords = gameData[level].words;
-    const answeredInLevel = answeredWords[String(level)] || [];
-    
-    let foundUnanswered = false;
-    for (let i = 0; i < levelWords.length; i++) {
-        const word = levelWords[i].word;
-        // เช็คทั้งคำและ index (เพราะ answeredWords อาจเก็บทั้ง 2 แบบ)
-        if (!answeredInLevel.includes(word) && !answeredInLevel.includes(i) && !answeredInLevel.includes(String(i))) {
-            currentWordIndex = i;
-            foundUnanswered = true;
-            break;
-        }
-    }
-    
-    // ถ้าทำครบหมดแล้ว เริ่มใหม่ที่ข้อ 0
-    if (!foundUnanswered) {
-        currentWordIndex = 0;
-    }
-    
-    // Update game screen user info
-    updateGameUserInfo();
-    
-    loadWord();
-    showScreen('gameScreen');
+.character-option:hover {
+    transform: scale(1.1);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
 }
 
-function startLevelAtWord(level, wordIndex) {
-    // ตรวจสอบว่าด่านปลดล็อคหรือยัง
-    if (level > unlockedLevels) {
-        showCustomAlert(`กรุณาผ่านด่าน ${unlockedLevels} ให้ได้อย่างน้อย 5 ข้อก่อน`, '🔒');
-        return;
-    }
-    
-
-    currentLevel = level;
-    currentWordIndex = wordIndex;
-    score = levelScores[level] || 0;
-    
-    // Update game screen user info
-    updateGameUserInfo();
-    
-    loadWordDirect();
-    showScreen('gameScreen');
+.character-option.selected {
+    border-color: #4fb848;
+    box-shadow: 0 8px 20px rgba(79, 184, 72, 0.5);
+    animation: bounce 0.5s;
 }
 
-function loadWord() {
-    const levelData = gameData[currentLevel];
-    
-    if (!levelData || currentWordIndex >= levelData.words.length) {
-        // Level completed
-        const levelAnswered = answeredWords[currentLevel] || [];
-        const answered = levelAnswered.length;
-        showCustomAlert(`ยินดีด้วย! คุณตอบถูก ${answered}/${levelData.words.length} ข้อ`, '🎉');
-        levelScores[currentLevel] = answered;
-        saveUserData();
-        currentWordIndex = 0;
-        showLevelSelect();
-        return;
-    }
-
-    const wordData = levelData.words[currentWordIndex];
-    setupWordDisplay(wordData);
+.character-option img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    pointer-events: none;
 }
 
-function loadWordDirect() {
-    const levelData = gameData[currentLevel];
-    if (!levelData || currentWordIndex >= levelData.words.length) {
-        showLevelSelect();
-        return;
-    }
-
-    const wordData = levelData.words[currentWordIndex];
-    setupWordDisplay(wordData);
+/* Edit Profile Buttons */
+.edit-buttons {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin-top: 30px;
+    width: 100%;
+    max-width: 500px;
 }
 
-function setupWordDisplay(wordData) {
-    const levelData = gameData[currentLevel];
-    document.getElementById('currentWord').textContent = levelData.name;
-    
-    // Set image
-    const imgElement = document.getElementById('wordImage');
-    imgElement.src = wordData.image;
-    imgElement.onerror = function() {
-        this.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"%3E%3Crect width="400" height="300" fill="%23f0f0f0"/%3E%3Ctext x="200" y="150" font-size="24" text-anchor="middle" fill="%23999"%3E' + encodeURIComponent(wordData.word) + '%3C/text%3E%3C/svg%3E';
-    };
-
-    // Generate answer slots - จัดกลุ่มพยัญชนะกับสระ/วรรณยุกต์
-    const slotsContainer = document.getElementById('answerSlots');
-    slotsContainer.innerHTML = '';
-    currentAnswer = [];
-    
-    // Logic จัดกลุ่มคำไทย (Cluster)
-    const wordStr = wordData.word;
-    window.currentWordClusters = []; // เก็บโครงสร้างว่าแต่ละ slot รับตัวอักษรไหนบ้าง
-    
-    // โค้ดสำหรับตรวจสอบว่าเป็นสระบน/ล่าง หรือวรรณยุกต์ หรือทัณฑฆาต (ตัวการันต์) หรือพินทุ หรือนิคหิต
-    const isUpperLowerVowelOrTone = (char) => {
-        const code = char.charCodeAt(0);
-        return code === 0x0E31 ||                      // ไม้หันอากาศ
-               (code >= 0x0E34 && code <= 0x0E3A) ||   // สระอิ ถึง พินทุ (สระบน/ล่าง)
-               (code >= 0x0E47 && code <= 0x0E4E);     // ไม้ไต่คู้ ถึง ยามักการ (วรรณยุกต์/เครื่องหมาย)
-    };
-
-    let clusterIndex = -1;
-    let charToClusterMap = []; // map ว่า ตัวอักษร index นี้ อยู่ใน cluster หน้าจอไหน
-
-    for (let i = 0; i < wordStr.length; i++) {
-        const char = wordStr[i];
-        if (i === 0 || !isUpperLowerVowelOrTone(char)) {
-            // เริ่มบล็อคใหม่ (พยัญชนะ หรือ สระหน้า/หลัง)
-            clusterIndex++;
-            window.currentWordClusters.push({ chars: [char], maxLen: 1 });
-        } else {
-            // เอาไปเกาะกับบล็อคก่อนหน้า
-            if(clusterIndex >= 0) {
-                window.currentWordClusters[clusterIndex].chars.push(char);
-                window.currentWordClusters[clusterIndex].maxLen++;
-            }
-        }
-        charToClusterMap.push(clusterIndex);
-    }
-    
-    window.charToClusterMap = charToClusterMap; // บันทึกไว้ใช้ตอนพิมพ์
-
-    // สร้างกล่องตามจำนวน cluster
-    for (let i = 0; i < window.currentWordClusters.length; i++) {
-        const slot = document.createElement('div');
-        slot.className = 'answer-slot answer-slot-char combined-slot';
-        slot.id = `slot-cluster-${i}`;
-        slotsContainer.appendChild(slot);
-    }
-
-    // Generate keyboard with relevant characters
-    generateKeyboard(wordData.word);
-    
-    // Hide next button, hide spelling display
-    document.getElementById('nextButton').style.display = 'none';
-    document.querySelector('.check-button').style.display = 'inline-block';
-    hideSpelling();
-    
-    // อัพเดทตัวนับข้อ
-    updateWordCounter();
-    
-    // อัพเดทคะแนนรวมสะสม
-    updateGameTotalScore();
-    
-    // เล่นเสียงคำอัตโนมัติ
-    setTimeout(() => {
-        playWordSound();
-    }, 300);
+.edit-button {
+    flex: 1;
+    padding: 16px 32px;
+    font-size: 1.3em;
+    font-weight: 700;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    position: relative;
+    overflow: hidden;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2), 
+                0 4px 8px rgba(0, 0, 0, 0.15),
+                inset 0 -3px 0 rgba(0, 0, 0, 0.2);
 }
 
-// แสดงคำสะกด/คำอ่าน + เล่นเสียงสะกดคำ
-function showSpelling() {
-    // ซ่อนคำอ่านตามที่ User ร้องขอ (ได้ยินแค่เสียง)
-    const spellingDisplay = document.getElementById('spellingDisplay');
-    if (spellingDisplay) {
-        spellingDisplay.style.display = 'none';
+.edit-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.5s;
+}
+
+.edit-button:hover::before {
+    left: 100%;
+}
+
+.save-button {
+    background: linear-gradient(145deg, #4CAF50 0%, #45a049 50%, #3d8b40 100%);
+    color: white;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.save-button:hover {
+    transform: translateY(-4px) scale(1.05);
+    box-shadow: 0 12px 28px rgba(76, 175, 80, 0.5), 
+                0 6px 12px rgba(76, 175, 80, 0.3),
+                inset 0 -3px 0 rgba(0, 0, 0, 0.3);
+}
+
+.cancel-button {
+    background: linear-gradient(145deg, #ff6b6b 0%, #ee5a52 50%, #c92a2a 100%);
+    color: white;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.cancel-button:hover {
+    transform: translateY(-4px) scale(1.05);
+    box-shadow: 0 12px 28px rgba(255, 107, 107, 0.5), 
+                0 6px 12px rgba(255, 107, 107, 0.3),
+                inset 0 -3px 0 rgba(0, 0, 0, 0.3);
+}
+
+.edit-button:active {
+    transform: translateY(-1px) scale(0.98);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2),
+                inset 0 3px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Responsive Edit Buttons */
+@media (max-width: 768px) {
+    .edit-buttons {
+        gap: 15px;
+        max-width: 90%;
     }
     
-    // เล่นเสียงสะกดคำจากโฟลเดอร์ เสียงสะกดคำ/ด่านที่X/N_คำ.mp3
-    playSpellingSound();
-}
-
-// เล่นเสียงสะกดคำ
-function playSpellingSound() {
-    if (!soundEnabled) return;
-    const wordIndex = currentWordIndex + 1; // ไฟล์เรียงเป็น 1-based
-    const levelData = gameData[currentLevel];
-    const wordData = levelData.words[currentWordIndex];
-    const audioPath = `เสียงสะกดคำ/ด่านที่${currentLevel}/${wordIndex}_${wordData.word}.mp3`;
-    playAudio(audioPath);
-}
-
-function hideSpelling() {
-    const spellingDisplay = document.getElementById('spellingDisplay');
-    if (spellingDisplay) {
-        spellingDisplay.style.display = 'none';
-        spellingDisplay.textContent = '';
+    .edit-button {
+        font-size: 1.5em;
+        font-size: 1.1em;
     }
 }
 
-// อัพเดทตัวนับข้อ (ข้อ X/10)
-function updateWordCounter() {
-    const counterEl = document.getElementById('wordCounter');
-    if (counterEl) {
-        const totalWords = gameData[currentLevel].words.length;
-        counterEl.textContent = `${currentWordIndex + 1}/${totalWords}`;
+@media (max-width: 480px) {
+    .edit-buttons {
+        flex-direction: column;
+        gap: 12px;
+        max-width: 280px;
+    }
+    
+    .edit-button {
+        padding: 14px 20px;
+        font-size: 1em;
+        width: 100%;
     }
 }
 
-// อัพเดทคะแนนรวมสะสมขณะเล่น
-function updateGameTotalScore() {
-    let totalScore = 0;
-    for (let level in answeredWords) {
-        totalScore += (answeredWords[level] ? answeredWords[level].length : 0);
+@media (min-width: 1200px) {
+    .edit-buttons {
+        max-width: 600px;
     }
     
-    const totalScoreEl = document.getElementById('gameTotalScore');
-    if (totalScoreEl) {
-        totalScoreEl.textContent = totalScore;
-    }
-    
-    // อัพเดทคะแนนด่านปัจจุบัน
-    const levelKey = String(currentLevel);
-    const levelAnswered = answeredWords[levelKey] ? answeredWords[levelKey].length : 0;
-    const currentScoreEl = document.getElementById('currentScore');
-    if (currentScoreEl) {
-        currentScoreEl.textContent = levelAnswered;
+    .edit-button {
+        padding: 18px 40px;
+        font-size: 1.4em;
     }
 }
 
-// ฟังก์ชันแสดงสรุปผลการเล่นรวม 30 คนล่าสุด
-async function showUsersSummary() {
-    const modal = document.getElementById('usersSummaryModal');
-    const tableBody = document.getElementById('summaryTableBody');
-    const loadingEl = document.getElementById('summaryLoading');
+/* User Info */
+.user-info {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    padding: 8px 18px;
+    border-radius: 50px;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12),
+                0 3px 6px rgba(0, 0, 0, 0.08),
+                inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    border: 2px solid rgba(255, 255, 255, 0.8);
+}
+
+.user-info:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18),
+                0 5px 10px rgba(0, 0, 0, 0.12),
+                inset 0 1px 0 rgba(255, 255, 255, 1);
+}
+
+.user-avatar {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    border: 3px solid #f4b235;
+    object-fit: cover;
+    box-shadow: 0 3px 10px rgba(244, 178, 53, 0.4),
+                inset 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.user-info:hover .user-avatar {
+    transform: rotate(5deg) scale(1.05);
+    border-color: #ffd700;
+    box-shadow: 0 5px 14px rgba(255, 215, 0, 0.6);
+}
+
+.user-name {
+    font-size: 1.2em;
+    color: #2563a8;
+    font-weight: 700;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    letter-spacing: 0.3px;
+}
+
+/* Responsive User Info */
+@media (max-width: 768px) {
+    .user-info {
+        top: 10px;
+        left: 10px;
+        gap: 8px;
+        padding: 6px 14px;
+    }
     
-    if (!modal) return;
+    .user-avatar {
+        width: 38px;
+        height: 38px;
+        border: 2.5px solid #f4b235;
+    }
     
-    modal.classList.add('active');
-    if (loadingEl) loadingEl.style.display = 'block';
-    if (tableBody) tableBody.innerHTML = '';
-    
-    try {
-        const summaryData = await gameAPI.getUsersSummary(30);
-        
-        if (loadingEl) loadingEl.style.display = 'none';
-        
-        if (!summaryData || summaryData.length === 0) {
-            tableBody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:20px;">ยังไม่มีข้อมูลผู้เล่น</td></tr>';
-            return;
-        }
-        
-        summaryData.forEach((user, index) => {
-            const totalPossible = user.maxUnlocked * 10;
-            const percentage = totalPossible > 0 ? Math.round((user.totalAnswered / totalPossible) * 100) : 0;
-            
-            let grade = '';
-            let gradeClass = '';
-            if (percentage >= 80) {
-                grade = 'ดีมาก 🌟';
-                gradeClass = 'grade-excellent';
-            } else if (percentage >= 50) {
-                grade = 'ดี 👍';
-                gradeClass = 'grade-good';
-            } else if (user.totalAnswered > 0) {
-                grade = 'ปรับปรุง 💪';
-                gradeClass = 'grade-improve';
-            } else {
-                grade = '-';
-                gradeClass = '';
-            }
-            
-            // สร้างรายละเอียดแต่ละด่าน
-            let levelDetailsHtml = '';
-            for (let l = 1; l <= 10; l++) {
-                const ans = user.levelDetails[String(l)] || 0;
-                const statusClass = ans >= 10 ? 'level-complete' : (ans > 0 ? 'level-progress' : 'level-none');
-                levelDetailsHtml += `<span class="level-badge ${statusClass}">${l}:${ans}</span>`;
-            }
-            
-            const lastLogin = user.lastLoginAt ? new Date(user.lastLoginAt).toLocaleDateString('th-TH', { day:'numeric', month:'short', year:'2-digit', hour:'2-digit', minute:'2-digit' }) : '-';
-            
-            const avatarSrc = `css/${characterImages[user.characterId] || '01.jpg'}`;
-            
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${index + 1}</td>
-                <td>
-                    <div class="summary-user-info">
-                        <img src="${avatarSrc}" alt="" class="summary-user-avatar">
-                        <div>
-                            <div class="summary-user-name">${user.displayName}</div>
-                            <div class="summary-user-id">${user.username}</div>
-                        </div>
-                    </div>
-                </td>
-                <td>${user.totalAnswered}/100</td>
-                <td>${user.maxUnlocked}/10</td>
-                <td class="${gradeClass}">${grade}</td>
-                <td class="level-details-cell">${levelDetailsHtml}</td>
-            `;
-            tableBody.appendChild(row);
-        });
-        
-    } catch (error) {
-        console.error('Error fetching users summary:', error);
-        if (loadingEl) loadingEl.style.display = 'none';
-        if (tableBody) {
-            tableBody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:20px;color:#e85d9e;">ไม่สามารถโหลดข้อมูลได้ กรุณาลองใหม่</td></tr>';
-        }
+    .user-name {
+        font-size: 1em;
     }
 }
 
-function closeUsersSummary() {
-    const modal = document.getElementById('usersSummaryModal');
-    if (modal) modal.classList.remove('active');
-}
-
-function generateKeyboard(word) {
-    const keyboardContainer = document.getElementById('thaiKeyboard');
-    
-    // Reset ปุ่มทั้งหมดก่อนล้าง (ลบ class selected ออก)
-    document.querySelectorAll('.thai-key').forEach(btn => {
-        btn.classList.remove('selected');
-    });
-    
-    // ล้างปุ่มเก่าออก
-    keyboardContainer.innerHTML = '';
-
-    // Mapping ตัวอักษรกับหมายเลขรูปภาพ
-    const consonantImageMap = {
-        'ก': 1, 'ข': 2, 'ฃ': 3, 'ค': 4, 'ฅ': 5, 'ฆ': 6, 'ง': 7, 'จ': 8, 'ฉ': 9,
-        'ช': 10, 'ซ': 11, 'ฌ': 12, 'ญ': 13, 'ฎ': 14, 'ฏ': 15, 'ฐ': 16, 'ฑ': 17, 'ฒ': 18,
-        'ณ': 19, 'ด': 20, 'ต': 21, 'ถ': 22, 'ท': 23, 'ธ': 24, 'น': 25, 'บ': 26, 'ป': 27,
-        'ผ': 28, 'ฝ': 29, 'พ': 30, 'ฟ': 31, 'ภ': 32, 'ม': 33, 'ย': 34, 'ร': 35, 'ล': 36,
-        'ว': 37, 'ศ': 38, 'ษ': 39, 'ส': 40, 'ห': 41, 'ฬ': 42, 'อ': 43, 'ฮ': 44
-    };
-    
-    // Compound vowels mapping (สระผสม)
-    const compoundVowelMap = {
-        'เอะ': { image: 9, parts: ['เ', 'ะ'] },
-        'เอ': { image: 11, parts: ['เ'] },
-        'แอะ': { image: 11, parts: ['แ', 'ะ'] },
-        'แอ': { image: 13, parts: ['แ'] },
-        'โอะ': { image: 13, parts: ['โ', 'ะ'] },
-        'โอ': { image: 15, parts: ['โ'] },
-        'เอาะ': { image: 15, parts: ['เ', 'า', 'ะ'] },
-        'ออ': { image: 17, parts: ['อ'] },
-        'ฮอ': { image: 18, parts: ['ฮ', 'อ'] },
-        'เอียะ': { image: 19, parts: ['เ', 'ี', 'ย', 'ะ'] },
-        'เอีย': { image: 20, parts: ['เ', 'ี', 'ย'] },
-        'เอือะ': { image: 21, parts: ['เ', 'ื', 'อ', 'ะ'] },
-        'เอือ': { image: 22, parts: ['เ', 'ื', 'อ'] },
-        'อัวะ': { image: 23, parts: ['ั', 'ว', 'ะ'] },
-        'อัว': { image: 24, parts: ['ั', 'ว'] },
-        'เอา': { image: 28, parts: ['เ', 'า'] }
-    };
-    
-    const vowelImageMap = {
-        'ะ': 1,
-        'า': 2,
-        'ิ': 3,
-        'ี': 4,
-        'ึ': 5,
-        'ื': 6,
-        'ุ': 7,
-        'ู': 8,
-        'เ': 10,
-        'แ': 12,
-        'โ': 14,
-        'อ': 16,
-        'ฤ': 29,
-        'ฦ': 31,
-        'ำ': 25,
-        'ใ': 26,
-        'ไ': 27,
-        'ั': 'ไม้หันกาศ',  // ไม้หันกาศ (mai han akat)
-        '่': 32,
-        '้': 33,
-        '๊': 34,
-        '๋': 35
-    };
-
-    // Get unique characters from the word
-    const wordChars = [...new Set(word.split(''))];
-    
-    // แยกพยัญชนะและสระ/วรรณยุกต์ (นับจำนวนที่ปรากฏในคำ รวมตัวซ้ำ)
-    const consonantsInWord = [];
-    const vowelsInWord = [];
-    
-    for (const char of word) {
-        if (consonantImageMap[char]) {
-            consonantsInWord.push(char);
-        } else if (char !== '') {
-            vowelsInWord.push(char);
-        }
+@media (max-width: 480px) {
+    body {
+        overflow-y: auto;
+        height: auto;
+        min-height: 100vh;
+        padding: 0;
+        margin: 0;
     }
     
-    // Add some extra random characters to make it challenging
-    const randomConsonants = [];
-    const randomVowels = [];
-    
-    // เพิ่มพยัญชนะสุ่ม (3 แถว x 4 คอลัมน์ = 12 ปุ่ม)
-    while (randomConsonants.length + consonantsInWord.length < 12) {
-        const randomChar = thaiConsonants[Math.floor(Math.random() * thaiConsonants.length)];
-        if (!consonantsInWord.includes(randomChar) && !randomConsonants.includes(randomChar)) {
-            randomConsonants.push(randomChar);
-        }
+    .user-info {
+        top: 10px;
+        left: 10px;
+        gap: 8px;
+        padding: 6px 12px;
     }
     
-    // เพิ่มสระ/วรรณยุกต์สุ่ม (1 แถว x 4 คอลัมน์ = 4 ปุ่ม)
-    while (randomVowels.length + vowelsInWord.length < 4) {
-        const randomChar = thaiVowels[Math.floor(Math.random() * thaiVowels.length)];
-        if (!vowelsInWord.includes(randomChar) && !randomVowels.includes(randomChar)) {
-            randomVowels.push(randomChar);
-        }
-    }
-
-    // รวมและสับเปลี่ยนแยกกัน
-    const consonantChars = [...consonantsInWord, ...randomConsonants].sort(() => Math.random() - 0.5);
-    const vowelChars = [...vowelsInWord, ...randomVowels].sort(() => Math.random() - 0.5);
-    
-    // รวมพยัญชนะก่อน แล้วตามด้วยสระ
-    const keyboardChars = [...consonantChars, ...vowelChars];
-
-    // Create buttons
-    keyboardChars.forEach(char => {
-        const button = document.createElement('button');
-        button.className = 'thai-key';
-        
-        // หาหมายเลขรูปภาพ
-        let imageNumber = null;
-        let folderName = '';
-        
-        // หาหมายเลขรูปภาพ
-        if (consonantImageMap[char]) {
-            imageNumber = consonantImageMap[char];
-            folderName = 'พยัญชนะ ก-ฮ';
-        } else if (vowelImageMap[char]) {
-            imageNumber = vowelImageMap[char];
-            folderName = 'สระ และ วรรณยุกต์';
-            button.classList.add('vowel-tone-keys');
-        }
-        
-        // ถ้าไม่พบในสระ ให้ลองหาในพยัญชนะ (สำหรับ ย ว อ)
-        if (!imageNumber && consonantImageMap[char]) {
-            imageNumber = consonantImageMap[char];
-            folderName = 'พยัญชนะ ก-ฮ';
-        }
-        
-        if (imageNumber && folderName) {
-            // สร้าง container สำหรับรูปภาพและปุ่มลำโพง
-            button.innerHTML = `
-                <img src="${folderName}/${imageNumber}.png" alt="${char}" style="width: 100%; height: 100%; object-fit: contain; pointer-events: none;">
-                <span class="sound-btn-char" style="position: absolute; bottom: 2px; right: 2px; font-size: 0.7em; opacity: 0.8; cursor: pointer; z-index: 10; background: rgba(255,255,255,0.7); border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center;">🔊</span>
-            `;
-        } else {
-            // ใช้ข้อความถ้าไม่มีรูป
-            button.innerHTML = `
-                <span style="pointer-events: none;">${char}</span>
-                <span class="sound-btn-char" style="position: absolute; bottom: 2px; right: 2px; font-size: 0.6em; opacity: 0.8; cursor: pointer; z-index: 10; background: rgba(255,255,255,0.7); border-radius: 50%; padding: 2px;">🔊</span>
-            `;
-        }
-        
-        button.style.position = 'relative';
-        button.onclick = () => selectCharacter(char, button);
-        
-        // เพิ่มการเล่นเสียงเมื่อคลิกที่ไอคอนลำโพงเท่านั้น
-        const soundBtn = button.querySelector('.sound-btn-char');
-        if (soundBtn) {
-            soundBtn.onclick = (e) => {
-                e.stopPropagation(); // ป้องกันไม่ให้เลือกอักษร
-                playCharacterSound(char);
-            };
-        }
-        
-        keyboardContainer.appendChild(button);
-    });
-}
-
-function selectCharacter(char, button) {
-    // ถ้ากดซ้ำตัวเดิมที่ถูกเลือกแล้ว ให้ยกเลิกการเลือก
-    if (button.classList.contains('selected')) {
-        // ลบตัวอักษรนี้ออกจาก currentAnswer (หาตัวสุดท้ายที่ตรงกัน)
-        let charIndex = -1;
-        for (let i = currentAnswer.length - 1; i >= 0; i--) {
-            if (currentAnswer[i] === char) {
-                charIndex = i;
-                break;
-            }
-        }
-        
-        if (charIndex !== -1) {
-            currentAnswer.splice(charIndex, 1);
-            // อัปเดตช่องแสดงผลทั้งหมด
-            updateAnswerSlots();
-        }
-        
-        // ยกเลิกการเลือกปุ่ม
-        button.classList.remove('selected');
-        return;
+    .user-avatar {
+        width: 35px;
+        height: 35px;
+        border: 2px solid #f4b235;
     }
     
-    // เพิ่มตัวอักษรลงใน currentAnswer
-    currentAnswer.push(char);
-    updateAnswerSlots();
-    button.classList.add('selected');
-    
-    // Play character sound if available
-    playCharacterSound(char);
-}
-
-// อัปเดตช่องแสดงผลแต่ละช่อง เป็นแบบ Cluster (ตัวซ้อน)
-function updateAnswerSlots() {
-    // ล้างกล่องทั้งหมดก่อน
-    if (!window.currentWordClusters) return;
-    
-    for (let i = 0; i < window.currentWordClusters.length; i++) {
-        const slot = document.getElementById(`slot-cluster-${i}`);
-        if (slot) {
-            slot.innerHTML = ''; // Clear prior spans
-        }
+    .user-name {
+        font-size: 0.9em;
+        max-width: 120px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
     
-    // วาดตัวอักษรที่พิมพ์ลงไปในกล่องที่มันควรอยู่
-    for (let i = 0; i < currentAnswer.length; i++) {
-        const char = currentAnswer[i];
-        const targetClusterIndex = window.charToClusterMap[i];
-        
-        if (targetClusterIndex !== undefined) {
-            const slot = document.getElementById(`slot-cluster-${targetClusterIndex}`);
-            if (slot) {
-                // ใส่ตัวอักษรลงในกล่อง เรียงต่อกันไป (CSS จะจัดการซ้อนให้เองถ้าตั้งค่าไว้)
-                const charSpan = document.createElement('span');
-                charSpan.className = 'stacked-char';
-                charSpan.textContent = char;
-                slot.appendChild(charSpan);
-            }
-        }
+    .auth-input {
+        max-width: 100%;
+        font-size: 1.05em;
+        padding: 14px 18px;
+        border-radius: 14px;
+    }
+    
+    .auth-title {
+        font-size: 1.5em;
+        margin-bottom: 18px;
+    }
+    
+    .auth-container {
+        padding: 30px 25px;
+        max-width: 92%;
+        margin: 20px auto;
+    }
+    
+    .character-container {
+        padding: 20px 15px;
+        max-width: 95%;
     }
 }
 
-function deleteLastChar() {
-    if (currentAnswer.length > 0) {
-        // ลบตัวอักษรตัวสุดท้าย
-        const removedChar = currentAnswer.pop();
-        
-        // อัปเดตการแสดงผล
-        updateAnswerSlots();
-        
-        // ยกเลิกการเลือกปุ่มตัวอักษรที่ถูกลบ
-        const keyboardButtons = document.querySelectorAll('.thai-key');
-        keyboardButtons.forEach(button => {
-            // ตรวจสอบตัวอักษรจาก alt ของ img หรือ text ของ span แรก
-            let buttonChar = '';
-            const img = button.querySelector('img');
-            if (img) {
-                buttonChar = img.alt;
-            } else {
-                const span = button.querySelector('span');
-                if (span) {
-                    buttonChar = span.textContent;
-                }
-            }
-            
-            if (buttonChar === removedChar && button.classList.contains('selected')) {
-                button.classList.remove('selected');
-                return;
-            }
-        });
+.logout-button {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: #ff6b6b;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 15px;
+    font-size: 1.1em;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    transition: all 0.3s ease;
+    font-family: 'Kanit', 'Prompt', sans-serif;
+    z-index: 1000;
+}
+
+.logout-button:hover {
+    background: #ff5252;
+    transform: scale(1.05);
+}
+
+@media (max-width: 480px) {
+    .logout-button {
+        top: 10px;
+        right: 10px;
+        padding: 8px 16px;
+        font-size: 0.95em;
+        border-radius: 12px;
     }
 }
 
-function checkAnswer() {
-    const levelData = gameData[currentLevel];
-    const wordData = levelData.words[currentWordIndex];
-    const userAnswer = currentAnswer.join('');
-    const correctAnswer = wordData.word;
+/* Main Menu Screen */
+.main-menu {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    position: relative;
+    padding: 20px;
+}
 
-    if (userAnswer === correctAnswer) {
-        showResultModal(true);
-        
-        // บันทึกคำที่ตอบถูก และเพิ่มคะแนนเฉพาะครั้งแรกที่ตอบถูก
-        const levelKey = String(currentLevel);
-        if (!answeredWords[levelKey]) {
-            answeredWords[levelKey] = [];
-        }
-        
-        // เช็คว่าเคยตอบถูกหรือยัง ถ้ายังให้เพิ่มคะแนน
-        const isFirstTime = !answeredWords[levelKey].includes(currentWordIndex);
-        
-        if (isFirstTime) {
-            score++;
-            answeredWords[levelKey].push(currentWordIndex);
-            saveUserData();
-        }
-        
-        // อัพเดทคะแนนรวม
-        updateGameTotalScore();
-        
-        document.getElementById('nextButton').style.display = 'inline-block';
-        document.querySelector('.check-button').style.display = 'none';
-        
-        // ตรวจสอบว่าตอบได้ 5 ข้อหรือยัง — ถ้าครบแล้ว ให้แสดงปุ่มให้ผู้เล่นปลดล็อคเอง
-        if (answeredWords[levelKey].length >= 5 && currentLevel === unlockedLevels && currentLevel < 10) {
-            // Mark next level as available to unlock (will show unlock UI in level select)
-            unlockAvailableLevels[currentLevel] = true;
-            // Remember to notify the player (but don't show immediately while they're playing)
-            pendingUnlockNotificationLevel = currentLevel + 1;
-            // update UI so the unlock button/status appears in level select
-            updateLevelDisplay();
-        }
-        
-        createConfetti();
-        // Auto-advance to next word after a short delay when answer is correct
-        setTimeout(() => {
-            // Close the result modal then advance
-            try { closeModal(); } catch (e) {}
-            // Advance to next word (will handle end-of-level inside loadWord)
-            nextWord();
-        }, 1200);
-    } else {
-        showResultModal(false);
-        // Reset answer
-        setTimeout(() => {
-            resetAnswer();
-        }, 1500);
+.game-logo {
+    max-width: 280px;
+    width: 85%;
+    margin-bottom: 20px;
+    animation: pulse 2s infinite;
+}
+
+@media (max-width: 480px) {
+    .game-logo {
+        max-width: 200px;
+        width: 80%;
+        margin-bottom: 15px;
     }
 }
 
-function resetAnswer() {
-    currentAnswer = [];
-    document.querySelectorAll('.answer-slot').forEach(slot => {
-        slot.textContent = '';
-    });
-    document.querySelectorAll('.thai-key').forEach(button => {
-        button.classList.remove('selected');
-    });
+.game-title {
+    font-size: 2.5em;
+    color: #2563a8;
+    font-weight: bold;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
 }
 
-function nextWord() {
-    currentWordIndex++;
-    loadWord();
+.game-subtitle {
+    font-size: 4em;
+    color: #f4b235;
+    font-weight: bold;
+    -webkit-text-stroke: 3px #2563a8;
+    paint-order: stroke fill;
+    margin: 20px 0;
+    text-shadow: 4px 4px 0px rgba(0,0,0,0.1);
 }
 
-function skipWord() {
-    // ข้ามไปคำถัดไป
-    currentWordIndex++;
-    if (currentWordIndex >= gameData[currentLevel].words.length) {
-        // ถ้าข้อสุดท้ายแล้ว กลับไปเลือกด่าน
-        showLevelSelect();
-    } else {
-        loadWord();
+.thai-subtitle {
+    font-size: 2.5em;
+    color: #2563a8;
+    font-weight: bold;
+    margin-bottom: 40px;
+}
+
+.character {
+    width: 200px;
+    height: 200px;
+    margin: 0 40px;
+    animation: float 3s ease-in-out infinite;
+}
+
+.character-left {
+    animation-delay: 0s;
+}
+
+.character-right {
+    animation-delay: 1.5s;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+}
+
+.start-button {
+    background: linear-gradient(145deg, #b8e986 0%, #7fb83e 100%);
+    color: white;
+    font-size: 1.5em; /* ขยายขนาดตัวหนังสือ */
+    font-weight: bold;
+    padding: 15px 50px; /* ขยายขนาดปุ่ม */
+    border: none;
+    border-radius: 35px;
+    cursor: pointer;
+    box-shadow: 
+        0 6px 15px rgba(127, 184, 62, 0.4),
+        0 3px 6px rgba(0, 0, 0, 0.2),
+        inset 0 -2px 4px rgba(0, 0, 0, 0.1),
+        inset 0 2px 3px rgba(255, 255, 255, 0.3);
+    transition: all 0.3s ease;
+    margin-top: 10px;
+    animation: pulse 2s infinite;
+    position: relative;
+    overflow: hidden;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+}
+
+@media (max-width: 768px) {
+    .start-button {
+        font-size: 1.25em;
+        padding: 12px 40px;
+        border-radius: 30px;
+        margin-top: 8px;
+        max-width: 90%;
     }
 }
 
-function showResultModal(isCorrect) {
-    const modal = document.getElementById('resultModal');
-    const modalContent = modal.querySelector('.modal-content');
-    const modalIcon = document.getElementById('modalIcon');
-    const modalTitle = document.getElementById('modalTitle');
-
-    if (isCorrect) {
-        modalContent.className = 'modal-content modal-correct';
-        modalIcon.textContent = '✓';
-        modalTitle.textContent = 'คำตอบถูกต้อง';
-        playCorrectSound();
-    } else {
-        modalContent.className = 'modal-content modal-wrong';
-        modalIcon.textContent = '✕';
-        modalTitle.textContent = 'คำตอบไม่ถูกต้อง';
-        playWrongSound();
-    }
-
-    modal.classList.add('active');
-}
-
-function closeModal() {
-    document.getElementById('resultModal').classList.remove('active');
-}
-
-function playWordSound() {
-    const levelData = gameData[currentLevel];
-    const wordData = levelData.words[currentWordIndex];
-    const audioPath = `${levelData.folder}/${wordData.word}.mp3`;
-    playAudio(audioPath);
-}
-
-function playWordSoundDirect(level, index) {
-    if (!soundEnabled) return;
-    const levelData = gameData[level];
-    const wordData = levelData.words[index];
-    const audioPath = `${levelData.folder}/${wordData.word}.mp3`;
-    playAudio(audioPath);
-}
-
-function playCharacterSound(char) {
-    if (!soundEnabled) return;
-    
-    // เล่นเสียงพยัญชนะ
-    if (thaiConsonants.includes(char)) {
-        const audioPath = `เสียงพยัญชนะ/${char}.mp3`;
-        playAudio(audioPath);
-    } 
-    // เล่นเสียงสระและวรรณยุกต์
-    else if (thaiVowels.includes(char)) {
-        // แปลงตัวอักษรเป็นชื่อไฟล์เสียง
-        const vowelSoundMap = {
-            'ะ': 'อะ',
-            'า': 'อา',
-            'ิ': 'อิ',
-            'ี': 'อี',
-            'ึ': 'อึ',
-            'ื': 'อือ',
-            'ุ': 'อุ',
-            'ู': 'อู',
-            'เ': 'เอ',
-            'แ': 'แอ',
-            'โ': 'โอ',
-            'ใ': 'ไอไม้ม้วน',
-            'ไ': 'ไอไม้มลาย',
-            'ำ': 'อำ',
-            'ั': 'หันอากาศ',
-            '็': 'ไต่คู้',
-            '์': 'ไม้ทัณฑฆาต',
-            '่': 'ไม้เอก',
-            '้': 'ไม้โท',
-            '๊': 'ไม้ตรี',
-            '๋': 'ไม้จัตวา'
-        };
-        
-        const soundName = vowelSoundMap[char];
-        if (soundName) {
-            const audioPath = `วรรณยุกต์สระ/${soundName}.mp3`;
-            playAudio(audioPath);
-        }
+@media (max-width: 480px) {
+    .start-button {
+        font-size: 1.1em;
+        padding: 11px 30px;
+        border-radius: 28px;
+        margin-top: 6px;
+        max-width: 85%;
     }
 }
 
-function playCorrectSound() {
-    if (!soundEnabled) return;
-    // You can add a correct answer sound effect here
-    const audio = new Audio();
-    audio.src = 'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBTGH0fPTgjMGHm7A7+OZSA0PVKvn77BbGAg+ltzy0H4qBSh+zPLaizsIGGS57OihUBELTKXh8bllHAU2kNXzzn4oBSV7yfHajjwJF2K37OmkUxEKSqPh8bllHAU2kNXzzn4oBSV7yfHajjwJF2K37OmkUxEKSqPh8bllHAU2kNXzzn4oBSV7yfHajjwJF2K37OmkUxEKSqPh8bllHAU2kNXzzn4oBSV7yfHajjwJF2K37OmkUxEKSqPh8bllHAU2kNXzzn4oBSV7yfHajjwJF2K37OmkUxEKSqPh8bllHAU2kNXzzn4oBSV7yfHajjwJF2K37OmkUxEKSqPh8bllHAU2kNXzzn4oBSV7yfHajjwJF2K37OmkUxEKSqPh8bllHAU2kNXzzn4oBSV7yfHajjwJF2K37OmkUxEKSqPh8bllHAU2kNXzzn4oBSV7yfHajjwJF2K37OmkUxEKSqPh8bllHAU2kNXzzn4oBSV7yfHajjwJF2K37OmkUxEKSqPh8bllHAU2kNXzzn4oBSV7yfHajjwJF2K37OmkUxEKSqPh8bllHAU2kNXzzn4oBSV7yfHajjwJF2K37OmkUxEKSqPh8bllHAU2kNXzzn4oBSV7yfHajjwJF2K37OmkUxEKSqPh8bllHAU2kNXzzn4oBSV7yfHajjwJF2K37OmkUxEKSqPh8bllHAU2kNXzzn4oBSV7yfHajjwJF2K37OmkUxEKSqPh8bllHAU2kNXzzn4oBSV7yfHajjwJF2K37OmkUxEKSqPh8bllHAU2kNXzzn4oBSV7yfHajjwJF2K37OmkUxEKSqPh8bllHAU2kNXzzn4oBSV7yfHajjwJF2K37OmkUxEKSqPh8bllHAU2kNXzzn4oBSV7yfHajjwJF2K37OmkUxEKSqPh8bllHAU2kNXzzn4oBSV7yfHajjwJF2K37OmkUxEKSqPh8bllHAU2kNXzzn4oBSV7yfHajjwJF2K37OmkUxEKSqPh8bllHAU2kNXzzn4oBSV7yfHajjwJF2K37OmkUxEKSqPh8bllHAU2kNXzzn4oBSV7yfHajjwJF2K37OmkUxEKSqPh8bllHAU2kNXzzn4o';
-    audio.play().catch(() => {});
+.start-button:hover {
+    transform: scale(1.1);
+    box-shadow: 0 12px 25px rgba(0,0,0,0.3);
 }
 
-function playCorrectSound() {
-    if (!soundEnabled) return;
-    
-    // สร้างเสียงพลุ (celebration sound) ดังขึ้น
-    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    
-    // เล่นเสียงหลายชุดเพื่อเลียนแบบเสียงพลุ
-    for (let i = 0; i < 5; i++) {
-        setTimeout(() => {
-            const oscillator = audioContext.createOscillator();
-            const gainNode = audioContext.createGain();
-            
-            oscillator.connect(gainNode);
-            gainNode.connect(audioContext.destination);
-            
-            // ความถี่แบบสุ่มเพื่อเสียงพลุ
-            oscillator.frequency.setValueAtTime(800 + Math.random() * 1000, audioContext.currentTime);
-            oscillator.type = 'sine';
-            
-            // ลดเสียงค่อยๆ
-            gainNode.gain.setValueAtTime(0.5, audioContext.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
-            
-            oscillator.start(audioContext.currentTime);
-            oscillator.stop(audioContext.currentTime + 0.5);
-        }, i * 100);
+.start-button:active {
+    transform: scale(0.95);
+    animation: none;
+}
+
+.start-button::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.start-button:hover::before {
+    width: 300px;
+    height: 300px;
+}
+
+.sound-icon {
+    position: fixed;
+    bottom: 15px;
+    right: 15px;
+    width: 50px;
+    height: 50px;
+    background: #ff8247;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    transition: all 0.3s ease;
+    animation: pulse 3s infinite;
+    z-index: 999;
+}
+
+@media (max-width: 480px) {
+    .sound-icon {
+        width: 45px;
+        height: 45px;
+        font-size: 20px;
+        bottom: 12px;
+        right: 12px;
     }
 }
 
-function playWrongSound() {
-    if (!soundEnabled) return;
-    
-    // สร้างเสียงแตร (buzzer sound)
-    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    const oscillator = audioContext.createOscillator();
-    const gainNode = audioContext.createGain();
-    
-    oscillator.connect(gainNode);
-    gainNode.connect(audioContext.destination);
-    
-    // เสียงแตรความถี่ต่ำ
-    oscillator.frequency.setValueAtTime(200, audioContext.currentTime);
-    oscillator.type = 'sawtooth';
-    
-    gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
-    
-    oscillator.start(audioContext.currentTime);
-    oscillator.stop(audioContext.currentTime + 0.3);
+.sound-icon:hover {
+    transform: scale(1.1) rotate(15deg);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.3);
 }
 
-function playAudio(src) {
-    if (!soundEnabled) return;
-    
-    // หยุดเสียงเก่าถ้ามี
-    if (currentAudio) {
-        currentAudio.pause();
-        currentAudio.currentTime = 0;
-    }
-    
-    currentAudio = new Audio(src);
-    currentAudio.volume = 0.8; // ปรับระดับเสียงปุ่มให้ดังพอ
-    currentAudio.play().catch(error => {
-        console.log('Audio playback failed:', error);
-    });
+.sound-icon:active {
+    transform: scale(0.9);
 }
 
-function toggleSound() {
-    backgroundMusicEnabled = !backgroundMusicEnabled;
-    const soundIcon = document.querySelector('.sound-icon');
-    soundIcon.textContent = backgroundMusicEnabled ? '🔊' : '🔇';
-    
-    // ควบคุมเพลงพื้นหลังเท่านั้น (ไม่ปิดเสียงคำและปุ่ม)
-    if (backgroundMusic) {
-        if (backgroundMusicEnabled) {
-            backgroundMusic.play().catch(error => {
-                console.log('Background music playback failed:', error);
-            });
-        } else {
-            backgroundMusic.pause();
-        }
-    }
-    
-    // เล่นเสียงเมื่อปิด/เปิดเสียง
-    playButtonClickSound();
+/* Level Selection Screen */
+.level-select {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
 }
 
-function playButtonClickSound() {
-    if (!soundEnabled) return;
-    // เล่นเสียง click ของปุ่ม
-    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    const oscillator = audioContext.createOscillator();
-    const gainNode = audioContext.createGain();
-    
-    oscillator.connect(gainNode);
-    gainNode.connect(audioContext.destination);
-    
-    oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
-    oscillator.type = 'sine';
-    
-    gainNode.gain.setValueAtTime(0.15, audioContext.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
-    
-    oscillator.start(audioContext.currentTime);
-    oscillator.stop(audioContext.currentTime + 0.1);
-}
-
-function createConfetti() {
-    const colors = ['#f4b235', '#4fb848', '#e85d9e', '#2563a8', '#ff8247'];
-    for (let i = 0; i < 50; i++) {
-        const confetti = document.createElement('div');
-        confetti.className = 'confetti';
-        confetti.style.left = Math.random() * 100 + '%';
-        confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-        confetti.style.animationDelay = Math.random() * 0.5 + 's';
-        document.body.appendChild(confetti);
-        
-        setTimeout(() => {
-            confetti.remove();
-        }, 3000);
+@media (max-width: 480px) {
+    .level-select {
+        padding: 15px 10px;
+        margin: 0 auto;
     }
 }
 
-// Initialize on load - removed, handled by authentication system above
+.level-title {
+    text-align: center;
+    font-size: 2.5em;
+    color: #4fb848;
+    font-weight: bold;
+    background: white;
+    padding: 20px;
+    border-radius: 30px;
+    margin-bottom: 30px;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.12);
+    position: relative;
+    overflow: hidden;
+}
+
+@media (max-width: 480px) {
+    .level-title {
+        font-size: 1.4em;
+        padding: 15px 20px;
+        margin-bottom: 20px;
+        border-radius: 25px;
+    }
+}
+
+.level-title::before {
+    content: '🎊 🎉 🎈';
+    position: absolute;
+    top: 20%;
+    left: 10%;
+    font-size: 50px;
+    opacity: 0.12;
+    pointer-events: none;
+    letter-spacing: 30px;
+    transform: rotate(-15deg);
+}
+
+.level-title::after {
+    content: '✨ 🌟 ⭐';
+    position: absolute;
+    bottom: 20%;
+    right: 10%;
+    font-size: 45px;
+    opacity: 0.12;
+    pointer-events: none;
+    letter-spacing: 25px;
+    transform: rotate(18deg);
+}
+
+.levels-grid {
+    display: grid;
+    /* Desktop: 2 cards per row as requested */
+    grid-template-columns: repeat(2, 1fr);
+    gap: 30px;
+    margin-bottom: 30px;
+}
+
+@media (max-width: 480px) {
+    .levels-grid {
+        gap: 20px;
+        margin-bottom: 20px;
+    }
+    
+    .level-select {
+        padding: 15px;
+    }
+}
+
+.level-card {
+    background: white;
+    border-radius: 30px;
+    padding: 30px;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+    text-align: center;
+    transition: all 0.3s ease;
+    animation: slideInUp 0.5s ease-out;
+    position: relative;
+    overflow: hidden;
+}
+
+.level-card::before {
+    content: '🎮';
+    position: absolute;
+    top: 20%;
+    left: 15%;
+    font-size: 60px;
+    opacity: 0.12;
+    pointer-events: none;
+    transform: rotate(-25deg);
+}
+
+.level-card::after {
+    content: '🏆 🎯 ⭐';
+    position: absolute;
+    bottom: 15%;
+    right: 10%;
+    font-size: 50px;
+    opacity: 0.12;
+    pointer-events: none;
+    letter-spacing: 15px;
+    transform: rotate(20deg);
+}
+
+.level-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+}
+
+.level-card-title {
+    font-size: 1.5em;
+    color: #2563a8;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+@media (max-width: 480px) {
+    .level-card {
+        width: 90vw;
+        max-width: 350px;
+        min-width: unset;
+        margin: 0 auto 16px auto;
+        border-radius: 20px;
+        box-shadow: 0 8px 24px rgba(40, 120, 200, 0.10), 0 1.5px 8px rgba(255, 105, 180, 0.10);
+        padding: 18px 0 18px 0;
+        background: linear-gradient(135deg, #f8fafc 60%, #e0e7ff 100%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        box-sizing: border-box;
+        border: 2.5px solid #e0e7ff;
+        position: relative;
+    }
+    .level-card-title {
+        font-size: 1.2em;
+        margin-bottom: 10px;
+        color: #2563a8;
+        font-weight: bold;
+        text-align: center;
+        letter-spacing: 0.5px;
+        text-shadow: 0 1px 0 #fff, 0 2px 6px #b6c6e6;
+    }
+    .word-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px 18px;
+        margin-bottom: 18px;
+        width: 100%;
+        padding: 0 8px;
+        box-sizing: border-box;
+    }
+    .level-card .level-btn {
+        margin: 0;
+    }
+    /* ปุ่มใน level card */
+    .level-card .level-btn {
+        width: 44vw;
+        min-width: 120px;
+        max-width: 160px;
+        margin: 6px 0;
+        font-size: 1.1em;
+        border-radius: 16px;
+        background: linear-gradient(90deg, #4ade80 0%, #38bdf8 100%);
+        color: #fff;
+        font-weight: 600;
+        box-shadow: 0 2px 8px rgba(56,189,248,0.10);
+        border: none;
+        transition: transform 0.12s, box-shadow 0.12s, background 0.18s;
+        position: relative;
+        overflow: hidden;
+    }
+    .level-card .level-btn:active {
+        transform: scale(0.97);
+        box-shadow: 0 1px 3px rgba(56,189,248,0.10);
+        background: linear-gradient(90deg, #38bdf8 0%, #4ade80 100%);
+    }
+    .level-card .level-btn:hover {
+        filter: brightness(1.08);
+        box-shadow: 0 4px 12px rgba(56,189,248,0.13);
+    }
+    /* ปุ่มเสียงในปุ่ม */
+    .level-card .level-btn .sound-icon, .level-card .level-btn .sound-btn {
+        background: #fff;
+        color: #38bdf8;
+        border-radius: 50%;
+        width: 26px;
+        height: 26px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1em;
+        margin-left: 8px;
+        box-shadow: 0 1px 4px rgba(56,189,248,0.10);
+        border: 1.5px solid #bae6fd;
+        transition: background 0.15s, color 0.15s;
+    }
+    .level-card .level-btn .sound-icon:active, .level-card .level-btn .sound-btn:active {
+        background: #bae6fd;
+        color: #2563a8;
+    }
+    .level-card .level-btn .sound-icon:hover, .level-card .level-btn .sound-btn:hover {
+        background: #e0f2fe;
+        color: #0ea5e9;
+    }
+    /* เพิ่มลูกเล่น background ฟุ้งๆ */
+    .level-card::before {
+        content: '';
+        position: absolute;
+        top: -30px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80%;
+        height: 40px;
+        background: radial-gradient(ellipse at center, #bae6fd55 0%, transparent 80%);
+        z-index: 0;
+        border-radius: 50%;
+        pointer-events: none;
+    }
+    .level-card .level-btn, .level-card .level-btn * {
+        z-index: 1;
+        position: relative;
+    }
+}
+
+.word-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+@media (max-width: 480px) {
+    .word-grid {
+        width: 100%;
+        box-sizing: border-box;
+    }
+}
+
+.word-item {
+    background: linear-gradient(135deg, #4fb848 0%, #7fb83e 100%);
+    color: white;
+    padding: 12px;
+    border-radius: 15px;
+    font-size: 1.2em;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+@media (max-width: 480px) {
+    .word-item {
+        padding: 10px 12px;
+        font-size: 1.05em;
+        border-radius: 12px;
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+    
+    .word-text {
+        font-size: 1em;
+        line-height: 1.3;
+    }
+    
+    .sound-icon-word {
+        font-size: 0.85em !important;
+        padding: 3px !important;
+    }
+    
+    .level-words {
+        gap: 12px;
+        margin-bottom: 18px;
+    }
+}
+
+.word-item:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.word-item:active {
+    transform: scale(0.98);
+}
+
+.word-item.answered {
+    background: linear-gradient(135deg, #4fb848 0%, #7fb83e 100%);
+}
+
+.word-item.unanswered {
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+}
+
+.word-item.danger {
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+}
+
+.level-score {
+    background: #e85d9e;
+    color: white;
+    font-size: 2em;
+    font-weight: bold;
+    padding: 15px;
+    border-radius: 20px;
+    margin-top: 20px;
+}
+
+.level-button,
+[id^="startLevel"] {
+    background: linear-gradient(135deg, #4fb848 0%, #7fb83e 100%);
+    color: white;
+    font-size: 1.2em;
+    font-weight: bold;
+    padding: 12px 30px;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(79, 184, 72, 0.4);
+}
+
+@media (max-width: 480px) {
+    .level-score {
+        font-size: 1.6em;
+        padding: 12px;
+        margin-top: 18px;
+        border-radius: 22px;
+    }
+    
+    .level-button,
+    [id^="startLevel"] {
+        font-size: 1.1em;
+        padding: 12px 28px;
+        border-radius: 42px;
+    }
+}
+
+/* Game Screen */
+.game-screen {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 10px;
+}
+
+@media (max-width: 480px) {
+    .game-screen {
+        padding: 0 10px;
+    }
+}
+
+.game-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: white;
+    padding: 15px 25px;
+    border-radius: 25px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+@media (max-width: 480px) {
+    .game-header {
+        padding: 12px 15px;
+        border-radius: 20px;
+        margin-bottom: 15px;
+    }
+}
+
+.player-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.player-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+}
+
+.player-stats {
+    text-align: left;
+}
+
+.player-label {
+    font-size: 1.1em;
+    color: #666;
+}
+
+.player-value {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #2563a8;
+    background: #4fb848;
+    color: white;
+    padding: 5px 15px;
+    border-radius: 15px;
+    display: inline-block;
+}
+
+.score-display {
+    display: none !important;
+}
+
+/* Responsive adjustments for mobile */
+@media (max-width: 768px) {
+    .player-avatar {
+        width: 48px;
+        height: 48px;
+    }
+    
+    .player-label {
+        font-size: 1em;
+    }
+    
+    .player-value {
+        font-size: 1.35em;
+        padding: 5px 14px;
+    }
+    
+    .menu-button {
+        font-size: 0.8em;
+        padding: 8px 14px;
+        border-radius: 14px;
+        min-width: auto;
+    }
+    
+    .sound-icon {
+        font-size: 1.7em;
+        width: 52px;
+        height: 52px;
+        bottom: 18px;
+        right: 18px;
+    }
+    
+    .next-button,
+    .check-button {
+        font-size: 1.1em;
+        padding: 12px 24px;
+        min-width: 90px;
+    }
+}
+
+@media (max-width: 480px) {
+    .summary-header {
+        flex-direction: row;
+        gap: 10px;
+        padding: 10px 15px;
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        margin-bottom: 15px;
+    }
+    
+    .player-info-game {
+        width: auto;
+        justify-content: flex-start;
+        gap: 8px;
+        flex: 1;
+    }
+    
+    .player-avatar {
+        width: 36px;
+        height: 36px;
+        border: 2px solid #f4b235;
+    }
+    
+    .player-stats {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+    }
+    
+    .player-label {
+        font-size: 0.8em;
+        line-height: 1.2;
+    }
+    
+    .player-value {
+        font-size: 1em;
+        padding: 3px 10px;
+        border-radius: 12px;
+    }
+    
+    .game-buttons {
+        width: auto;
+        justify-content: flex-end;
+        gap: 8px;
+        flex-shrink: 0;
+        align-items: center;
+    }
+    
+    .menu-button {
+        font-size: 0.7em;
+        padding: 8px 12px;
+        border-radius: 12px;
+        min-width: auto;
+        white-space: nowrap;
+        font-weight: 700;
+    }
+    
+    .home-button {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .skip-button {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .sound-icon {
+        font-size: 1.2em;
+        width: 42px;
+        height: 42px;
+        bottom: 15px;
+        right: 15px;
+    }
+}
+
+.game-buttons {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.menu-button {
+    background: linear-gradient(145deg, #f4b235 0%, #f39c12 100%);
+    color: white;
+    font-size: 1.3em;
+    font-weight: bold;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    box-shadow: 
+        0 6px 12px rgba(243, 156, 18, 0.4),
+        0 2px 4px rgba(0, 0, 0, 0.2),
+        inset 0 -2px 4px rgba(0, 0, 0, 0.1),
+        inset 0 1px 2px rgba(255, 255, 255, 0.3);
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.menu-button:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+}
+
+.menu-button:active {
+    transform: scale(0.95);
+}
+
+.home-button {
+    background: transparent;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: pulse 3s infinite;
+    position: relative;
+    z-index: 5;
+    cursor: pointer;
+    pointer-events: auto;
+    border: none;
+    flex-shrink: 0;
+}
+
+.home-button img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.home-button:hover {
+    animation: rotate 0.5s ease-in-out;
+}
+
+.skip-button {
+    background: rgba(255, 255, 255, 0.4);
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 5;
+}
+
+.skip-button img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.skip-button:hover {
+    transform: scale(1.1);
+}
+
+.skip-button:active {
+    transform: scale(0.95);
+}
+
+/* Summary Header - สรุปผลการเล่น */
+.summary-header {
+    margin-bottom: 30px;
+}
+
+/* Player Summary Info - ข้อมูลผู้เล่นในหน้าสรุปผล */
+.player-summary-info {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%);
+    padding: 12px 28px;
+    border-radius: 50px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    margin: 0 auto 20px auto;
+    max-width: fit-content;
+    border: 2px solid rgba(79, 184, 72, 0.3);
+    transition: all 0.3s ease;
+}
+
+.player-summary-info:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(79, 184, 72, 0.2);
+    border-color: rgba(79, 184, 72, 0.5);
+}
+
+.summary-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 3px solid #4fb848;
+    object-fit: cover;
+    box-shadow: 0 2px 8px rgba(79, 184, 72, 0.3);
+}
+
+.summary-player-name {
+    font-size: 1.3em;
+    font-weight: 700;
+    color: #2c3e50;
+}
+
+.summary-player-id {
+    font-size: 1.1em;
+    color: #888;
+    font-weight: 500;
+}
+
+@media (max-width: 480px) {
+    .player-summary-info {
+        padding: 10px 18px;
+        gap: 8px;
+    }
+
+    .summary-avatar {
+        width: 36px;
+        height: 36px;
+    }
+
+    .summary-player-name {
+        font-size: 1em;
+    }
+
+    .summary-player-id {
+        font-size: 0.85em;
+    }
+}
+
+/* User Profile Display */
+.user-profile-display {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: white;
+    padding: 15px 25px;
+    border-radius: 50px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+    margin-bottom: 20px;
+    transition: all 0.3s ease;
+    max-width: fit-content;
+}
+
+.user-profile-display:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+}
+
+.profile-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 3px solid #4fb848;
+    object-fit: cover;
+}
+
+.profile-info {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.profile-name, .profile-score {
+    font-size: 1.3em;
+    color: #2c3e50;
+    font-weight: 600;
+}
+
+.summary-header .level-title {
+    text-align: center;
+    font-size: 2em;
+    color: #4fb848;
+    font-weight: bold;
+    background: white;
+    padding: 20px;
+    border-radius: 30px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.summary-stats {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    position: relative;
+    z-index: 1;
+}
+
+.stat-card {
+    text-align: center;
+    background: white;
+    padding: 15px 30px;
+    border-radius: 20px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    min-width: 150px;
+    min-height: 100px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.stat-label {
+    font-size: 1.2em;
+    color: #666;
+    margin-bottom: 5px;
+}
+
+.stat-value {
+    font-size: 2.5em;
+    font-weight: bold;
+    color: #2563a8;
+}
+
+/* Responsive สำหรับแท็บเล็ต */
+@media (max-width: 768px) and (min-width: 481px) {
+    .summary-header .level-title {
+        font-size: 1.3em;
+        padding: 10px;
+    }
+    
+    .summary-stats {
+        gap: 10px;
+    }
+    
+    .stat-card {
+        padding: 10px 20px;
+        min-width: 100px;
+        flex: 1;
+    }
+}
+
+@media (max-width: 480px) {
+    .summary-header .level-title {
+        font-size: 1.3em;
+        padding: 12px 18px;
+        border-radius: 25px;
+    }
+    
+    .summary-stats {
+        flex-direction: row;
+        flex-wrap: wrap;
+        width: 100%;
+        gap: 10px;
+        justify-content: center;
+        padding: 0 10px;
+    }
+    
+    .stat-card {
+        width: calc(50% - 5px);
+        min-width: auto;
+        padding: 12px 18px;
+        border-radius: 18px;
+    }
+    
+    .stat-label {
+        font-size: 0.9em;
+        margin-bottom: 6px;
+    }
+    
+    .stat-value {
+        font-size: 1.8em;
+    }
+    
+    .game-content {
+        padding: 15px 10px;
+        border-radius: 24px;
+        gap: 20px;
+        margin: 0 auto;
+        max-width: calc(100% - 20px);
+    }
+    
+    .word-image {
+        max-width: 240px;
+        max-height: 240px;
+        padding: 12px;
+        margin: 0 auto;
+        display: block;
+    }
+    
+    .answer-slots {
+        gap: 10px;
+        margin: 18px auto;
+        padding: 8px;
+        justify-content: center;
+    }
+    
+    .answer-slot {
+        min-width: 180px;
+        max-width: calc(100% - 40px);
+        padding: 12px 20px;
+        font-size: 1.8em;
+        height: 80px;
+    }
+    
+}
+
+.game-content {
+    background: white;
+    border-radius: 30px;
+    padding: 40px;
+    box-shadow: 
+        0 15px 35px rgba(255, 105, 180, 0.25),
+        0 5px 15px rgba(0, 0, 0, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 40px;
+    align-items: start;
+    border: 3px solid rgba(255, 182, 193, 0.6);
+    position: relative;
+    overflow: visible;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.game-left {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+@media (max-width: 480px) {
+    .game-left {
+        padding: 0 5px;
+    }
+}
+
+.game-right {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    align-items: center;
+    width: 100%;
+}
+
+@media (max-width: 480px) {
+    .game-right {
+        padding: 0 5px;
+        gap: 20px;
+    }
+}
+
+.level-indicator {
+    width: 100%;
+    text-align: center;
+    padding: 15px;
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+    border-radius: 20px;
+    border: 2px solid #4fb848;
+    box-shadow: 0 4px 12px rgba(79, 184, 72, 0.2);
+}
+
+/* Tablet: make the category pill fit its text */
+@media (min-width: 481px) and (max-width: 1024px) {
+    .level-indicator {
+        width: 80%;
+        max-width: 420px;
+        min-width: 220px;
+        box-sizing: border-box;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 12px 0;
+        margin: 0 auto 16px auto;
+        font-size: 1.15em;
+    }
+}
+
+@media (max-width: 480px) {
+    .level-indicator {
+        padding: 10px;
+        margin: 0 auto;
+        max-width: calc(100% - 20px);
+        font-size: 0.95em;
+    }
+}
+
+.image-section {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+@media (max-width: 480px) {
+    .image-section {
+        padding: 0 5px;
+    }
+}
+
+.answer-section {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+@media (max-width: 480px) {
+    .answer-section {
+        padding: 0 5px;
+    }
+}
+
+.keyboard-section {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+    .keyboard-section {
+        width: 100%;
+        padding: 0 5px;
+        margin: 0 auto;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .keyboard-section {
+        width: 100%;
+        padding: 5px 0;
+        margin: 0 auto;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+}
+
+.game-content::before {
+    content: '⭐';
+    position: absolute;
+    top: 8%;
+    left: 12%;
+    font-size: 42px;
+    opacity: 0.25;
+    pointer-events: none;
+    z-index: 0;
+    animation: float1 12s ease-in-out infinite;
+}
+
+.game-content::after {
+    content: '🌟';
+    position: absolute;
+    top: 15%;
+    right: 18%;
+    font-size: 38px;
+    opacity: 0.22;
+    pointer-events: none;
+    z-index: 0;
+    animation: float2 15s ease-in-out infinite;
+}
+
+.input-area::before {
+    content: '✨';
+    position: absolute;
+    top: 25%;
+    left: 8%;
+    font-size: 35px;
+    opacity: 0.2;
+    pointer-events: none;
+    animation: float3 18s ease-in-out infinite;
+}
+
+.input-area::after {
+    content: '💫';
+    position: absolute;
+    bottom: 20%;
+    left: 15%;
+    font-size: 40px;
+    opacity: 0.23;
+    pointer-events: none;
+    animation: float4 14s ease-in-out infinite;
+}
+
+.image-area::before {
+    content: '🎨';
+    position: absolute;
+    top: 12%;
+    right: 10%;
+    font-size: 44px;
+    opacity: 0.2;
+    pointer-events: none;
+    animation: float1 16s ease-in-out infinite reverse;
+}
+
+.image-area::after {
+    content: '🎵';
+    position: absolute;
+    bottom: 25%;
+    right: 12%;
+    font-size: 36px;
+    opacity: 0.21;
+    pointer-events: none;
+    animation: float2 13s ease-in-out infinite;
+}
+
+.thai-keyboard::before {
+    content: '🌈';
+    position: absolute;
+    top: -5%;
+    left: 5%;
+    font-size: 32px;
+    opacity: 0.18;
+    pointer-events: none;
+    animation: float3 20s ease-in-out infinite;
+}
+
+.thai-keyboard::after {
+    content: '🎯';
+    position: absolute;
+    bottom: -8%;
+    right: 8%;
+    font-size: 38px;
+    opacity: 0.19;
+    pointer-events: none;
+    animation: float4 17s ease-in-out infinite reverse;
+}
+
+.answer-slots::before {
+    content: '🦋';
+    position: absolute;
+    top: -15px;
+    left: -10px;
+    font-size: 33px;
+    opacity: 0.2;
+    pointer-events: none;
+    animation: float1 14s ease-in-out infinite;
+}
+
+.answer-slots::after {
+    content: '🌸';
+    position: absolute;
+    top: -12px;
+    right: -8px;
+    font-size: 35px;
+    opacity: 0.21;
+    pointer-events: none;
+    animation: float2 19s ease-in-out infinite reverse;
+}
+
+@keyframes float1 {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    25% { transform: translate(12px, -8px) rotate(8deg); }
+    50% { transform: translate(-10px, 6px) rotate(-5deg); }
+    75% { transform: translate(8px, -10px) rotate(6deg); }
+}
+
+@keyframes float2 {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    33% { transform: translate(-8px, 10px) rotate(-6deg); }
+    66% { transform: translate(10px, -8px) rotate(7deg); }
+}
+
+@keyframes float3 {
+    0%, 100% { transform: translate(0, 0) rotate(0deg) scale(1); }
+    50% { transform: translate(5px, -12px) rotate(-8deg) scale(1.1); }
+}
+
+@keyframes float4 {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    40% { transform: translate(10px, 8px) rotate(10deg); }
+    80% { transform: translate(-12px, -6px) rotate(-7deg); }
+}
+
+.game-content > * {
+    position: relative;
+    z-index: 1;
+}
+
+.input-area {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    position: relative;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+@media (max-width: 480px) {
+    .input-area {
+        padding: 0 5px;
+    }
+}
+
+.thai-keyboard {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    max-width: 500px;
+    width: 100%;
+    margin: 0 auto;
+    position: relative;
+    padding: 15px 10px;
+}
+
+/* Tablet & smaller devices */
+@media (max-width: 1024px) {
+    .thai-keyboard {
+        gap: 4px;
+        padding: 4px 2px;
+        max-width: 85%;
+    }
+    
+    .thai-key {
+        font-size: 0.9em;
+        border-radius: 9px;
+    }
+}
+
+/* Mobile devices */
+@media (max-width: 480px) {
+    .thai-keyboard {
+        gap: 6px;
+        padding: 8px 5px;
+    }
+    
+    .thai-key {
+        font-size: 1.2em;
+        border-radius: 10px;
+    }
+}
+
+.thai-key {
+    background: linear-gradient(145deg, #f4b235 0%, #f39c12 100%);
+    color: white;
+    font-size: 1.5em;
+    font-weight: bold;
+    width: 100%;
+    aspect-ratio: 1;
+    border: none;
+    border-radius: 15px;
+    cursor: pointer;
+    box-shadow: 
+        0 6px 12px rgba(243, 156, 18, 0.4),
+        0 2px 4px rgba(0, 0, 0, 0.2),
+        inset 0 -2px 4px rgba(0, 0, 0, 0.1),
+        inset 0 1px 2px rgba(255, 255, 255, 0.3);
+    position: relative;
+    transition: all 0.2s ease;
+    animation: slideInUp 0.3s ease-out;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.thai-key:hover:not(.disabled) {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 
+        0 8px 20px rgba(243, 156, 18, 0.6),
+        0 4px 8px rgba(0, 0, 0, 0.3),
+        inset 0 -2px 4px rgba(0, 0, 0, 0.1),
+        inset 0 1px 2px rgba(255, 255, 255, 0.4);
+    filter: brightness(1.1);
+}
+
+.thai-key:active {
+    transform: scale(0.95);
+    animation: bounce 0.5s;
+}
+
+.thai-key.selected {
+    background: linear-gradient(145deg, #4fb848 0%, #7fb83e 100%);
+    animation: bounce 0.5s;
+    box-shadow: 
+        0 6px 16px rgba(79, 184, 72, 0.5),
+        0 2px 4px rgba(0, 0, 0, 0.2),
+        inset 0 -2px 4px rgba(0, 0, 0, 0.1),
+        inset 0 1px 2px rgba(255, 255, 255, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.thai-key.disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    transform: scale(0.9);
+}
+
+.thai-key-sound {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    font-size: 0.18em;
+    color: white;
+}
+
+@media (max-width: 480px) {
+    /* Reduce speaker icon size specifically on mobile */
+    .thai-key-sound {
+        top: 3px;
+        right: 3px;
+        font-size: 0.14em;
+    }
+}
+
+.image-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    position: relative;
+    width: 100%;
+    justify-content: center;
+}
+
+@media (max-width: 480px) {
+    .image-area {
+        padding: 0 5px;
+    }
+}
+
+.word-image {
+    width: 100%;
+    max-width: 350px;
+    height: 280px;
+    object-fit: contain;
+    border-radius: 20px;
+    animation: fadeIn 0.5s ease-in;
+    transition: transform 0.3s ease;
+    image-orientation: from-image;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    padding: 15px;
+}
+
+.word-image:hover {
+    transform: scale(1.05);
+}
+
+.answer-slots {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    position: relative;
+    flex-wrap: wrap;
+    padding: 10px;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.answer-slot {
+    background: linear-gradient(135deg, #e85d9e 0%, #d64a8a 100%);
+    color: white;
+    font-size: 4em;
+    font-weight: 900;
+    width: auto;
+    min-width: 180px;
+    height: 90px;
+    padding: 15px 25px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 30px rgba(232, 93, 158, 0.8), 
+                0 0 50px rgba(232, 93, 158, 0.5),
+                inset 0 -4px 15px rgba(0, 0, 0, 0.3),
+                0 0 20px rgba(255, 255, 255, 0.4);
+    animation: slideInUp 0.3s ease-out;
+    transition: all 0.3s ease;
+    border: 5px solid rgba(255, 255, 255, 0.7);
+    text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.6),
+                 -2px -2px 4px rgba(255, 255, 255, 0.3),
+                 0 0 20px rgba(255, 255, 255, 0.5),
+                 0 0 30px rgba(232, 93, 158, 0.8);
+    letter-spacing: 4px;
+    font-family: 'Kanit', sans-serif;
+}
+
+.answer-slot:not(:empty) {
+    animation: bounce 0.5s;
+    background: linear-gradient(135deg, #e85d9e 0%, #d64a8a 100%);
+}
+
+.answer-slot.correct {
+    animation: bounce 0.5s, glow 1s;
+    background: linear-gradient(135deg, #4fb848 0%, #7fb83e 100%);
+}
+
+/* Unlock button and status */
+.unlock-button {
+    margin-left: 8px;
+    background: linear-gradient(135deg, #4fb848 0%, #6fcf5a 100%);
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 700;
+}
+.unlock-button:hover { transform: translateY(-2px); }
+.unlock-status {
+    display: inline-block;
+    margin-left: 8px;
+    color: #2f8a2f;
+    font-weight: 700;
+}
+
+/* Visual state for a level card that is unlockable but not yet unlocked */
+.level-card.unlockable .level-card-title,
+.level-card.unlockable .word-grid,
+.level-card.unlockable .level-score {
+    opacity: 0.55;
+    filter: grayscale(10%);
+}
+
+/* Visual state for a level card that is locked */
+.level-card.locked .level-card-title,
+.level-card.locked .word-grid,
+.level-card.locked .level-score {
+    opacity: 0.55;
+    filter: grayscale(20%);
+}
+
+/* Ensure start button stays fully visible when acting as unlock */
+.level-card .start-button.unlock-action {
+    opacity: 1 !important;
+    transform: translateY(-2px);
+    position: relative;
+    z-index: 5;
+}
+
+/* Start button when it's acting as an unlock action */
+[id^="startLevel"].unlock-action,
+.start-button.unlock-action {
+    background: linear-gradient(135deg, #31c14a 0%, #4fb848 100%);
+    box-shadow: 0 8px 20px rgba(79,184,72,0.45);
+    transform: translateY(-2px);
+}
+
+.answer-slot.wrong {
+    animation: shake 0.5s;
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+}
+
+.game-controls {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 20px;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+@media (max-width: 480px) {
+    .game-controls {
+        gap: 12px;
+        margin-top: 15px;
+        align-items: center;
+        justify-content: center;
+        padding: 0 10px;
+    }
+}
+
+/* Speaker icon inside keys (created by JS as .sound-btn-char) */
+@media (max-width: 768px) {
+    .sound-btn-char {
+        width: 16px !important;
+        height: 16px !important;
+        font-size: 0.55em !important;
+        bottom: 3px !important;
+        right: 3px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .sound-btn-char {
+        width: 14px !important;
+        height: 14px !important;
+        font-size: 0.5em !important;
+        bottom: 3px !important;
+        right: 3px !important;
+    }
+}
+
+.play-sound-button {
+    background: linear-gradient(135deg, #ff8247 0%, #ff6b35 100%);
+    color: white;
+    font-size: 1.2em;
+    padding: 12px 30px;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(255, 130, 71, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    font-weight: 600;
+}
+
+@media (max-width: 480px) {
+    .play-sound-button {
+        font-size: 1.2em;
+        padding: 13px 32px;
+        border-radius: 42px;
+        gap: 8px;
+    }
+}
+
+.play-sound-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(255, 130, 71, 0.5);
+}
+
+.play-sound-button:active {
+    transform: translateY(0);
+}
+
+.check-button {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    color: white;
+    font-size: 1.2em;
+    font-weight: 700;
+    padding: 12px 30px;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.5);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+@media (max-width: 480px) {
+    .check-button {
+        font-size: 1.2em;
+        padding: 13px 32px;
+        border-radius: 42px;
+    }
+}
+
+.check-button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 16px rgba(245, 158, 11, 0.6);
+    animation: pulse 1s infinite;
+}
+
+.check-button:active {
+    transform: scale(0.95);
+}
+
+.delete-char-button {
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+    color: white;
+    font-size: 1.2em;
+    font-weight: 600;
+    padding: 12px 30px;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(255, 107, 107, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+}
+
+@media (max-width: 480px) {
+    .delete-char-button {
+        font-size: 1.1em;
+        padding: 13px 28px;
+        border-radius: 42px;
+        gap: 6px;
+    }
+}
+
+.delete-char-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(255, 107, 107, 0.5);
+}
+
+.delete-char-button:active {
+    transform: translateY(0);
+}
+
+/* Spelling Button - ปุ่มคำสะกด */
+.spelling-button {
+    background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+    color: white;
+    font-size: 1.2em;
+    font-weight: 600;
+    padding: 12px 30px;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(155, 89, 182, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+}
+
+.spelling-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(155, 89, 182, 0.5);
+}
+
+.spelling-button:active {
+    transform: translateY(0);
+}
+
+@media (max-width: 480px) {
+    .spelling-button {
+        font-size: 1.1em;
+        padding: 13px 28px;
+        border-radius: 42px;
+        gap: 6px;
+    }
+}
+
+/* Spelling Display - ซ่อนถาวรแล้ว เหลือแค่เสียง */
+.spelling-display {
+    display: none !important;
+}
+
+@media (max-width: 480px) {
+    .spelling-display {
+        font-size: 1.3em;
+        padding: 14px 20px;
+        letter-spacing: 2px;
+    }
+}
+
+/* ============================================ */
+/* 2D Cluster Layout for Thai Answer Slots       */
+/* ============================================ */
+
+.cluster-layout {
+    display: flex !important;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.cluster-column {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+}
+
+.cluster-zone {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+/* กล่องหลัก - พยัญชนะ/สระหน้า/สระหลัง */
+.answer-slot.slot-main {
+    min-width: 55px;
+    width: 60px;
+    height: 65px;
+    font-size: 2.2em;
+    font-weight: 900;
+    background: linear-gradient(135deg, #e85d9e 0%, #d64a8a 100%);
+    color: white;
+    border-radius: 14px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 4px 12px rgba(232, 93, 158, 0.5),
+                inset 0 -2px 6px rgba(0, 0, 0, 0.2);
+    border: 3px solid rgba(255, 255, 255, 0.5);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
+    transition: all 0.3s ease;
+    font-family: 'Kanit', sans-serif;
+    padding: 4px;
+}
+
+/* กล่องเล็ก - สระบน/วรรณยุกต์ */
+.answer-slot.slot-above {
+    min-width: 42px;
+    width: 46px;
+    height: 42px;
+    font-size: 1.6em;
+    font-weight: 800;
+    background: linear-gradient(135deg, #a78bfa 0%, #8b5cf6 100%);
+    color: white;
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 3px 8px rgba(139, 92, 246, 0.4),
+                inset 0 -2px 4px rgba(0, 0, 0, 0.15);
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+    font-family: 'Kanit', sans-serif;
+    padding: 2px;
+}
+
+/* กล่องเล็ก - สระล่าง */
+.answer-slot.slot-below {
+    min-width: 42px;
+    width: 46px;
+    height: 42px;
+    font-size: 1.6em;
+    font-weight: 800;
+    background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%);
+    color: white;
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 3px 8px rgba(14, 165, 233, 0.4),
+                inset 0 -2px 4px rgba(0, 0, 0, 0.15);
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+    font-family: 'Kanit', sans-serif;
+    padding: 2px;
+}
+
+/* Placeholder สำหรับจัดตำแหน่งให้สมมาตร */
+.slot-placeholder-above,
+.slot-placeholder-below {
+    width: 46px;
+    height: 42px;
+    visibility: hidden;
+}
+
+/* Bounce animation when character is filled */
+.answer-slot.slot-main:not(:empty),
+.answer-slot.slot-above:not(:empty),
+.answer-slot.slot-below:not(:empty) {
+    animation: bounce 0.4s ease;
+}
+
+@media (max-width: 480px) {
+    .cluster-layout {
+        gap: 6px;
+    }
+    .answer-slot.slot-main {
+        min-width: 44px;
+        width: 48px;
+        height: 54px;
+        font-size: 1.7em;
+    }
+    .answer-slot.slot-above,
+    .answer-slot.slot-below {
+        min-width: 34px;
+        width: 38px;
+        height: 34px;
+        font-size: 1.3em;
+    }
+    .slot-placeholder-above,
+    .slot-placeholder-below {
+        width: 38px;
+        height: 34px;
+    }
+}
+
+.check-button::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.check-button:hover::after {
+    width: 300px;
+    height: 300px;
+}
+
+.next-button {
+    background: linear-gradient(135deg, #4fb848 0%, #7fb83e 100%);
+    color: white;
+    font-size: 1.2em;
+    font-weight: 700;
+    padding: 12px 30px;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(79, 184, 72, 0.4);
+    display: none;
+    transition: all 0.3s ease;
+    animation: bounce 0.5s;
+    position: relative;
+    z-index: 3;
+}
+
+@media (max-width: 768px) {
+    .next-button {
+        font-size: 1.1em;
+        padding: 11px 26px;
+    }
+}
+
+@media (max-width: 480px) {
+    .next-button {
+        font-size: 1.2em;
+        padding: 13px 32px;
+        border-radius: 42px;
+    }
+}
+
+.next-button:hover {
+    transform: scale(1.05) translateX(5px);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+}
+
+.next-button:active {
+    transform: scale(0.95);
+}
+
+.hint-button {
+    background: transparent;
+    color: #f4b235;
+    font-size: 1.2em;
+    font-weight: bold;
+    padding: 12px 30px;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: none;
+    transition: all 0.3s ease;
+}
+
+@media (max-width: 480px) {
+    .hint-button {
+        font-size: 1em;
+        padding: 10px 20px;
+        border-radius: 35px;
+    }
+}
+
+/* Modal/Popup */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 1000;
+    justify-content: center;
+    align-items: flex-start;
+    padding-top: 100px;
+    backdrop-filter: blur(5px);
+    overflow: hidden;
+}
+
+.modal.active {
+    display: flex;
+    animation: fadeIn 0.3s;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 30px;
+    padding: 40px;
+    text-align: center;
+    max-width: 500px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    position: relative;
+    animation: slideInModal 0.4s ease-out;
+    transform: translateY(0);
+}
+
+@media (max-width: 480px) {
+    .modal-content {
+        padding: 30px 25px;
+        border-radius: 25px;
+        max-width: 90%;
+    }
+    
+    .modal-icon {
+        font-size: 4em;
+        margin-bottom: 15px;
+    }
+    
+    .modal-title {
+        font-size: 2em;
+        margin-bottom: 15px;
+    }
+    
+    .modal-close {
+        font-size: 1.2em;
+        padding: 12px 32px;
+        border-radius: 18px;
+    }
+}
+
+@keyframes slideInModal {
+    0% {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.modal-icon {
+    font-size: 5em;
+    margin-bottom: 20px;
+    animation: bounce 0.5s ease-out;
+}
+
+.modal-correct .modal-icon {
+    color: #4fb848;
+}
+
+.modal-wrong .modal-icon {
+    color: #ff6b6b;
+}
+
+.modal-title {
+    font-size: 2.5em;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.modal-correct .modal-title {
+    color: #4fb848;
+}
+
+.modal-wrong .modal-title {
+    color: #ff6b6b;
+}
+
+.modal-close {
+    background: #4fb848;
+    color: white;
+    font-size: 1.5em;
+    font-weight: bold;
+    padding: 15px 40px;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: all 0.3s ease;
+}
+
+.modal-close:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+}
+
+.modal-close:active {
+    transform: scale(0.95);
+}
+
+.close-modal {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: #ff6b6b;
+    color: white;
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.5em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.close-modal:hover {
+    transform: rotate(90deg) scale(1.2);
+    background: #ff5252;
+}
+
+.close-modal:active {
+    transform: rotate(90deg) scale(0.9);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .game-content {
+        grid-template-columns: 1fr;
+        padding: 30px 20px;
+        gap: 30px;
+    }
+
+    .game-left {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .game-right {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .game-subtitle {
+        font-size: 2.8em;
+    }
+
+    .thai-subtitle {
+        font-size: 2em;
+    }
+
+    .start-button {
+        font-size: 1.8em;
+        padding: 16px 50px;
+    }
+
+    .levels-grid {
+        grid-template-columns: 1fr;
+        gap: 25px;
+    }
+
+    .answer-slot {
+        width: auto;
+        min-width: 150px;
+        height: 70px;
+        font-size: 3em;
+        padding: 10px 20px;
+        text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.6),
+                     -1px -1px 3px rgba(255, 255, 255, 0.3),
+                     0 0 15px rgba(255, 255, 255, 0.5),
+                     0 0 25px rgba(232, 93, 158, 0.8);
+        letter-spacing: 3px;
+    }
+}
+
+.confetti {
+    position: fixed;
+    width: 10px;
+    height: 10px;
+    background: #f4b235;
+    position: absolute;
+    animation: confetti-fall 3s linear;
+    z-index: 999;
+}
+
+@keyframes confetti-fall {
+    0% {
+        transform: translateY(-100px) rotate(0deg);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(100vh) rotate(720deg);
+        opacity: 0;
+    }
+}
+
+/* Custom Alert Modal */
+.custom-alert-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px);
+    z-index: 10000;
+    justify-content: center;
+    align-items: center;
+    animation: fadeIn 0.3s ease;
+}
+
+.custom-alert-overlay.active {
+    display: flex;
+}
+
+.custom-alert-box {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    border-radius: 30px;
+    padding: 40px 50px;
+    max-width: 450px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3),
+                0 0 0 1px rgba(255, 255, 255, 0.5) inset;
+    animation: slideInAlert 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.custom-alert-box::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, 
+        transparent 30%, 
+        rgba(255, 255, 255, 0.3) 50%, 
+        transparent 70%);
+    animation: shimmer 3s infinite;
+}
+
+.custom-alert-icon {
+    font-size: 80px;
+    margin-bottom: 20px;
+    animation: bounceIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+}
+
+.custom-alert-message {
+    font-size: 1.4em;
+    color: #2c3e50;
+    margin-bottom: 30px;
+    font-weight: 600;
+    line-height: 1.5;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    position: relative;
+    z-index: 1;
+}
+
+.custom-alert-button {
+    background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+    color: white;
+    border: none;
+    padding: 15px 50px;
+    font-size: 1.3em;
+    font-weight: 700;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 20px rgba(76, 175, 80, 0.4),
+                0 0 0 3px rgba(255, 255, 255, 0.3) inset;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+    margin: 5px;
+}
+
+@media (max-width: 480px) {
+    .custom-alert-box {
+        padding: 30px 35px;
+        border-radius: 25px;
+    }
+    
+    .custom-alert-icon {
+        font-size: 70px;
+        margin-bottom: 18px;
+    }
+    
+    .custom-alert-message {
+        font-size: 1.2em;
+        margin-bottom: 25px;
+    }
+    
+    .custom-alert-button {
+        padding: 13px 38px;
+        font-size: 1.15em;
+        margin: 8px;
+        min-width: 130px;
+    }
+    
+    .cancel-button {
+        margin-top: 5px !important;
+    }
+}
+
+.custom-alert-button::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.custom-alert-button:hover::before {
+    width: 300px;
+    height: 300px;
+}
+
+.custom-alert-button:hover {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 12px 30px rgba(76, 175, 80, 0.5),
+                0 0 0 4px rgba(255, 255, 255, 0.4) inset;
+}
+
+.custom-alert-button:active {
+    transform: translateY(0) scale(0.98);
+}
+
+@keyframes slideInAlert {
+    0% {
+        transform: translateY(-100px) scale(0.5);
+        opacity: 0;
+    }
+    100% {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes bounceIn {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.2);
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes shimmer {
+    0% {
+        transform: translateX(-100%) translateY(-100%) rotate(45deg);
+    }
+    100% {
+        transform: translateX(100%) translateY(100%) rotate(45deg);
+    }
+}
+
+/* ============================================ */
+/* Word Counter Display */
+/* ============================================ */
+.word-counter-display {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 8px 18px;
+    border-radius: 50px;
+    font-size: 1.1em;
+    font-weight: bold;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    animation: pulse 2s infinite;
+}
+
+.word-counter-label {
+    opacity: 0.9;
+    font-size: 0.85em;
+}
+
+.word-counter-value {
+    font-size: 1.2em;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* ============================================ */
+/* Results Button (Main Menu) */
+/* ============================================ */
+.results-button {
+    background: linear-gradient(145deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 16px 40px;
+    font-size: 1.4em;
+    font-weight: 700;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4),
+                0 4px 8px rgba(0, 0, 0, 0.15),
+                inset 0 -3px 0 rgba(0, 0, 0, 0.2);
+    font-family: 'Kanit', 'Prompt', sans-serif;
+    margin-top: 35px; /* ขยับปุ่มลงมาด้านล่างมากขึ้น */
+    position: relative;
+    overflow: hidden;
+}
+
+.results-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.5s;
+}
+
+.results-button:hover::before {
+    left: 100%;
+}
+
+.results-button:hover {
+    transform: translateY(-4px) scale(1.05);
+    box-shadow: 0 12px 28px rgba(102, 126, 234, 0.6),
+                0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+.results-button:active {
+    transform: translateY(-1px) scale(0.98);
+}
+
+@media (max-width: 480px) {
+    .results-button {
+        font-size: 1.1em;
+        padding: 14px 30px;
+        margin-top: 25px; /* ขยับปุ่มลงมาในมือถือด้วย */
+    }
+}
+
+/* ============================================ */
+/* Score Display (Game Screen) */
+/* ============================================ */
+.score-display {
+    font-size: 0.95em;
+    color: #555;
+}
+
+.score-display .player-value {
+    font-weight: bold;
+    color: #4fb848;
+    font-size: 1.1em;
+}
+
+/* ============================================ */
+/* Users Summary Modal */
+/* ============================================ */
+.users-summary-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px);
+    z-index: 10000;
+    animation: fadeIn 0.3s ease;
+}
+
+.users-summary-modal.active {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.users-summary-content {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    border-radius: 24px;
+    width: 95%;
+    max-width: 1000px;
+    max-height: 90vh;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3),
+                0 8px 24px rgba(0, 0, 0, 0.15);
+    display: flex;
+    flex-direction: column;
+    animation: slideInUp 0.4s ease;
+}
+
+.users-summary-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 28px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.users-summary-header h2 {
+    font-size: 1.4em;
+    margin: 0;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.close-summary-btn {
+    background: rgba(255,255,255,0.2);
+    border: 2px solid rgba(255,255,255,0.4);
+    color: white;
+    font-size: 1.3em;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.close-summary-btn:hover {
+    background: rgba(255,255,255,0.4);
+    transform: rotate(90deg) scale(1.1);
+}
+
+/* Loading */
+.summary-loading {
+    display: none;
+    text-align: center;
+    padding: 40px;
+    color: #666;
+    font-size: 1.1em;
+}
+
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid rgba(102, 126, 234, 0.2);
+    border-top: 4px solid #667eea;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 15px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Summary Table */
+.summary-table-wrapper {
+    overflow-y: auto;
+    max-height: calc(90vh - 80px);
+    padding: 0;
+}
+
+.summary-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95em;
+}
+
+.summary-table thead {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.summary-table th {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    padding: 14px 12px;
+    text-align: center;
+    font-weight: 700;
+    color: #2563a8;
+    border-bottom: 3px solid #667eea;
+    white-space: nowrap;
+    font-size: 0.9em;
+}
+
+.summary-table td {
+    padding: 12px 10px;
+    text-align: center;
+    border-bottom: 1px solid #eee;
+    vertical-align: middle;
+}
+
+.summary-table tbody tr {
+    transition: background 0.2s ease;
+}
+
+.summary-table tbody tr:hover {
+    background: rgba(102, 126, 234, 0.08);
+}
+
+.summary-table tbody tr:nth-child(even) {
+    background: rgba(248, 249, 250, 0.5);
+}
+
+.summary-table tbody tr:nth-child(even):hover {
+    background: rgba(102, 126, 234, 0.1);
+}
+
+/* User info in summary table */
+.summary-user-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: flex-start;
+}
+
+.summary-user-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 2px solid #f4b235;
+    object-fit: cover;
+}
+
+.summary-user-name {
+    font-weight: 600;
+    color: #333;
+    font-size: 0.95em;
+    text-align: left;
+}
+
+.summary-user-id {
+    font-size: 0.75em;
+    color: #999;
+    text-align: left;
+}
+
+/* Grade colors */
+.grade-excellent {
+    color: #4fb848;
+    font-weight: bold;
+}
+
+.grade-good {
+    color: #f4b235;
+    font-weight: bold;
+}
+
+.grade-improve {
+    color: #e85d9e;
+    font-weight: bold;
+}
+
+/* Level badges */
+.level-details-cell {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    justify-content: center;
+}
+
+.level-badge {
+    display: inline-block;
+    padding: 3px 7px;
+    border-radius: 8px;
+    font-size: 0.75em;
+    font-weight: 600;
+    min-width: 32px;
+    text-align: center;
+}
+
+.level-complete {
+    background: linear-gradient(135deg, #4fb848, #3d8b40);
+    color: white;
+}
+
+.level-progress {
+    background: linear-gradient(135deg, #f4b235, #e0a030);
+    color: white;
+}
+
+.level-none {
+    background: #e9ecef;
+    color: #aaa;
+}
+
+/* Spelling button pulse animation */
+.spelling-button {
+    animation: none;
+    transition: all 0.3s ease;
+}
+
+.spelling-button:hover {
+    animation: pulseGlow 1s infinite;
+}
+
+@keyframes pulseGlow {
+    0%, 100% {
+        box-shadow: 0 4px 8px rgba(244, 178, 53, 0.3);
+    }
+    50% {
+        box-shadow: 0 4px 20px rgba(244, 178, 53, 0.7);
+    }
+}
+
+/* Responsive - Summary Modal */
+@media (max-width: 768px) {
+    .users-summary-content {
+        width: 98%;
+        max-height: 95vh;
+        border-radius: 16px;
+    }
+
+    .users-summary-header {
+        padding: 15px 18px;
+    }
+
+    .users-summary-header h2 {
+        font-size: 1.1em;
+    }
+
+    .summary-table th,
+    .summary-table td {
+        padding: 8px 6px;
+        font-size: 0.8em;
+    }
+
+    .summary-user-avatar {
+        width: 28px;
+        height: 28px;
+    }
+
+    .level-badge {
+        font-size: 0.65em;
+        padding: 2px 5px;
+    }
+}
+
+@media (max-width: 480px) {
+    .users-summary-header h2 {
+        font-size: 0.95em;
+    }
+
+    .summary-table th:nth-child(6),
+    .summary-table td:nth-child(6) {
+        display: none; /* Hide level details on very small screens */
+    }
+
+    .word-counter-display {
+        padding: 5px 12px;
+        font-size: 0.9em;
+    }
+}
