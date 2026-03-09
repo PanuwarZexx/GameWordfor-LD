@@ -2568,6 +2568,29 @@ body::before {
     height: 70px;
     font-size: 2.2em;
     padding: 8px;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+/* For Thai character stacking */
+.combined-slot {
+    /* Flex handles centering perfectly */
+    white-space: nowrap;
+}
+
+.stacked-char {
+    display: inline-block;
+    /* Negative margin to pull characters together so vowels/tones stack */
+    margin-left: -5px;
+    margin-right: -5px;
+}
+.stacked-char:first-child {
+    margin-left: 0;
+}
+.stacked-char:last-child {
+    margin-right: 0;
 }
 
 @media (max-width: 480px) {
