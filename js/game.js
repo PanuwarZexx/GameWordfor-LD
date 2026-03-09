@@ -16,6 +16,9 @@ try {
     unlockNotificationShown = {};
 }
 
+// Combo System state
+let currentCombo = 0;
+
 // Character image mapping (ใช้ร่วมกัน)
 const characterImages = {
     1: '01.jpg',
@@ -919,7 +922,18 @@ function loadWordDirect() {
     }
 
     const wordData = levelData.words[currentWordIndex];
-    setupWordDisplay(wordData);
+    
+    // Smooth Transition (WOW Feature)
+    const gameRight = document.querySelector('.game-right');
+    if (gameRight) {
+        gameRight.classList.add('transitioning');
+        setTimeout(() => {
+            setupWordDisplay(wordData);
+            gameRight.classList.remove('transitioning');
+        }, 400); // 400ms matches the CSS transition time
+    } else {
+        setupWordDisplay(wordData);
+    }
 }
 
 function setupWordDisplay(wordData) {
@@ -1466,6 +1480,14 @@ function checkAnswer() {
     const correctAnswer = wordData.word;
 
     if (userAnswer === correctAnswer) {
+        // Combo System: Increment combo
+        currentCombo++;
+        let bonusPoints = 0;
+        if (currentCombo >= 3) {
+            bonusPoints = Math.floor(currentCombo / 2); // เพิ่มโบนัสตามรอบคอมโบ
+            showComboUI(currentCombo);
+        }
+
         showResultModal(true);
         
         // บันทึกคำที่ตอบถูก และเพิ่มคะแนนเฉพาะครั้งแรกที่ตอบถูก
@@ -1478,7 +1500,8 @@ function checkAnswer() {
         const isFirstTime = !answeredWords[levelKey].includes(currentWordIndex);
         
         if (isFirstTime) {
-            score++;
+            // บวกคะแนนพื้นฐาน 1 พร้อมคะแนนโบนัสคอมโบ
+            score += (1 + bonusPoints);
             answeredWords[levelKey].push(currentWordIndex);
             saveUserData();
         }
