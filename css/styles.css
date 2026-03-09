@@ -68,102 +68,56 @@ body::before {
 }
 
 /* Floating shapes in background */
+/* Immersive Background / Particles (WOW Feature) */
 .floating-shape {
-    position: fixed;
+    position: absolute;
+    background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 70%);
+    border-radius: 50%;
+    filter: blur(4px);
+    opacity: 0.6;
     animation: floatShape 20s infinite ease-in-out;
     pointer-events: none;
     z-index: 0;
-    filter: blur(1px);
 }
 
 .floating-shape:nth-child(1) {
-    width: 100px;
-    height: 100px;
-    top: 10%;
-    left: 10%;
-    animation-delay: 0s;
+    width: 150px; height: 150px;
+    top: 5%; left: 10%;
+    animation-duration: 25s;
+    background: radial-gradient(circle, rgba(232, 93, 158, 0.4) 0%, rgba(255,255,255,0) 70%);
 }
-
-.floating-shape:nth-child(1)::before {
-    content: '⭐';
-    font-size: 60px;
-    position: absolute;
-    animation: rotate 8s linear infinite;
-}
-
 .floating-shape:nth-child(2) {
-    width: 80px;
-    height: 80px;
-    top: 70%;
-    left: 80%;
-    animation-delay: 5s;
+    width: 200px; height: 200px;
+    top: 60%; left: 80%;
+    animation-duration: 30s;
+    animation-delay: -5s;
+    background: radial-gradient(circle, rgba(79, 184, 72, 0.3) 0%, rgba(255,255,255,0) 70%);
 }
-
-.floating-shape:nth-child(2)::before {
-    content: '🌟';
-    font-size: 50px;
-    position: absolute;
-    animation: rotate 10s linear infinite reverse;
-}
-
 .floating-shape:nth-child(3) {
-    width: 90px;
-    height: 90px;
-    top: 50%;
-    left: 50%;
-    animation-delay: 10s;
+    width: 120px; height: 120px;
+    top: 40%; left: 20%;
+    animation-duration: 22s;
+    animation-delay: -10s;
+    background: radial-gradient(circle, rgba(56, 189, 248, 0.4) 0%, rgba(255,255,255,0) 70%);
 }
-
-.floating-shape:nth-child(3)::before {
-    content: '✨';
-    font-size: 55px;
-    position: absolute;
-    animation: rotate 12s linear infinite;
-}
-
 .floating-shape:nth-child(4) {
-    width: 110px;
-    height: 110px;
-    top: 20%;
-    right: 20%;
-    animation-delay: 15s;
+    width: 80px; height: 80px;
+    top: 15%; left: 75%;
+    animation-duration: 18s;
+    background: radial-gradient(circle, rgba(245, 158, 11, 0.4) 0%, rgba(255,255,255,0) 70%);
 }
-
-.floating-shape:nth-child(4)::before {
-    content: '💫';
-    font-size: 65px;
-    position: absolute;
-    animation: rotate 9s linear infinite reverse;
-}
-
 .floating-shape:nth-child(5) {
-    width: 70px;
-    height: 70px;
-    top: 30%;
-    left: 25%;
-    animation-delay: 3s;
+    width: 250px; height: 250px;
+    top: 70%; left: 15%;
+    animation-duration: 35s;
+    background: radial-gradient(circle, rgba(167, 139, 250, 0.3) 0%, rgba(255,255,255,0) 70%);
 }
-
-.floating-shape:nth-child(5)::before {
-    content: '🌈';
-    font-size: 45px;
-    position: absolute;
-    animation: rotate 15s linear infinite;
-}
-
 .floating-shape:nth-child(6) {
     width: 95px;
     height: 95px;
     top: 80%;
     left: 50%;
     animation-delay: 7s;
-}
-
-.floating-shape:nth-child(6)::before {
-    content: '☀️';
-    font-size: 58px;
-    position: absolute;
-    animation: rotate 11s linear infinite;
 }
 
 .floating-shape:nth-child(7) {
@@ -174,26 +128,12 @@ body::before {
     animation-delay: 12s;
 }
 
-.floating-shape:nth-child(7)::before {
-    content: '🎈';
-    font-size: 52px;
-    position: absolute;
-    animation: rotate 13s linear infinite reverse;
-}
-
 .floating-shape:nth-child(8) {
     width: 75px;
     height: 75px;
     top: 60%;
     left: 15%;
     animation-delay: 18s;
-}
-
-.floating-shape:nth-child(8)::before {
-    content: '🎨';
-    font-size: 48px;
-    position: absolute;
-    animation: rotate 14s linear infinite;
 }
 
 .floating-shape:nth-child(9) {
@@ -204,26 +144,12 @@ body::before {
     animation-delay: 9s;
 }
 
-.floating-shape:nth-child(9)::before {
-    content: '🎵';
-    font-size: 55px;
-    position: absolute;
-    animation: rotate 10s linear infinite reverse;
-}
-
 .floating-shape:nth-child(10) {
     width: 80px;
     height: 80px;
     top: 85%;
     right: 30%;
     animation-delay: 6s;
-}
-
-.floating-shape:nth-child(10)::before {
-    content: '🌸';
-    font-size: 50px;
-    position: absolute;
-    animation: rotate 16s linear infinite;
 }
 
 .floating-shape:nth-child(11) {
@@ -234,26 +160,12 @@ body::before {
     animation-delay: 14s;
 }
 
-.floating-shape:nth-child(11)::before {
-    content: '🦋';
-    font-size: 45px;
-    position: absolute;
-    animation: rotate 9s linear infinite reverse;
-}
-
 .floating-shape:nth-child(12) {
     width: 100px;
     height: 100px;
     top: 55%;
     right: 10%;
     animation-delay: 11s;
-}
-
-.floating-shape:nth-child(12)::before {
-    content: '🎯';
-    font-size: 60px;
-    position: absolute;
-    animation: rotate 12s linear infinite;
 }
 
 .floating-shape:nth-child(13) {
@@ -264,13 +176,6 @@ body::before {
     animation-delay: 4s;
 }
 
-.floating-shape:nth-child(13)::before {
-    content: '🎪';
-    font-size: 42px;
-    position: absolute;
-    animation: rotate 17s linear infinite reverse;
-}
-
 .floating-shape:nth-child(14) {
     width: 85px;
     height: 85px;
@@ -279,26 +184,12 @@ body::before {
     animation-delay: 8s;
 }
 
-.floating-shape:nth-child(14)::before {
-    content: '🎁';
-    font-size: 52px;
-    position: absolute;
-    animation: rotate 13s linear infinite;
-}
-
 .floating-shape:nth-child(15) {
     width: 95px;
     height: 95px;
     top: 45%;
     left: 85%;
     animation-delay: 16s;
-}
-
-.floating-shape:nth-child(15)::before {
-    content: '🌟';
-    font-size: 58px;
-    position: absolute;
-    animation: rotate 11s linear infinite reverse;
 }
 
 @keyframes floatShape {
@@ -1909,6 +1800,61 @@ body::before {
     }
 }
 
+/* Micro-animations: Ripple effect for Thai Keys */
+.thai-key {
+    background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(248,249,250,0.95) 100%);
+    border: 2px solid rgba(255,255,255,0.8);
+    border-radius: 12px;
+    padding: 10px 5px;
+    font-size: 1.6em;
+    font-weight: 700;
+    color: #2c3e50;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1),
+                inset 0 -2px 5px rgba(0,0,0,0.05);
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Kanit', sans-serif;
+    position: relative;
+    overflow: hidden;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.thai-key::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100%;
+    height: 100%;
+    background: rgba(232, 93, 158, 0.2);
+    border-radius: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0;
+    transition: transform 0.4s ease-out, opacity 0.4s ease-out;
+}
+
+.thai-key:active::after {
+    transform: translate(-50%, -50%) scale(2);
+    opacity: 1;
+    transition: 0s;
+}
+
+.thai-key:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 6px 12px rgba(232, 93, 158, 0.2);
+    border-color: rgba(232, 93, 158, 0.4);
+    z-index: 10;
+}
+
+.thai-key:active {
+    transform: translateY(2px) scale(0.95);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
 .answer-section {
     width: 100%;
     display: flex;
@@ -3026,6 +2972,34 @@ body::before {
     animation: shimmer 3s infinite;
 }
 
+.custom-.answer-section {
+    padding: 10px;
+    margin-bottom: 5px;
+}
+
+/* ============================================ */
+/* Smooth Word Transitions (WOW Feature) */
+/* ============================================ */
+.game-right {
+    transition: opacity 0.4s ease-out, transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.game-right.transitioning {
+    opacity: 0;
+    transform: translateY(20px) scale(0.98);
+}
+
+.word-transition-enter {
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+.word-transition-enter-active {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+}
+
 .custom-alert-icon {
     font-size: 80px;
     margin-bottom: 20px;
@@ -3246,6 +3220,52 @@ body::before {
     font-weight: bold;
     color: #4fb848;
     font-size: 1.1em;
+}
+
+/* ============================================ */
+/* Combo Streak Display (WOW Feature)           */
+/* ============================================ */
+.combo-display {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(135deg, #ff4e50 0%, #f9d423 100%);
+    padding: 5px 15px;
+    border-radius: 30px;
+    box-shadow: 0 0 15px rgba(255, 78, 80, 0.6), inset 0 0 10px rgba(255, 255, 255, 0.5);
+    margin-left: auto;
+    border: 2px solid #fff;
+    transform: scale(0);
+}
+
+.combo-text {
+    color: white;
+    font-size: 1.1em;
+    font-weight: 900;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+    letter-spacing: 2px;
+}
+
+.combo-multiplier {
+    color: #fff;
+    font-size: 1.5em;
+    font-weight: 900;
+    text-shadow: 2px 2px 0px #ff4e50, -1px -1px 0px #f9d423;
+}
+
+.animate-combo {
+    animation: comboPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards, comboPulse 1.5s infinite alternate ease-in-out;
+}
+
+@keyframes comboPop {
+    0% { transform: scale(0) rotate(-10deg); opacity: 0; }
+    80% { transform: scale(1.1) rotate(5deg); opacity: 1; }
+    100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+
+@keyframes comboPulse {
+    0% { filter: drop-shadow(0 0 5px rgba(255,78,80,0.6)); }
+    100% { filter: drop-shadow(0 0 15px #f9d423); transform: scale(1.05); }
 }
 
 /* ============================================ */
