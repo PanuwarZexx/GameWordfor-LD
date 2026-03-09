@@ -1531,11 +1531,39 @@ function checkAnswer() {
             nextWord();
         }, 1200);
     } else {
+        // Combo System: Reset on wrong answer
+        currentCombo = 0;
+        hideComboUI();
+
         showResultModal(false);
         // Reset answer
         setTimeout(() => {
             resetAnswer();
         }, 1500);
+    }
+}
+
+// ฟังก์ชันแสดงและซ่อน Combo UI
+function showComboUI(comboCount) {
+    const comboDisplay = document.getElementById('comboDisplay');
+    const multiplier = document.getElementById('comboMultiplier');
+    
+    if (comboDisplay && multiplier) {
+        multiplier.textContent = `x${comboCount}`;
+        comboDisplay.style.display = 'flex';
+        
+        // Re-trigger animation
+        comboDisplay.classList.remove('animate-combo');
+        void comboDisplay.offsetWidth; // trigger reflow
+        comboDisplay.classList.add('animate-combo');
+    }
+}
+
+function hideComboUI() {
+    const comboDisplay = document.getElementById('comboDisplay');
+    if (comboDisplay) {
+        comboDisplay.style.display = 'none';
+        comboDisplay.classList.remove('animate-combo');
     }
 }
 
