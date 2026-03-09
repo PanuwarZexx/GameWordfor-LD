@@ -2433,7 +2433,7 @@ body::before {
 }
 
 .check-button {
-    background: linear-gradient(135deg, #2563a8 0%, #1e4a8a 100%);
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
     color: white;
     font-size: 1.2em;
     font-weight: 700;
@@ -2441,7 +2441,7 @@ body::before {
     border: none;
     border-radius: 50px;
     cursor: pointer;
-    box-shadow: 0 4px 12px rgba(37, 99, 168, 0.4);
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.5);
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
@@ -2457,7 +2457,7 @@ body::before {
 
 .check-button:hover {
     transform: scale(1.05);
-    box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+    box-shadow: 0 6px 16px rgba(245, 158, 11, 0.6);
     animation: pulse 1s infinite;
 }
 
@@ -2536,21 +2536,9 @@ body::before {
     }
 }
 
-/* Spelling Display - แสดงคำสะกด */
+/* Spelling Display - ซ่อนถาวรแล้ว เหลือแค่เสียง */
 .spelling-display {
-    background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
-    color: #6a1b9a;
-    font-size: 1.8em;
-    font-weight: 700;
-    padding: 18px 30px;
-    border-radius: 20px;
-    text-align: center;
-    margin-top: 15px;
-    border: 3px solid #ce93d8;
-    box-shadow: 0 4px 15px rgba(155, 89, 182, 0.3);
-    animation: slideInUp 0.4s ease-out;
-    letter-spacing: 3px;
-    width: 100%;
+    display: none !important;
 }
 
 @media (max-width: 480px) {
@@ -2576,21 +2564,13 @@ body::before {
 
 /* For Thai character stacking */
 .combined-slot {
-    /* Flex handles centering perfectly */
     white-space: nowrap;
+    line-height: 1.2;
 }
 
 .stacked-char {
-    display: inline-block;
-    /* Negative margin to pull characters together so vowels/tones stack */
-    margin-left: -5px;
-    margin-right: -5px;
-}
-.stacked-char:first-child {
-    margin-left: 0;
-}
-.stacked-char:last-child {
-    margin-right: 0;
+    /* ให้เบราว์เซอร์จัดการซ้อนตามธรรมชาติภาษาไทย ไม่ต้อง margin แล้ว */
+    display: inline;
 }
 
 @media (max-width: 480px) {
