@@ -22,7 +22,8 @@ app.use(cors({
         'http://127.0.0.1:5501',
         'https://games-word-thai.netlify.app',
         'https://project-com-tech.ubru.ac.th',
-        'http://project-com-tech.ubru.ac.th'
+        'http://project-com-tech.ubru.ac.th',
+        'https://panuwarzexx.github.io'
     ],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
