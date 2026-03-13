@@ -1818,7 +1818,7 @@ function playButtonClickSound() {
     oscillator.connect(gainNode);
     gainNode.connect(audioContext.destination);
     
-    oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+    oscillator.frequency.setValueAtTime(800, audioContext.currentTime); 
     oscillator.type = 'sine';
     
     gainNode.gain.setValueAtTime(0.15, audioContext.currentTime);
