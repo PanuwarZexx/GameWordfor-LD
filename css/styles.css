@@ -2335,6 +2335,7 @@ body::before {
     display: flex;
     justify-content: center;
     margin-top: -2px;
+    max-width: 100%;
 }
 
 @media (max-width: 480px) {
@@ -2380,6 +2381,8 @@ body::before {
     align-items: center;
     justify-content: center;
     outline: none;
+    flex-shrink: 1;
+    max-width: 32%;
 }
 
 .img-button:hover {
