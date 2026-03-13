@@ -2331,11 +2331,11 @@ body::before {
 
 /* ปุ่มตรวจสอบขึ้นบรรทัดใหม่ อยู่กึ่งกลาง ชิด 3 ปุ่มบน */
 .game-controls .check-button-img {
-    flex-basis: 100%;
+    flex-basis: auto;
     display: flex;
     justify-content: center;
     margin-top: 0;
-    max-width: 100%;
+    max-width: 32%;
 }
 
 @media (max-width: 480px) {
@@ -2401,7 +2401,7 @@ body::before {
 }
 
 .img-button.check-button-img img.btn-bottom {
-    height: 170px;
+    height: 125px;
     width: auto;
     object-fit: contain;
 }
@@ -2457,14 +2457,14 @@ body::before {
 
 /* กล่องหลัก - พยัญชนะ/สระหน้า/สระหลัง */
 .answer-slot.slot-main {
-    min-width: 80px;
-    width: 100px;
-    height: 100px;
-    font-size: 3.2em;
+    min-width: 56px;
+    width: 70px;
+    height: 70px;
+    font-size: 2.2em;
     font-weight: 900;
     background: linear-gradient(135deg, #e85d9e 0%, #d64a8a 100%);
     color: white;
-    border-radius: 18px;
+    border-radius: 14px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -2474,19 +2474,19 @@ body::before {
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
     transition: all 0.3s ease;
     font-family: 'Kanit', sans-serif;
-    padding: 4px;
+    padding: 3px;
 }
 
 /* กล่องเล็ก - สระบน/วรรณยุกต์ */
 .answer-slot.slot-above {
-    min-width: 60px;
-    width: 70px;
-    height: 60px;
-    font-size: 2.2em;
+    min-width: 42px;
+    width: 49px;
+    height: 42px;
+    font-size: 1.5em;
     font-weight: 800;
     background: linear-gradient(135deg, #a78bfa 0%, #8b5cf6 100%);
     color: white;
-    border-radius: 12px;
+    border-radius: 9px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -2501,14 +2501,14 @@ body::before {
 
 /* กล่องเล็ก - สระล่าง */
 .answer-slot.slot-below {
-    min-width: 60px;
-    width: 70px;
-    height: 60px;
-    font-size: 2.2em;
+    min-width: 42px;
+    width: 49px;
+    height: 42px;
+    font-size: 1.5em;
     font-weight: 800;
     background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%);
     color: white;
-    border-radius: 12px;
+    border-radius: 9px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -2524,8 +2524,8 @@ body::before {
 /* Placeholder สำหรับจัดตำแหน่งให้สมมาตร */
 .slot-placeholder-above,
 .slot-placeholder-below {
-    width: 70px;
-    height: 60px;
+    width: 49px;
+    height: 42px;
     visibility: hidden;
 }
 
@@ -2538,25 +2538,25 @@ body::before {
 
 @media (max-width: 480px) {
     .cluster-layout {
-        gap: 6px;
+        gap: 4px;
     }
     .answer-slot.slot-main {
-        min-width: 65px;
-        width: 80px;
-        height: 80px;
-        font-size: 2.6em;
+        min-width: 46px;
+        width: 56px;
+        height: 56px;
+        font-size: 1.8em;
     }
     .answer-slot.slot-above,
     .answer-slot.slot-below {
-        min-width: 48px;
-        width: 56px;
-        height: 50px;
-        font-size: 1.8em;
+        min-width: 34px;
+        width: 39px;
+        height: 35px;
+        font-size: 1.3em;
     }
     .slot-placeholder-above,
     .slot-placeholder-below {
-        width: 56px;
-        height: 50px;
+        width: 39px;
+        height: 35px;
     }
 }
 
