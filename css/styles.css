@@ -2476,13 +2476,14 @@ body::before {
 
 .game-controls {
     display: flex;
-    gap: 12px;
+    gap: 8px;
     justify-content: center;
     flex-wrap: nowrap;
     width: 100%;
     align-items: center;
     margin-top: 5px;
-    padding: 5px 10px;
+    padding: 5px 5px;
+    overflow: hidden;
 }
 
 /* ปุ่มตรวจสอบอยู่ในแถวเดียวกับ 3 ปุ่มบน */
@@ -2541,8 +2542,8 @@ body::before {
     align-items: center;
     justify-content: center;
     outline: none;
-    flex-shrink: 1;
-    max-width: 22%;
+    flex: 1;
+    max-width: 24%;
 }
 
 .img-button:hover {
@@ -2555,14 +2556,16 @@ body::before {
 }
 
 .img-button img.btn-top {
-    height: 120px;
+    height: 100px;
     width: auto;
+    max-width: 100%;
     object-fit: contain;
 }
 
 .img-button.check-button-img img.btn-bottom {
-    height: 120px;
+    height: 100px;
     width: auto;
+    max-width: 100%;
     object-fit: contain;
 }
 
