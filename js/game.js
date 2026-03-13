@@ -1542,26 +1542,70 @@ function checkAnswer() {
         currentCombo = 0;
         hideComboUI();
 
-        // Determine specific error
-        let errorType = 'คำตอบไม่ถูกต้อง';
-        for (let i = 0; i < Math.max(userAnswer.length, correctAnswer.length); i++) {
-            if (userAnswer[i] !== correctAnswer[i]) {
-                const expectedChar = correctAnswer[i];
-                if (!expectedChar) {
-                    errorType = 'มีตัวอักษรเกินมาครับ';
-                } else if (!userAnswer[i]) {
-                    errorType = 'กรอกตัวอักษรไม่ครบครับ';
-                } else if (thaiConsonants.includes(expectedChar)) {
-                    errorType = 'ใส่พยัญชนะผิดครับ';
-                } else if (['่', '้', '๊', '๋'].includes(expectedChar)) {
-                    errorType = 'ใส่วรรณยุกต์ผิดครับ';
-                } else if (thaiVowels.includes(expectedChar)) {
-                    errorType = 'ใส่สระผิดครับ';
-                } else {
-                    errorType = 'ใส่ตัวอักษรผิดครับ';
+        // วิเคราะห์ข้อผิดพลาดทั้งหมดอย่างละเอียด
+        let hasConsonantError = false;
+        let hasVowelError = false;
+        let hasToneError = false;
+        let hasMissing = false;
+        let hasExtra = false;
+        
+        const toneMarks = ['่', '้', '๊', '๋'];
+        const vowelChars = ['ะ', 'า', 'ิ', 'ี', 'ึ', 'ื', 'ุ', 'ู', 'เ', 'แ', 'โ', 'ใ', 'ไ', 'ำ', 'ั', '็', '์', 'ํ'];
+        
+        const maxLen = Math.max(userAnswer.length, correctAnswer.length);
+        
+        for (let i = 0; i < maxLen; i++) {
+            const userChar = userAnswer[i];
+            const correctChar = correctAnswer[i];
+            
+            if (userChar === correctChar) continue;
+            
+            if (!userChar) {
+                // ผู้เล่นกรอกไม่ครบ
+                hasMissing = true;
+            } else if (!correctChar) {
+                // ผู้เล่นกรอกเกิน
+                hasExtra = true;
+            } else {
+                // ตัวอักษรผิด - จำแนกประเภทจากตัวที่ควรจะเป็น (correctChar)
+                if (toneMarks.includes(correctChar) || toneMarks.includes(userChar)) {
+                    hasToneError = true;
+                } else if (vowelChars.includes(correctChar) || vowelChars.includes(userChar)) {
+                    hasVowelError = true;
+                } else if (thaiConsonants.includes(correctChar) || thaiConsonants.includes(userChar)) {
+                    hasConsonantError = true;
                 }
-                break;
             }
+        }
+        
+        // สร้างข้อความแจ้งเตือนรวม
+        let errorType = '';
+        let errorParts = [];
+        
+        if (hasMissing) {
+            errorParts.push('กรอกตัวอักษรไม่ครบ');
+        }
+        if (hasExtra) {
+            errorParts.push('มีตัวอักษรเกิน');
+        }
+        if (hasConsonantError && hasVowelError && hasToneError) {
+            errorParts.push('ใส่พยัญชนะ สระ และวรรณยุกต์ผิด');
+        } else if (hasConsonantError && hasVowelError) {
+            errorParts.push('ใส่พยัญชนะและสระผิด');
+        } else if (hasConsonantError && hasToneError) {
+            errorParts.push('ใส่พยัญชนะและวรรณยุกต์ผิด');
+        } else if (hasVowelError && hasToneError) {
+            errorParts.push('ใส่สระและวรรณยุกต์ผิด');
+        } else {
+            if (hasConsonantError) errorParts.push('ใส่พยัญชนะผิด');
+            if (hasVowelError) errorParts.push('ใส่สระผิด');
+            if (hasToneError) errorParts.push('ใส่วรรณยุกต์ผิด');
+        }
+        
+        if (errorParts.length > 0) {
+            errorType = errorParts.join(' และ') + 'ครับ';
+        } else {
+            errorType = 'คำตอบไม่ถูกต้องครับ';
         }
 
         showResultModal(false, errorType);
@@ -1818,7 +1862,7 @@ function playButtonClickSound() {
     oscillator.connect(gainNode);
     gainNode.connect(audioContext.destination);
     
-    oscillator.frequency.setValueAtTime(800, audioContext.currentTime); 
+    oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
     oscillator.type = 'sine';
     
     gainNode.gain.setValueAtTime(0.15, audioContext.currentTime);
