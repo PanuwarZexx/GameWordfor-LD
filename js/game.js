@@ -1817,14 +1817,6 @@ function playCharacterSound(char) {
 }
 
 function playCorrectSound() {
-    if (!soundEnabled) return;
-    // You can add a correct answer sound effect here
-    const audio = new Audio();
-    audio.src = 'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBTGH0fPTgjMGHm7A7+OZSA0PVKvn77BbGAg+ltzy0H4qBSh+zPLaizsIGGS57OihUBELTKXh8bllHAU2kNXzzn4oBSV7yfHajjwJF2K37OmkUxEKSqPh8bllHAU2kNXzzn4oBSV7yfHajjwJF2K37OmkUxEKSqPh8bllHAU2kNXzzn4oBSV7yfHajjwJF2K37OmkUxEKSqPh8bllHAU2kNXzzn4oBSV7yfHajjwJF2K37OmkUxEKSqPh8bllHAU2kNXzzn4oBSV7yfHajjwJF2K37OmkUxEKSqPh8bllHAU2kNXzzn4oBSV7yfHajjwJF2K37OmkUxEKSqPh8bllHAU2kNXzzn4oBSV7yfHajjwJF2K37OmkUxEKSqPh8bllHAU2kNXzzn4oBSV7yfHajjwJF2K37OmkUxEKSqPh8bllHAU2kNXzzn4oBSV7yfHajjwJF2K37OmkUxEKSqPh8bllHAU2kNXzzn4oBSV7yfHajjwJF2K37OmkUxEKSqPh8bllHAU2kNXzzn4oBSV7yfHajjwJF2K37OmkUxEKSqPh8bllHAU2kNXzzn4oBSV7yfHajjwJF2K37OmkUxEKSqPh8bllHAU2kNXzzn4oBSV7yfHajjwJF2K37OmkUxEKSqPh8bllHAU2kNXzzn4oBSV7yfHajjwJF2K37OmkUxEKSqPh8bllHAU2kNXzzn4oBSV7yfHajjwJF2K37OmkUxEKSqPh8bllHAU2kNXzzn4oBSV7yfHajjwJF2K37OmkUxEKSqPh8bllHAU2kNXzzn4oBSV7yfHajjwJF2K37OmkUxEKSqPh8bllHAU2kNXzzn4oBSV7yfHajjwJF2K37OmkUxEKSqPh8bllHAU2kNXzzn4oBSV7yfHajjwJF2K37OmkUxEKSqPh8bllHAU2kNXzzn4oBSV7yfHajjwJF2K37OmkUxEKSqPh8bllHAU2kNXzzn4oBSV7yfHajjwJF2K37OmkUxEKSqPh8bllHAU2kNXzzn4oBSV7yfHajjwJF2K37OmkUxEKSqPh8bllHAU2kNXzzn4oBSV7yfHajjwJF2K37OmkUxEKSqPh8bllHAU2kNXzzn4o';
-    audio.play().catch(() => {});
-}
-
-function playCorrectSound() {
     // เล่นเสียงเสมอ ไม่ว่า soundEnabled จะเปิดหรือปิด
     
     // สร้างเสียงพลุ (celebration sound) ดังขึ้น
