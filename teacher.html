@@ -31,6 +31,8 @@
         }
         .btn-secondary { background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.4); }
         .btn-secondary:hover { background: rgba(255,255,255,0.3); }
+        .btn-print { background: #667eea; color: white; border: none; padding: 8px 18px; border-radius: 10px; cursor: pointer; font-family: 'Kanit', sans-serif; font-weight: 600; font-size: 0.9em; }
+        .btn-print:hover { background: #5a6fd6; }
 
         .container { max-width: 1100px; margin: 30px auto; padding: 0 20px; }
 
@@ -66,7 +68,6 @@
         }
         .student-card .sc-name { font-weight: 700; font-size: 1em; }
         .student-card .sc-user { font-size: 0.8em; color: #888; }
-        .student-card .sc-meta { font-size: 0.75em; color: #aaa; margin-bottom: 8px; }
         .progress-bar { height: 8px; background: #e0e7ff; border-radius: 10px; overflow: hidden; }
         .progress-bar .fill { height: 100%; border-radius: 10px; transition: width 0.5s ease; }
         .progress-bar .fill.good { background: linear-gradient(90deg, #4fb848, #7fb83e); }
@@ -107,6 +108,7 @@
         .profile-info .pname { font-weight: 900; font-size: 1.3em; }
         .profile-info .pmeta { font-size: 0.85em; color: #888; line-height: 1.6; }
         .profile-info .pmeta span { margin-right: 15px; }
+        .profile-actions { display: flex; flex-direction: column; gap: 8px; align-items: flex-end; }
         .close-btn {
             background: #f0f0f0; border: none; width: 40px; height: 40px;
             border-radius: 50%; cursor: pointer; font-size: 1.3em; transition: all 0.3s;
@@ -138,6 +140,13 @@
         .perf-good { background: linear-gradient(135deg, #667eea, #764ba2); color: white; }
         .perf-improve { background: linear-gradient(135deg, #f4b235, #f39c12); color: white; }
         .perf-needhelp { background: linear-gradient(135deg, #ff6b6b, #ee5a24); color: white; }
+
+        /* Donut Chart */
+        .donut-chart { display: flex; align-items: center; gap: 30px; justify-content: center; margin-bottom: 20px; }
+        .donut-svg { width: 150px; height: 150px; }
+        .donut-label { font-size: 0.9em; }
+        .donut-label div { margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+        .donut-label .dot { width: 14px; height: 14px; border-radius: 50%; display: inline-block; }
 
         /* Word Chart */
         .chart-section { background: white; border-radius: 20px; padding: 25px; margin-bottom: 20px; box-shadow: 0 3px 12px rgba(0,0,0,0.06); }
@@ -180,6 +189,14 @@
         .legend { display: flex; gap: 15px; margin-top: 10px; font-size: 0.8em; color: #666; }
         .legend-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 4px; vertical-align: middle; }
 
+        /* Level Progress Bar */
+        .level-progress-section { background: white; border-radius: 20px; padding: 25px; margin-bottom: 20px; box-shadow: 0 3px 12px rgba(0,0,0,0.06); }
+        .level-prog-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; font-size: 0.85em; }
+        .level-prog-label { width: 60px; font-weight: 700; }
+        .level-prog-bar { flex: 1; height: 18px; background: #f0f0f0; border-radius: 8px; overflow: hidden; }
+        .level-prog-fill { height: 100%; border-radius: 8px; background: linear-gradient(90deg, #667eea, #764ba2); transition: width 0.5s; }
+        .level-prog-val { width: 50px; text-align: right; font-weight: 600; color: #667eea; }
+
         .search-bar {
             padding: 10px 18px; border: 2px solid #e0e7ff; border-radius: 12px;
             font-family: 'Kanit', sans-serif; font-size: 0.95em; width: 100%;
@@ -192,6 +209,20 @@
             .score-summary { grid-template-columns: repeat(2, 1fr); }
             .profile-card { flex-direction: column; text-align: center; }
         }
+
+        /* Print Styles */
+        @media print {
+            body { background: white !important; color: black !important; }
+            .header, .search-bar, .student-list, .close-btn, .btn-print, .detail-overlay { display: none !important; }
+            .detail-box { box-shadow: none !important; max-height: none !important; overflow: visible !important; }
+            .profile-actions { display: none !important; }
+            .chart-section, .history-section, .level-progress-section, .sc-box, .profile-card, .score-summary { box-shadow: none !important; border: 1px solid #ddd !important; }
+            .level-words { display: block !important; }
+            .perf-badge { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .word-bar-correct, .word-bar-wrong, .history-bar, .level-prog-fill, .progress-bar .fill { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            #printArea { display: block !important; padding: 20px; }
+        }
+        #printArea { display: none; }
     </style>
 </head>
 <body>
@@ -238,10 +269,13 @@
         </div>
     </div>
 
-    <script src="js/api.js?v=20260313c"></script>
+    <!-- Print Area (hidden, used for printing) -->
+    <div id="printArea"></div>
+
+    <script src="js/api.js?v=20260313d"></script>
     <script>
         const characterImages = { 1:'01.jpg', 2:'02.jpg', 3:'03.jpg', 4:'04.jpg', 5:'05.jpg', 6:'06.jpg' };
-        const MAX_SCORE = 1000; // คะแนนเต็ม
+        const MAX_SCORE = 1000;
         let allStudents = [];
 
         if (!localStorage.getItem('authToken')) {
@@ -294,7 +328,6 @@
                 const fillClass = pct >= 60 ? 'good' : pct >= 40 ? 'mid' : 'low';
                 const avatarSrc = `css/${characterImages[st.characterId] || '01.jpg'}`;
                 const lastLogin = st.lastLoginAt ? new Date(st.lastLoginAt).toLocaleDateString('th-TH', { day:'numeric', month:'short' }) : '-';
-                const perf = getPerformanceLevel(pct);
                 const classInfo = st.classroom ? ` | ${st.classroom}` : '';
                 const sidInfo = st.studentId ? `${st.studentId} | ` : '';
                 return `<div class="student-card" onclick="showDetail('${st.id}')">
@@ -342,16 +375,12 @@
                 const perf = getPerformanceLevel(pct);
                 const joinDate = new Date(s.createdAt).toLocaleDateString('th-TH', { day:'numeric', month:'long', year:'numeric' });
                 const lastLogin = s.lastLoginAt ? new Date(s.lastLoginAt).toLocaleDateString('th-TH', { day:'numeric', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit' }) : '-';
-
-                // Play session summary
                 const dailyKeys = Object.keys(history.dailyStats || {});
                 const totalPlayDays = dailyKeys.length;
-                const firstPlay = dailyKeys.length > 0 ? dailyKeys[0] : '-';
-                const lastPlay = dailyKeys.length > 0 ? dailyKeys[dailyKeys.length - 1] : '-';
 
                 let html = '';
 
-                // ===== Profile Card =====
+                // ===== Profile Card + Print Button =====
                 html += `<div class="profile-card">
                     <img src="${avatarSrc}" class="avatar" onerror="this.src='css/01.jpg'">
                     <div class="profile-info">
@@ -370,7 +399,10 @@
                             <span>📊 ทำแบบทดสอบ ${detail.stats.totalAttempts} ครั้ง</span>
                         </div>
                     </div>
-                    <button class="close-btn" onclick="closeDetail()">✕</button>
+                    <div class="profile-actions">
+                        <button class="close-btn" onclick="closeDetail()">✕</button>
+                        <button class="btn-print" onclick="printReport()">🖨️ ปริ้นผล</button>
+                    </div>
                 </div>`;
 
                 // ===== Performance Badge =====
@@ -386,6 +418,57 @@
                     <div class="sc-box pct"><div class="sc-val">${detail.stats.accuracy}%</div><div class="sc-lbl">ความแม่นยำ</div></div>
                     <div class="sc-box plays"><div class="sc-val">${detail.stats.totalAttempts}</div><div class="sc-lbl">ทำแบบทดสอบ</div></div>
                 </div>`;
+
+                // ===== Donut Chart (ถูก/ผิด) =====
+                const correct = detail.stats.correctAttempts || 0;
+                const wrong = detail.stats.wrongAttempts || 0;
+                const total = correct + wrong || 1;
+                const correctPct = (correct / total) * 100;
+                const correctDash = (correctPct / 100) * 251.2;
+                html += `<div class="chart-section">
+                    <h4>🎯 สัดส่วนการตอบถูก/ผิด</h4>
+                    <div class="donut-chart">
+                        <svg class="donut-svg" viewBox="0 0 100 100">
+                            <circle cx="50" cy="50" r="40" fill="none" stroke="#f0f0f0" stroke-width="12"/>
+                            <circle cx="50" cy="50" r="40" fill="none" stroke="#4fb848" stroke-width="12"
+                                stroke-dasharray="${correctDash} ${251.2 - correctDash}" stroke-dashoffset="62.8"
+                                stroke-linecap="round" style="transition:all 0.5s;"/>
+                            <circle cx="50" cy="50" r="40" fill="none" stroke="#ff6b6b" stroke-width="12"
+                                stroke-dasharray="${((100-correctPct)/100)*251.2} ${correctDash}" stroke-dashoffset="${62.8 - correctDash}"
+                                stroke-linecap="round" style="transition:all 0.5s;"/>
+                            <text x="50" y="48" text-anchor="middle" font-size="14" font-weight="900" fill="#2c3e50">${Math.round(correctPct)}%</text>
+                            <text x="50" y="60" text-anchor="middle" font-size="6" fill="#888">ถูกต้อง</text>
+                        </svg>
+                        <div class="donut-label">
+                            <div><span class="dot" style="background:#4fb848;"></span> ตอบถูก ${correct} ครั้ง (${Math.round(correctPct)}%)</div>
+                            <div><span class="dot" style="background:#ff6b6b;"></span> ตอบผิด ${wrong} ครั้ง (${Math.round(100-correctPct)}%)</div>
+                            <div><span class="dot" style="background:#667eea;"></span> รวม ${total} ครั้ง</div>
+                        </div>
+                    </div>
+                </div>`;
+
+                // ===== Level Progress Bars =====
+                html += `<div class="level-progress-section">
+                    <h4>📈 ความก้าวหน้าแต่ละด่าน</h4>`;
+                for (let level = 1; level <= 10; level++) {
+                    const logs = detail.logsByLevel[String(level)];
+                    if (!logs || logs.length === 0) {
+                        html += `<div class="level-prog-row">
+                            <div class="level-prog-label">ด่าน ${level}</div>
+                            <div class="level-prog-bar"><div class="level-prog-fill" style="width:0%"></div></div>
+                            <div class="level-prog-val">-</div>
+                        </div>`;
+                        continue;
+                    }
+                    const levelCorrect = logs.filter(l => l.isCorrect).length;
+                    const levelPct = Math.round((levelCorrect / logs.length) * 100);
+                    html += `<div class="level-prog-row">
+                        <div class="level-prog-label">ด่าน ${level}</div>
+                        <div class="level-prog-bar"><div class="level-prog-fill" style="width:${levelPct}%;background:${levelPct>=60?'linear-gradient(90deg,#4fb848,#7fb83e)':levelPct>=40?'linear-gradient(90deg,#f4b235,#f39c12)':'linear-gradient(90deg,#ff6b6b,#ee5a24)'}"></div></div>
+                        <div class="level-prog-val">${levelPct}%</div>
+                    </div>`;
+                }
+                html += `</div>`;
 
                 // ===== Word Accuracy Chart =====
                 const allLogs = [];
@@ -434,7 +517,7 @@
                     const dates = dailyKeys.slice(-21);
                     const maxVal = Math.max(...dates.map(d => history.dailyStats[d].total), 1);
                     html += `<div class="history-section">
-                        <h4>📈 แนวโน้มการเล่นรายวัน (${totalPlayDays} วัน)</h4>
+                        <h4>📅 แนวโน้มการเล่นรายวัน (${totalPlayDays} วัน)</h4>
                         <div class="history-bars">`;
                     dates.forEach(date => {
                         const stat = history.dailyStats[date];
@@ -461,27 +544,21 @@
                 for (let level = 1; level <= 10; level++) {
                     const logs = detail.logsByLevel[String(level)];
                     if (!logs || logs.length === 0) continue;
-
                     const wordMap = {};
                     logs.forEach(log => {
                         if (!wordMap[log.word]) wordMap[log.word] = [];
                         wordMap[log.word].push(log);
                     });
-
                     const levelCorrect = logs.filter(l => l.isCorrect).length;
-                    const levelTotal = logs.length;
-
                     html += `<div class="level-section">
                         <div class="level-title" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'">
-                            ด่านที่ ${level} — ✅ ${levelCorrect}/${levelTotal} (${Math.round(levelCorrect/levelTotal*100)}%)
+                            ด่านที่ ${level} — ✅ ${levelCorrect}/${logs.length} (${Math.round(levelCorrect/logs.length*100)}%)
                         </div>
                         <div class="level-words" style="display:none;">`;
-
                     for (const [word, attempts] of Object.entries(wordMap)) {
                         const latest = attempts[0];
                         const date = new Date(latest.playedAt).toLocaleDateString('th-TH', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' });
                         const correctCount = attempts.filter(a => a.isCorrect).length;
-
                         html += `<div class="word-row">
                             <span class="word-status">${latest.isCorrect ? '✅' : '❌'}</span>
                             <div class="word-detail">
@@ -495,7 +572,6 @@
                     }
                     html += '</div></div>';
                 }
-
                 if (Object.keys(detail.logsByLevel).length === 0) {
                     html += '<p style="text-align:center;color:#888;padding:20px;">ยังไม่มีประวัติการเล่น</p>';
                 }
@@ -506,6 +582,29 @@
             } catch (error) {
                 document.getElementById('detailContent').innerHTML = `<p style="color:#ff6b6b;padding:20px;">เกิดข้อผิดพลาด: ${error.message}</p>`;
             }
+        }
+
+        function printReport() {
+            const content = document.getElementById('detailContent').innerHTML;
+            const printArea = document.getElementById('printArea');
+            printArea.innerHTML = content;
+            // Show all level details for print
+            printArea.querySelectorAll('.level-words').forEach(el => el.style.display = 'block');
+            // Hide close/print buttons in print
+            printArea.querySelectorAll('.close-btn, .btn-print, .profile-actions').forEach(el => el.style.display = 'none');
+            printArea.style.display = 'block';
+            document.querySelector('.header').style.display = 'none';
+            document.querySelector('.container').style.display = 'none';
+            document.querySelector('.detail-overlay').style.display = 'none';
+            window.print();
+            // Restore
+            setTimeout(() => {
+                printArea.style.display = 'none';
+                document.querySelector('.header').style.display = '';
+                document.querySelector('.container').style.display = '';
+                document.querySelector('.detail-overlay').style.display = '';
+                document.getElementById('detailOverlay').classList.add('active');
+            }, 500);
         }
 
         function closeDetail() { document.getElementById('detailOverlay').classList.remove('active'); }

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="th">
 <head>
     <meta charset="UTF-8">
@@ -331,35 +331,6 @@
         </div>
     </div>
 
-    <!-- Users Summary Modal -->
-    <div class="users-summary-modal" id="usersSummaryModal">
-        <div class="users-summary-content">
-            <div class="users-summary-header">
-                <h2>📊 สรุปผลการเล่นรวม (30 คนล่าสุด)</h2>
-                <button class="close-summary-btn" onclick="closeUsersSummary()">✕</button>
-            </div>
-            <div class="summary-loading" id="summaryLoading">
-                <div class="loading-spinner"></div>
-                <p>กำลังโหลดข้อมูล...</p>
-            </div>
-            <div class="summary-table-wrapper">
-                <table class="summary-table">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>ผู้เล่น</th>
-                            <th>ตอบถูก</th>
-                            <th>ด่าน</th>
-                            <th>ระดับ</th>
-                            <th>รายละเอียด (ด่าน:คะแนน)</th>
-                        </tr>
-                    </thead>
-                    <tbody id="summaryTableBody">
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
 
     <script src="js/api.js?v=20260313"></script>
     <script src="js/game.js?v=20260313"></script>
