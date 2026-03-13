@@ -2321,20 +2321,21 @@ body::before {
 
 .game-controls {
     display: flex;
-    gap: 15px;
+    gap: 10px;
     justify-content: center;
-    margin-top: 20px;
+    margin-top: 10px;
     flex-wrap: wrap;
     width: 100%;
+    align-items: center;
 }
 
 @media (max-width: 480px) {
     .game-controls {
-        gap: 12px;
-        margin-top: 15px;
+        gap: 8px;
+        margin-top: 8px;
         align-items: center;
         justify-content: center;
-        padding: 0 10px;
+        padding: 0 5px;
     }
 }
 
@@ -2385,23 +2386,23 @@ body::before {
 }
 
 .img-button img.btn-top {
-    height: 130px;
+    height: 160px;
     width: auto;
     object-fit: contain;
 }
 
 .img-button.check-button-img img.btn-bottom {
-    height: 180px;
+    height: 200px;
     width: auto;
     object-fit: contain;
 }
 
 @media (max-width: 480px) {
     .img-button img.btn-top {
-        height: 100px;
+        height: 120px;
     }
     .img-button.check-button-img img.btn-bottom {
-        height: 140px;
+        height: 160px;
     }
 }
 
