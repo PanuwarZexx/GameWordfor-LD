@@ -2343,142 +2343,49 @@ body::before {
     }
 }
 
-.play-sound-button {
-    background: linear-gradient(135deg, #ff8247 0%, #ff6b35 100%);
-    color: white;
-    font-size: 1.2em;
-    padding: 12px 30px;
+/* Hide old buttons if still referenced */
+.play-sound-button, .spelling-button, .delete-char-button, .check-button { display: none; }
+
+/* Image Buttons Formatting */
+.img-button {
+    background: transparent;
     border: none;
-    border-radius: 50px;
+    padding: 0;
     cursor: pointer;
-    box-shadow: 0 4px 12px rgba(255, 130, 71, 0.4);
+    transition: transform 0.2s ease, filter 0.2s ease;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    transition: all 0.3s ease;
-    font-weight: 600;
+    outline: none;
 }
 
-@media (max-width: 480px) {
-    .play-sound-button {
-        font-size: 1.2em;
-        padding: 13px 32px;
-        border-radius: 42px;
-        gap: 8px;
-    }
-}
-
-.play-sound-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(255, 130, 71, 0.5);
-}
-
-.play-sound-button:active {
-    transform: translateY(0);
-}
-
-.check-button {
-    background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
-    color: white;
-    font-size: 1.2em;
-    font-weight: 700;
-    padding: 12px 30px;
-    border: none;
-    border-radius: 50px;
-    cursor: pointer;
-    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.5);
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
-}
-
-@media (max-width: 480px) {
-    .check-button {
-        font-size: 1.2em;
-        padding: 13px 32px;
-        border-radius: 42px;
-    }
-}
-
-.check-button:hover {
+.img-button:hover {
     transform: scale(1.05);
-    box-shadow: 0 6px 16px rgba(34, 197, 94, 0.6);
-    animation: pulse 1s infinite;
+    filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.2)) brightness(1.05);
 }
 
-.check-button:active {
+.img-button:active {
     transform: scale(0.95);
 }
 
-.delete-char-button {
-    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
-    color: white;
-    font-size: 1.2em;
-    font-weight: 600;
-    padding: 12px 30px;
-    border: none;
-    border-radius: 50px;
-    cursor: pointer;
-    box-shadow: 0 4px 12px rgba(255, 107, 107, 0.4);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    transition: all 0.3s ease;
+.img-button img.btn-top {
+    height: 65px;
+    width: auto;
+    object-fit: contain;
+}
+
+.img-button.check-button-img img.btn-bottom {
+    height: 100px; /* Make the ตรวจสอบ button noticeably larger */
+    width: auto;
+    object-fit: contain;
 }
 
 @media (max-width: 480px) {
-    .delete-char-button {
-        font-size: 1.1em;
-        padding: 13px 28px;
-        border-radius: 42px;
-        gap: 6px;
+    .img-button img.btn-top {
+        height: 50px;
     }
-}
-
-.delete-char-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(255, 107, 107, 0.5);
-}
-
-.delete-char-button:active {
-    transform: translateY(0);
-}
-
-/* Spelling Button - ปุ่มคำสะกด */
-.spelling-button {
-    background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
-    color: white;
-    font-size: 1.2em;
-    font-weight: 600;
-    padding: 12px 30px;
-    border: none;
-    border-radius: 50px;
-    cursor: pointer;
-    box-shadow: 0 4px 12px rgba(155, 89, 182, 0.4);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    transition: all 0.3s ease;
-}
-
-.spelling-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(155, 89, 182, 0.5);
-}
-
-.spelling-button:active {
-    transform: translateY(0);
-}
-
-@media (max-width: 480px) {
-    .spelling-button {
-        font-size: 1.1em;
-        padding: 13px 28px;
-        border-radius: 42px;
-        gap: 6px;
+    .img-button.check-button-img img.btn-bottom {
+        height: 75px;
     }
 }
 
@@ -2524,10 +2431,10 @@ body::before {
 
 /* กล่องหลัก - พยัญชนะ/สระหน้า/สระหลัง */
 .answer-slot.slot-main {
-    min-width: 55px;
-    width: 60px;
-    height: 65px;
-    font-size: 2.2em;
+    min-width: 70px;
+    width: 75px;
+    height: 80px;
+    font-size: 2.8em;
     font-weight: 900;
     background: linear-gradient(135deg, #e85d9e 0%, #d64a8a 100%);
     color: white;
@@ -2546,10 +2453,10 @@ body::before {
 
 /* กล่องเล็ก - สระบน/วรรณยุกต์ */
 .answer-slot.slot-above {
-    min-width: 42px;
-    width: 46px;
-    height: 42px;
-    font-size: 1.6em;
+    min-width: 50px;
+    width: 55px;
+    height: 50px;
+    font-size: 2.0em;
     font-weight: 800;
     background: linear-gradient(135deg, #a78bfa 0%, #8b5cf6 100%);
     color: white;
@@ -2568,10 +2475,10 @@ body::before {
 
 /* กล่องเล็ก - สระล่าง */
 .answer-slot.slot-below {
-    min-width: 42px;
-    width: 46px;
-    height: 42px;
-    font-size: 1.6em;
+    min-width: 50px;
+    width: 55px;
+    height: 50px;
+    font-size: 2.0em;
     font-weight: 800;
     background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%);
     color: white;
@@ -2591,8 +2498,8 @@ body::before {
 /* Placeholder สำหรับจัดตำแหน่งให้สมมาตร */
 .slot-placeholder-above,
 .slot-placeholder-below {
-    width: 46px;
-    height: 42px;
+    width: 55px;
+    height: 50px;
     visibility: hidden;
 }
 
@@ -2608,22 +2515,22 @@ body::before {
         gap: 6px;
     }
     .answer-slot.slot-main {
-        min-width: 44px;
-        width: 48px;
-        height: 54px;
-        font-size: 1.7em;
+        min-width: 55px;
+        width: 60px;
+        height: 65px;
+        font-size: 2.2em;
     }
     .answer-slot.slot-above,
     .answer-slot.slot-below {
-        min-width: 34px;
-        width: 38px;
-        height: 34px;
-        font-size: 1.3em;
+        min-width: 42px;
+        width: 46px;
+        height: 42px;
+        font-size: 1.6em;
     }
     .slot-placeholder-above,
     .slot-placeholder-below {
-        width: 38px;
-        height: 34px;
+        width: 46px;
+        height: 42px;
     }
 }
 
