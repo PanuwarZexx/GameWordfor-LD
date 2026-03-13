@@ -422,7 +422,7 @@
             tbody.innerHTML = users.map((user, i) => {
                 const role = user.role || 'student';
                 const roleName = { admin: 'ผู้ดูแล', teacher: 'คุณครู', student: 'ผู้เรียน' }[role];
-                const avatarSrc = `css/${characterImages[user.characterId] || '01.jpg'}`;
+                const avatarSrc = role === 'teacher' ? 'ปุ่ม button/teacherlogo.png' : role === 'admin' ? 'ปุ่ม button/logo.png' : `css/${characterImages[user.characterId] || '01.jpg'}`;
                 const lastLogin = user.lastLoginAt ? new Date(user.lastLoginAt).toLocaleDateString('th-TH', { day:'numeric', month:'short', year:'2-digit', hour:'2-digit', minute:'2-digit' }) : '-';
                 return `<tr>
                     <td>${i + 1}</td>
