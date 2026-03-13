@@ -683,8 +683,39 @@ app.post('/api/progress/log', authenticateToken, async (req, res) => {
     }
 });
 
+// ==================== AUTO SEED ADMIN ====================
+
+async function seedAdmin() {
+    try {
+        const existing = await User.findOne({ username: 'admin' });
+        if (existing) {
+            if (existing.role !== 'admin') {
+                existing.role = 'admin';
+                await existing.save();
+                console.log('✅ Updated existing admin role');
+            }
+            return;
+        }
+
+        const hashedPassword = await bcrypt.hash('admin1234', 10);
+        const admin = new User({
+            username: 'admin',
+            password: hashedPassword,
+            displayName: 'ผู้ดูแลระบบ',
+            characterId: 1,
+            characterImage: '1.png',
+            role: 'admin'
+        });
+        await admin.save();
+        console.log('✅ Admin created: admin / admin1234');
+    } catch (error) {
+        console.error('Seed admin error:', error);
+    }
+}
+
 // ==================== SERVER START ====================
 
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
     console.log(`🚀 Server running on http://localhost:${PORT}`);
+    await seedAdmin();
 });
