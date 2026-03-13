@@ -2321,20 +2321,25 @@ body::before {
 
 .game-controls {
     display: flex;
-    gap: 10px;
+    gap: 8px;
     justify-content: center;
-    margin-top: 10px;
+    margin-top: 5px;
     flex-wrap: wrap;
     width: 100%;
     align-items: center;
 }
 
+/* ปุ่มตรวจสอบขึ้นบรรทัดใหม่ อยู่กึ่งกลาง */
+.game-controls .check-button-img {
+    flex-basis: 100%;
+    display: flex;
+    justify-content: center;
+}
+
 @media (max-width: 480px) {
     .game-controls {
-        gap: 8px;
-        margin-top: 8px;
-        align-items: center;
-        justify-content: center;
+        gap: 5px;
+        margin-top: 3px;
         padding: 0 5px;
     }
 }
@@ -2386,23 +2391,23 @@ body::before {
 }
 
 .img-button img.btn-top {
-    height: 160px;
+    height: 80px;
     width: auto;
     object-fit: contain;
 }
 
 .img-button.check-button-img img.btn-bottom {
-    height: 200px;
+    height: 110px;
     width: auto;
     object-fit: contain;
 }
 
 @media (max-width: 480px) {
     .img-button img.btn-top {
-        height: 120px;
+        height: 65px;
     }
     .img-button.check-button-img img.btn-bottom {
-        height: 160px;
+        height: 90px;
     }
 }
 
