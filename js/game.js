@@ -1683,12 +1683,16 @@ function showResultModal(isCorrect, errorMsg = '') {
         modalTitle.textContent = errorMsg || 'คำตอบไม่ถูกต้อง';
         playWrongSound();
         
-        // Speak specific error using Web Speech API
+        // Speak specific error using Web Speech API (หน่วงเวลาให้เสียงแตรจบก่อน)
         if (errorMsg && soundEnabled && 'speechSynthesis' in window) {
-            window.speechSynthesis.cancel();
-            const utterance = new SpeechSynthesisUtterance(errorMsg);
-            utterance.lang = 'th-TH';
-            window.speechSynthesis.speak(utterance);
+            setTimeout(() => {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(errorMsg);
+                utterance.lang = 'th-TH';
+                utterance.rate = 0.9;  // พูดช้าลงเล็กน้อยให้เด็กฟังชัด
+                utterance.volume = 1.0;
+                window.speechSynthesis.speak(utterance);
+            }, 400); // รอให้เสียงแตรจบก่อน
         }
     }
 
