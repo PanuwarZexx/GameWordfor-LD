@@ -1757,7 +1757,7 @@ body::before {
 .game-right {
     display: flex;
     flex-direction: column;
-    gap: 25px;
+    gap: 8px;
     align-items: center;
     width: 100%;
 }
@@ -1765,7 +1765,7 @@ body::before {
 @media (max-width: 480px) {
     .game-right {
         padding: 0 5px;
-        gap: 20px;
+        gap: 5px;
     }
 }
 
@@ -2198,16 +2198,16 @@ body::before {
 
 .word-image {
     width: 100%;
-    max-width: 350px;
-    height: 280px;
+    max-width: 280px;
+    height: 180px;
     object-fit: contain;
-    border-radius: 20px;
+    border-radius: 16px;
     animation: fadeIn 0.5s ease-in;
     transition: transform 0.3s ease;
     image-orientation: from-image;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
     background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
-    padding: 15px;
+    padding: 10px;
 }
 
 .word-image:hover {
@@ -2453,75 +2453,75 @@ body::before {
 
 /* กล่องหลัก - พยัญชนะ/สระหน้า/สระหลัง */
 .answer-slot.slot-main {
-    min-width: 120px;
-    width: 140px;
-    height: 140px;
-    font-size: 4.2em;
+    min-width: 80px;
+    width: 100px;
+    height: 100px;
+    font-size: 3.2em;
     font-weight: 900;
     background: linear-gradient(135deg, #e85d9e 0%, #d64a8a 100%);
     color: white;
-    border-radius: 20px;
+    border-radius: 18px;
     display: flex;
     justify-content: center;
     align-items: center;
-    box-shadow: 0 6px 18px rgba(232, 93, 158, 0.5),
-                inset 0 -3px 8px rgba(0, 0, 0, 0.2);
-    border: 4px solid rgba(255, 255, 255, 0.5);
+    box-shadow: 0 5px 15px rgba(232, 93, 158, 0.5),
+                inset 0 -2px 6px rgba(0, 0, 0, 0.2);
+    border: 3px solid rgba(255, 255, 255, 0.5);
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
     transition: all 0.3s ease;
     font-family: 'Kanit', sans-serif;
-    padding: 6px;
+    padding: 4px;
 }
 
 /* กล่องเล็ก - สระบน/วรรณยุกต์ */
 .answer-slot.slot-above {
-    min-width: 80px;
-    width: 95px;
-    height: 85px;
-    font-size: 2.8em;
+    min-width: 60px;
+    width: 70px;
+    height: 60px;
+    font-size: 2.2em;
     font-weight: 800;
     background: linear-gradient(135deg, #a78bfa 0%, #8b5cf6 100%);
     color: white;
-    border-radius: 14px;
+    border-radius: 12px;
     display: flex;
     justify-content: center;
     align-items: center;
-    box-shadow: 0 4px 10px rgba(139, 92, 246, 0.4),
-                inset 0 -2px 5px rgba(0, 0, 0, 0.15);
-    border: 3px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 0 3px 8px rgba(139, 92, 246, 0.4),
+                inset 0 -2px 4px rgba(0, 0, 0, 0.15);
+    border: 2px solid rgba(255, 255, 255, 0.4);
     text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
     transition: all 0.3s ease;
     font-family: 'Kanit', sans-serif;
-    padding: 4px;
+    padding: 2px;
 }
 
 /* กล่องเล็ก - สระล่าง */
 .answer-slot.slot-below {
-    min-width: 80px;
-    width: 95px;
-    height: 85px;
-    font-size: 2.8em;
+    min-width: 60px;
+    width: 70px;
+    height: 60px;
+    font-size: 2.2em;
     font-weight: 800;
     background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%);
     color: white;
-    border-radius: 14px;
+    border-radius: 12px;
     display: flex;
     justify-content: center;
     align-items: center;
-    box-shadow: 0 4px 10px rgba(14, 165, 233, 0.4),
-                inset 0 -2px 5px rgba(0, 0, 0, 0.15);
-    border: 3px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 0 3px 8px rgba(14, 165, 233, 0.4),
+                inset 0 -2px 4px rgba(0, 0, 0, 0.15);
+    border: 2px solid rgba(255, 255, 255, 0.4);
     text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
     transition: all 0.3s ease;
     font-family: 'Kanit', sans-serif;
-    padding: 4px;
+    padding: 2px;
 }
 
 /* Placeholder สำหรับจัดตำแหน่งให้สมมาตร */
 .slot-placeholder-above,
 .slot-placeholder-below {
-    width: 95px;
-    height: 85px;
+    width: 70px;
+    height: 60px;
     visibility: hidden;
 }
 
@@ -2537,22 +2537,22 @@ body::before {
         gap: 6px;
     }
     .answer-slot.slot-main {
-        min-width: 100px;
-        width: 110px;
-        height: 110px;
-        font-size: 3.2em;
+        min-width: 65px;
+        width: 80px;
+        height: 80px;
+        font-size: 2.6em;
     }
     .answer-slot.slot-above,
     .answer-slot.slot-below {
-        min-width: 65px;
-        width: 75px;
-        height: 68px;
-        font-size: 2.2em;
+        min-width: 48px;
+        width: 56px;
+        height: 50px;
+        font-size: 1.8em;
     }
     .slot-placeholder-above,
     .slot-placeholder-below {
-        width: 75px;
-        height: 68px;
+        width: 56px;
+        height: 50px;
     }
 }
 
