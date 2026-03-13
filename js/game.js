@@ -1,4 +1,4 @@
-// User Management
+﻿// User Management
 let currentUser = null;
 let currentUserData = null;
 let selectedCharacterId = null;
@@ -1706,52 +1706,33 @@ function showResultModal(isCorrect, errorMsg = '') {
 
     if (isCorrect) {
         modalContent.className = 'modal-content modal-correct';
-        modalIcon.textContent = '✓';
-        modalTitle.textContent = 'คำตอบถูกต้อง';
-        playCorrectSound();
-        
-        // อ่านผลลัพธ์ด้วยเสียง (ตอบถูก)
-        if ('speechSynthesis' in window) {
-            setTimeout(() => {
-                try {
-                    window.speechSynthesis.cancel();
-                    const utterance = new SpeechSynthesisUtterance('ถูกต้อง เก่งมาก!');
-                    utterance.lang = 'th-TH';
-                    utterance.rate = 0.9;
-                    utterance.volume = 1.0;
-                    utterance.pitch = 1.2;
-                    window.speechSynthesis.speak(utterance);
-                } catch (e) {
-                    console.error('TTS error:', e);
-                }
-            }, 400);
-        }
+        modalIcon.textContent = '\u2713';
+        modalTitle.textContent = '\u0e04\u0e33\u0e15\u0e2d\u0e1a\u0e16\u0e39\u0e01\u0e15\u0e49\u0e2d\u0e07';
+        playCheckSound('\u0e04\u0e33\u0e15\u0e2d\u0e1a\u0e16\u0e39\u0e01\u0e15\u0e49\u0e2d\u0e07');
     } else {
         modalContent.className = 'modal-content modal-wrong';
-        modalIcon.textContent = '✕';
-        modalTitle.textContent = errorMsg || 'คำตอบไม่ถูกต้อง';
-        playWrongSound();
-        
-        // อ่านข้อผิดพลาดด้วยเสียง (อ่านเสมอไม่ว่า soundEnabled จะเปิดหรือปิด)
-        if (errorMsg && 'speechSynthesis' in window) {
-            setTimeout(() => {
-                try {
-                    window.speechSynthesis.cancel();
-                    const utterance = new SpeechSynthesisUtterance(errorMsg);
-                    utterance.lang = 'th-TH';
-                    utterance.rate = 0.85;
-                    utterance.volume = 1.0;
-                    utterance.pitch = 1.0;
-                    window.speechSynthesis.speak(utterance);
-                    console.log('TTS speaking:', errorMsg);
-                } catch (e) {
-                    console.error('TTS error:', e);
-                }
-            }, 600);
-        }
+        modalIcon.textContent = '\u2715';
+        modalTitle.textContent = errorMsg || '\u0e04\u0e33\u0e15\u0e2d\u0e1a\u0e44\u0e21\u0e48\u0e16\u0e39\u0e01\u0e15\u0e49\u0e2d\u0e07';
+        playCheckSound(errorMsg || '\u0e04\u0e33\u0e15\u0e2d\u0e1a\u0e44\u0e21\u0e48\u0e16\u0e39\u0e01\u0e15\u0e49\u0e2d\u0e07');
     }
 
     modal.classList.add('active');
+}
+
+// เล่นไฟล์เสียงจริงจากโฟลเดอร์ เสียงตรวจสอบคำตอบ
+function playCheckSound(msg) {
+    const soundMap = {
+        '\u0e04\u0e33\u0e15\u0e2d\u0e1a\u0e16\u0e39\u0e01\u0e15\u0e49\u0e2d\u0e07': '\u0e04\u0e33\u0e15\u0e2d\u0e1a\u0e16\u0e39\u0e01\u0e15\u0e49\u0e2d\u0e07',
+        '\u0e04\u0e33\u0e15\u0e2d\u0e1a\u0e44\u0e21\u0e48\u0e16\u0e39\u0e01\u0e15\u0e49\u0e2d\u0e07': '\u0e04\u0e33\u0e15\u0e2d\u0e1a\u0e44\u0e21\u0e48\u0e16\u0e39\u0e01\u0e15\u0e49\u0e2d\u0e07',
+        '\u0e43\u0e2a\u0e48\u0e1e\u0e22\u0e31\u0e0d\u0e0a\u0e19\u0e30\u0e1c\u0e34\u0e14': '\u0e43\u0e2a\u0e48\u0e1e\u0e22\u0e31\u0e0d\u0e0a\u0e19\u0e30\u0e1c\u0e34\u0e14',
+        '\u0e43\u0e2a\u0e48\u0e2a\u0e23\u0e30\u0e1c\u0e34\u0e14': '\u0e43\u0e2a\u0e48\u0e2a\u0e23\u0e30\u0e1c\u0e34\u0e14',
+        '\u0e43\u0e2a\u0e48\u0e27\u0e23\u0e23\u0e13\u0e22\u0e38\u0e01\u0e15\u0e4c\u0e1c\u0e34\u0e14': '\u0e43\u0e2a\u0e48\u0e27\u0e23\u0e23\u0e13\u0e22\u0e38\u0e01\u0e15\u0e4c\u0e1c\u0e34\u0e14',
+        '\u0e43\u0e2a\u0e48\u0e1e\u0e22\u0e31\u0e0d\u0e0a\u0e19\u0e30\u0e1c\u0e34\u0e14 \u0e41\u0e25\u0e30\u0e43\u0e2a\u0e48\u0e2a\u0e23\u0e30\u0e1c\u0e34\u0e14': '\u0e43\u0e2a\u0e48\u0e1e\u0e22\u0e31\u0e0d\u0e0a\u0e19\u0e30\u0e1c\u0e34\u0e14\u0e41\u0e25\u0e30\u0e43\u0e2a\u0e48\u0e2a\u0e23\u0e30\u0e1c\u0e34\u0e14'
+    };
+    const fileName = soundMap[msg] || '\u0e04\u0e33\u0e15\u0e2d\u0e1a\u0e44\u0e21\u0e48\u0e16\u0e39\u0e01\u0e15\u0e49\u0e2d\u0e07';
+    const audio = new Audio('\u0e40\u0e2a\u0e35\u0e22\u0e07\u0e15\u0e23\u0e27\u0e08\u0e2a\u0e2d\u0e1a\u0e04\u0e33\u0e15\u0e2d\u0e1a/' + fileName + '.mp3');
+    audio.volume = 1.0;
+    audio.play().catch(e => console.error('Sound error:', e));
 }
 
 function closeModal() {
