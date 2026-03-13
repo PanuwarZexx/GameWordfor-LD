@@ -1683,16 +1683,22 @@ function showResultModal(isCorrect, errorMsg = '') {
         modalTitle.textContent = errorMsg || 'คำตอบไม่ถูกต้อง';
         playWrongSound();
         
-        // Speak specific error using Web Speech API (หน่วงเวลาให้เสียงแตรจบก่อน)
-        if (errorMsg && soundEnabled && 'speechSynthesis' in window) {
+        // อ่านข้อผิดพลาดด้วยเสียง (อ่านเสมอไม่ว่า soundEnabled จะเปิดหรือปิด)
+        if (errorMsg && 'speechSynthesis' in window) {
             setTimeout(() => {
-                window.speechSynthesis.cancel();
-                const utterance = new SpeechSynthesisUtterance(errorMsg);
-                utterance.lang = 'th-TH';
-                utterance.rate = 0.9;  // พูดช้าลงเล็กน้อยให้เด็กฟังชัด
-                utterance.volume = 1.0;
-                window.speechSynthesis.speak(utterance);
-            }, 400); // รอให้เสียงแตรจบก่อน
+                try {
+                    window.speechSynthesis.cancel();
+                    const utterance = new SpeechSynthesisUtterance(errorMsg);
+                    utterance.lang = 'th-TH';
+                    utterance.rate = 0.85;
+                    utterance.volume = 1.0;
+                    utterance.pitch = 1.0;
+                    window.speechSynthesis.speak(utterance);
+                    console.log('TTS speaking:', errorMsg);
+                } catch (e) {
+                    console.error('TTS error:', e);
+                }
+            }, 600);
         }
     }
 
