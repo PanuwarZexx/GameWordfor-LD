@@ -2331,11 +2331,11 @@ body::before {
 
 /* ปุ่มตรวจสอบขึ้นบรรทัดใหม่ อยู่กึ่งกลาง ชิด 3 ปุ่มบน */
 .game-controls .check-button-img {
-    flex-basis: auto;
+    flex-basis: 100%;
     display: flex;
     justify-content: center;
-    margin-top: 0;
-    max-width: 32%;
+    margin-top: 2px;
+    max-width: 100%;
 }
 
 @media (max-width: 480px) {
@@ -2457,75 +2457,75 @@ body::before {
 
 /* กล่องหลัก - พยัญชนะ/สระหน้า/สระหลัง */
 .answer-slot.slot-main {
-    min-width: 39px;
-    width: 49px;
-    height: 49px;
-    font-size: 1.5em;
+    min-width: 56px;
+    width: 70px;
+    height: 70px;
+    font-size: 2.2em;
     font-weight: 900;
     background: linear-gradient(135deg, #e85d9e 0%, #d64a8a 100%);
     color: white;
-    border-radius: 10px;
+    border-radius: 14px;
     display: flex;
     justify-content: center;
     align-items: center;
     box-shadow: 0 4px 12px rgba(232, 93, 158, 0.5),
                 inset 0 -2px 4px rgba(0, 0, 0, 0.2);
     border: 2px solid rgba(255, 255, 255, 0.5);
-    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
+    transition: all 0.3s ease;
+    font-family: 'Kanit', sans-serif;
+    padding: 3px;
+}
+
+/* กล่องเล็ก - สระบน/วรรณยุกต์ */
+.answer-slot.slot-above {
+    min-width: 42px;
+    width: 49px;
+    height: 42px;
+    font-size: 1.5em;
+    font-weight: 800;
+    background: linear-gradient(135deg, #a78bfa 0%, #8b5cf6 100%);
+    color: white;
+    border-radius: 9px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 3px 8px rgba(139, 92, 246, 0.4),
+                inset 0 -2px 4px rgba(0, 0, 0, 0.15);
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
     transition: all 0.3s ease;
     font-family: 'Kanit', sans-serif;
     padding: 2px;
 }
 
-/* กล่องเล็ก - สระบน/วรรณยุกต์ */
-.answer-slot.slot-above {
-    min-width: 29px;
-    width: 34px;
-    height: 29px;
-    font-size: 1.05em;
-    font-weight: 800;
-    background: linear-gradient(135deg, #a78bfa 0%, #8b5cf6 100%);
-    color: white;
-    border-radius: 7px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    box-shadow: 0 2px 6px rgba(139, 92, 246, 0.4),
-                inset 0 -1px 3px rgba(0, 0, 0, 0.15);
-    border: 2px solid rgba(255, 255, 255, 0.4);
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
-    transition: all 0.3s ease;
-    font-family: 'Kanit', sans-serif;
-    padding: 1px;
-}
-
 /* กล่องเล็ก - สระล่าง */
 .answer-slot.slot-below {
-    min-width: 29px;
-    width: 34px;
-    height: 29px;
-    font-size: 1.05em;
+    min-width: 42px;
+    width: 49px;
+    height: 42px;
+    font-size: 1.5em;
     font-weight: 800;
     background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%);
     color: white;
-    border-radius: 7px;
+    border-radius: 9px;
     display: flex;
     justify-content: center;
     align-items: center;
-    box-shadow: 0 2px 6px rgba(14, 165, 233, 0.4),
-                inset 0 -1px 3px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 3px 8px rgba(14, 165, 233, 0.4),
+                inset 0 -2px 4px rgba(0, 0, 0, 0.15);
     border: 2px solid rgba(255, 255, 255, 0.4);
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
     transition: all 0.3s ease;
     font-family: 'Kanit', sans-serif;
-    padding: 1px;
+    padding: 2px;
 }
 
 /* Placeholder สำหรับจัดตำแหน่งให้สมมาตร */
 .slot-placeholder-above,
 .slot-placeholder-below {
-    width: 34px;
-    height: 29px;
+    width: 49px;
+    height: 42px;
     visibility: hidden;
 }
 
@@ -2538,25 +2538,25 @@ body::before {
 
 @media (max-width: 480px) {
     .cluster-layout {
-        gap: 3px;
+        gap: 4px;
     }
     .answer-slot.slot-main {
-        min-width: 32px;
-        width: 39px;
-        height: 39px;
-        font-size: 1.26em;
+        min-width: 46px;
+        width: 56px;
+        height: 56px;
+        font-size: 1.8em;
     }
     .answer-slot.slot-above,
     .answer-slot.slot-below {
-        min-width: 24px;
-        width: 27px;
-        height: 25px;
-        font-size: 0.9em;
+        min-width: 34px;
+        width: 39px;
+        height: 35px;
+        font-size: 1.3em;
     }
     .slot-placeholder-above,
     .slot-placeholder-below {
-        width: 27px;
-        height: 25px;
+        width: 39px;
+        height: 35px;
     }
 }
 
