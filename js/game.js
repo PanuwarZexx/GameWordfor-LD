@@ -1535,7 +1535,29 @@ function checkAnswer() {
         currentCombo = 0;
         hideComboUI();
 
-        showResultModal(false);
+        // Determine specific error
+        let errorType = 'คำตอบไม่ถูกต้อง';
+        for (let i = 0; i < Math.max(userAnswer.length, correctAnswer.length); i++) {
+            if (userAnswer[i] !== correctAnswer[i]) {
+                const expectedChar = correctAnswer[i];
+                if (!expectedChar) {
+                    errorType = 'มีตัวอักษรเกินมาครับ';
+                } else if (!userAnswer[i]) {
+                    errorType = 'กรอกตัวอักษรไม่ครบครับ';
+                } else if (thaiConsonants.includes(expectedChar)) {
+                    errorType = 'ใส่พยัญชนะผิดครับ';
+                } else if (['่', '้', '๊', '๋'].includes(expectedChar)) {
+                    errorType = 'ใส่วรรณยุกต์ผิดครับ';
+                } else if (thaiVowels.includes(expectedChar)) {
+                    errorType = 'ใส่สระผิดครับ';
+                } else {
+                    errorType = 'ใส่ตัวอักษรผิดครับ';
+                }
+                break;
+            }
+        }
+
+        showResultModal(false, errorType);
         // Reset answer
         setTimeout(() => {
             resetAnswer();
@@ -1593,7 +1615,7 @@ function skipWord() {
     }
 }
 
-function showResultModal(isCorrect) {
+function showResultModal(isCorrect, errorMsg = '') {
     const modal = document.getElementById('resultModal');
     const modalContent = modal.querySelector('.modal-content');
     const modalIcon = document.getElementById('modalIcon');
@@ -1607,8 +1629,16 @@ function showResultModal(isCorrect) {
     } else {
         modalContent.className = 'modal-content modal-wrong';
         modalIcon.textContent = '✕';
-        modalTitle.textContent = 'คำตอบไม่ถูกต้อง';
+        modalTitle.textContent = errorMsg || 'คำตอบไม่ถูกต้อง';
         playWrongSound();
+        
+        // Speak specific error using Web Speech API
+        if (errorMsg && soundEnabled && 'speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(errorMsg);
+            utterance.lang = 'th-TH';
+            window.speechSynthesis.speak(utterance);
+        }
     }
 
     modal.classList.add('active');
