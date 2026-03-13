@@ -1677,6 +1677,23 @@ function showResultModal(isCorrect, errorMsg = '') {
         modalIcon.textContent = '✓';
         modalTitle.textContent = 'คำตอบถูกต้อง';
         playCorrectSound();
+        
+        // อ่านผลลัพธ์ด้วยเสียง (ตอบถูก)
+        if ('speechSynthesis' in window) {
+            setTimeout(() => {
+                try {
+                    window.speechSynthesis.cancel();
+                    const utterance = new SpeechSynthesisUtterance('ถูกต้อง เก่งมาก!');
+                    utterance.lang = 'th-TH';
+                    utterance.rate = 0.9;
+                    utterance.volume = 1.0;
+                    utterance.pitch = 1.2;
+                    window.speechSynthesis.speak(utterance);
+                } catch (e) {
+                    console.error('TTS error:', e);
+                }
+            }, 400);
+        }
     } else {
         modalContent.className = 'modal-content modal-wrong';
         modalIcon.textContent = '✕';
@@ -1776,7 +1793,7 @@ function playCorrectSound() {
 }
 
 function playCorrectSound() {
-    if (!soundEnabled) return;
+    // เล่นเสียงเสมอ ไม่ว่า soundEnabled จะเปิดหรือปิด
     
     // สร้างเสียงพลุ (celebration sound) ดังขึ้น
     const audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -1795,7 +1812,7 @@ function playCorrectSound() {
             oscillator.type = 'sine';
             
             // ลดเสียงค่อยๆ
-            gainNode.gain.setValueAtTime(0.5, audioContext.currentTime);
+            gainNode.gain.setValueAtTime(0.7, audioContext.currentTime);
             gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
             
             oscillator.start(audioContext.currentTime);
@@ -1805,7 +1822,7 @@ function playCorrectSound() {
 }
 
 function playWrongSound() {
-    if (!soundEnabled) return;
+    // เล่นเสียงเสมอ ไม่ว่า soundEnabled จะเปิดหรือปิด
     
     // สร้างเสียงแตร (buzzer sound)
     const audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -1819,7 +1836,7 @@ function playWrongSound() {
     oscillator.frequency.setValueAtTime(200, audioContext.currentTime);
     oscillator.type = 'sawtooth';
     
-    gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+    gainNode.gain.setValueAtTime(0.4, audioContext.currentTime);
     gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
     
     oscillator.start(audioContext.currentTime);
