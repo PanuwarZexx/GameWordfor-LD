@@ -230,6 +230,20 @@ class GameAPI {
         }
     }
 
+    async editUser(userId, data) {
+        try {
+            const response = await fetch(`${API_BASE_URL}/admin/users/${userId}`, {
+                method: 'PUT',
+                headers: this.getHeaders(),
+                body: JSON.stringify(data)
+            });
+            return await this.handleResponse(response);
+        } catch (error) {
+            console.error('Admin edit user error:', error);
+            throw error;
+        }
+    }
+
     // ==================== TEACHER ====================
 
     async getStudentsList() {

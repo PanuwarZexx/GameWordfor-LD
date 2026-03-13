@@ -497,6 +497,33 @@ app.put('/api/admin/users/:id/role', authenticateToken, requireRole('admin'), as
     }
 });
 
+// Edit user (admin only) - update displayName, password, role
+app.put('/api/admin/users/:id', authenticateToken, requireRole('admin'), async (req, res) => {
+    try {
+        const { displayName, password, role } = req.body;
+        const updateFields = {};
+
+        if (displayName) updateFields.displayName = displayName;
+        if (role && ['admin', 'teacher', 'student'].includes(role)) updateFields.role = role;
+        if (password) updateFields.password = await bcrypt.hash(password, 10);
+
+        const user = await User.findByIdAndUpdate(
+            req.params.id,
+            updateFields,
+            { new: true }
+        ).select('-password');
+
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        res.json({ message: 'User updated', user });
+    } catch (error) {
+        console.error('Admin edit user error:', error);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
 // Delete user (admin only)
 app.delete('/api/admin/users/:id', authenticateToken, requireRole('admin'), async (req, res) => {
     try {
