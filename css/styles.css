@@ -2321,7 +2321,7 @@ body::before {
 
 .game-controls {
     display: flex;
-    gap: 15px;
+    gap: 4px;
     justify-content: center;
     margin-top: 0;
     flex-wrap: wrap;
@@ -2334,7 +2334,7 @@ body::before {
     flex-basis: 100%;
     display: flex;
     justify-content: center;
-    margin-top: 5px;
+    margin-top: 0;
     max-width: 100%;
 }
 
