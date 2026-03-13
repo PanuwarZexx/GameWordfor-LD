@@ -1290,7 +1290,7 @@ body::before {
     }
     
     .next-button,
-    .check-button {
+    .check-button-img {
         font-size: 1.1em;
         padding: 12px 24px;
         min-width: 90px;
@@ -2359,8 +2359,8 @@ body::before {
     }
 }
 
-/* Hide old buttons if still referenced */
-.play-sound-button, .spelling-button, .delete-char-button, .check-button { display: none; }
+/* Hide old text-based buttons (replaced by image buttons) */
+.play-sound-button, .spelling-button, .delete-char-button { display: none; }
 
 /* Image Buttons Formatting */
 .img-button {
@@ -2550,22 +2550,10 @@ body::before {
     }
 }
 
-.check-button::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.3);
-    transform: translate(-50%, -50%);
-    transition: width 0.6s, height 0.6s;
-}
-
-.check-button:hover::after {
-    width: 300px;
-    height: 300px;
+/* Ripple effect for check-button-img */
+.check-button-img {
+    position: relative;
+    overflow: hidden;
 }
 
 .next-button {
