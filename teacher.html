@@ -536,22 +536,25 @@
                 if (totalPlayDays > 0) {
                     const dates = dailyKeys.slice(-21);
                     const maxVal = Math.max(...dates.map(d => history.dailyStats[d].total), 1);
+                    const barMinW = dates.length <= 3 ? '80px' : '6px';
+                    const barGap = dates.length <= 3 ? '20px' : '3px';
                     html += `<div class="history-section">
                         <h4>📅 แนวโน้มการเล่นรายวัน (${totalPlayDays} วัน)</h4>
-                        <div class="history-bars">`;
+                        <div style="display:flex;gap:${barGap};align-items:flex-end;height:120px;padding:10px 0;">`;
                     dates.forEach(date => {
                         const stat = history.dailyStats[date];
-                        const correctH = Math.max((stat.correct / maxVal) * 70, 2);
-                        const wrongH = Math.max((stat.wrong / maxVal) * 70, stat.wrong > 0 ? 2 : 0);
-                        html += `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:1px;align-self:flex-end;">
-                            <div class="history-bar correct" style="width:100%;height:${correctH}px;" title="${date}: ถูก ${stat.correct}"></div>
-                            ${wrongH > 0 ? `<div class="history-bar wrong" style="width:100%;height:${wrongH}px;" title="${date}: ผิด ${stat.wrong}"></div>` : ''}
+                        const correctH = Math.max((stat.correct / maxVal) * 90, 8);
+                        const wrongH = Math.max((stat.wrong / maxVal) * 90, stat.wrong > 0 ? 8 : 0);
+                        const dl = new Date(date).toLocaleDateString('th-TH', { day:'numeric', month:'short' });
+                        html += `<div style="flex:1;min-width:${barMinW};display:flex;flex-direction:column;align-items:center;gap:2px;align-self:flex-end;">
+                            <div style="font-size:0.75em;color:#4fb848;font-weight:700;">✅${stat.correct}</div>
+                            <div style="width:100%;height:${correctH}px;background:#4fb848;border-radius:4px 4px 0 0;"></div>
+                            ${wrongH > 0 ? `<div style="width:100%;height:${wrongH}px;background:#ff6b6b;border-radius:0 0 4px 4px;"></div><div style="font-size:0.75em;color:#ff6b6b;font-weight:700;">❌${stat.wrong}</div>` : ''}
+                            <div style="font-size:0.7em;color:#888;margin-top:4px;">${dl}</div>
                         </div>`;
                     });
-                    html += `</div><div class="history-dates">`;
-                    dates.forEach(d => { html += `<span>${d.slice(8)}</span>`; });
                     html += `</div>
-                        <div class="legend">
+                        <div class="legend" style="margin-top:10px;">
                             <span><span class="legend-dot" style="background:#4fb848;"></span>ถูก</span>
                             <span><span class="legend-dot" style="background:#ff6b6b;"></span>ผิด</span>
                         </div>
