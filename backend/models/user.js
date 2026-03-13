@@ -43,6 +43,11 @@ const userSchema = new mongoose.Schema({
     lastLoginAt: {
         type: Date,
         default: Date.now
+    },
+    role: {
+        type: String,
+        enum: ['admin', 'teacher', 'student'],
+        default: 'student'
     }
 }, {
     timestamps: true
