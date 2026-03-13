@@ -2392,13 +2392,13 @@ body::before {
 }
 
 .img-button img.btn-top {
-    height: 170px;
+    height: 155px;
     width: auto;
     object-fit: contain;
 }
 
 .img-button.check-button-img img.btn-bottom {
-    height: 110px;
+    height: 170px;
     width: auto;
     object-fit: contain;
 }
