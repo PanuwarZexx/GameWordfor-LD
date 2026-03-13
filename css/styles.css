@@ -2457,10 +2457,10 @@ body::before {
 
 /* กล่องหลัก - พยัญชนะ/สระหน้า/สระหลัง */
 .answer-slot.slot-main {
-    min-width: 70px;
-    width: 90px;
-    height: 90px;
-    font-size: 3em;
+    min-width: 50px;
+    width: 65px;
+    height: 65px;
+    font-size: 2.2em;
     font-weight: 900;
     background: linear-gradient(135deg, #e85d9e 0%, #d64a8a 100%);
     color: white;
@@ -2479,10 +2479,10 @@ body::before {
 
 /* กล่องเล็ก - สระบน/วรรณยุกต์ */
 .answer-slot.slot-above {
-    min-width: 45px;
-    width: 55px;
-    height: 45px;
-    font-size: 1.8em;
+    min-width: 32px;
+    width: 40px;
+    height: 35px;
+    font-size: 1.4em;
     font-weight: 800;
     background: linear-gradient(135deg, #a78bfa 0%, #8b5cf6 100%);
     color: white;
@@ -2501,10 +2501,10 @@ body::before {
 
 /* กล่องเล็ก - สระล่าง */
 .answer-slot.slot-below {
-    min-width: 45px;
-    width: 55px;
-    height: 45px;
-    font-size: 1.8em;
+    min-width: 32px;
+    width: 40px;
+    height: 35px;
+    font-size: 1.4em;
     font-weight: 800;
     background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%);
     color: white;
@@ -2524,8 +2524,8 @@ body::before {
 /* Placeholder สำหรับจัดตำแหน่งให้สมมาตร */
 .slot-placeholder-above,
 .slot-placeholder-below {
-    width: 55px;
-    height: 45px;
+    width: 40px;
+    height: 35px;
     visibility: hidden;
 }
 
@@ -2538,25 +2538,25 @@ body::before {
 
 @media (max-width: 480px) {
     .cluster-layout {
-        gap: 5px;
+        gap: 4px;
     }
     .answer-slot.slot-main {
-        min-width: 55px;
-        width: 70px;
-        height: 70px;
-        font-size: 2.4em;
+        min-width: 42px;
+        width: 55px;
+        height: 55px;
+        font-size: 1.8em;
     }
     .answer-slot.slot-above,
     .answer-slot.slot-below {
-        min-width: 38px;
-        width: 45px;
-        height: 38px;
-        font-size: 1.5em;
+        min-width: 28px;
+        width: 35px;
+        height: 30px;
+        font-size: 1.2em;
     }
     .slot-placeholder-above,
     .slot-placeholder-below {
-        width: 45px;
-        height: 38px;
+        width: 35px;
+        height: 30px;
     }
 }
 
