@@ -96,6 +96,18 @@ async function login() {
         const response = await gameAPI.login(username, password);
         currentUser = username;
         currentUserData = response.user;
+        
+        // Role-based redirect
+        const userRole = response.user.role || 'student';
+        if (userRole === 'teacher') {
+            window.location.href = 'teacher.html';
+            return;
+        } else if (userRole === 'admin') {
+            window.location.href = 'admin.html';
+            return;
+        }
+        
+        // Student: continue to game
         await loadUserData();
         init();
         showScreen('mainMenu');
@@ -1496,6 +1508,16 @@ function checkAnswer() {
 
         showResultModal(true);
         
+        // บันทึก play log สำหรับรายงานครู
+        gameAPI.logPlayAttempt({
+            level: currentLevel,
+            wordIndex: currentWordIndex,
+            word: correctAnswer,
+            userAnswer: userAnswer,
+            isCorrect: true,
+            errorType: ''
+        });
+        
         // บันทึกคำที่ตอบถูก และเพิ่มคะแนนเฉพาะครั้งแรกที่ตอบถูก
         const levelKey = String(currentLevel);
         if (!answeredWords[levelKey]) {
@@ -1609,6 +1631,16 @@ function checkAnswer() {
         }
 
         showResultModal(false, errorType);
+        
+        // บันทึก play log สำหรับรายงานครู
+        gameAPI.logPlayAttempt({
+            level: currentLevel,
+            wordIndex: currentWordIndex,
+            word: correctAnswer,
+            userAnswer: userAnswer,
+            isCorrect: false,
+            errorType: errorType
+        });
         // Reset answer
         setTimeout(() => {
             resetAnswer();

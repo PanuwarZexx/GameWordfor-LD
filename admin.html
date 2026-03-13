@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ผู้ดูแลระบบ - จัดการผู้ใช้</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Kanit', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #2c3e50;
+        }
+        .admin-header {
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(20px);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+        .admin-header h1 {
+            color: white;
+            font-size: 1.4em;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        .admin-header .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-family: 'Kanit', sans-serif;
+            font-weight: 600;
+            font-size: 0.95em;
+            transition: all 0.3s ease;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #4fb848 0%, #7fb83e 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(79,184,72,0.4);
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(79,184,72,0.5); }
+        .btn-danger {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(255,107,107,0.4);
+        }
+        .btn-danger:hover { transform: translateY(-2px); }
+        .btn-secondary {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.4);
+        }
+        .btn-secondary:hover { background: rgba(255,255,255,0.3); }
+        .btn-sm { padding: 6px 14px; font-size: 0.85em; }
+
+        .admin-container {
+            max-width: 1100px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        .stats-row {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        .stat-card {
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 20px 25px;
+            flex: 1;
+            min-width: 150px;
+            border: 1px solid rgba(255,255,255,0.2);
+            text-align: center;
+            color: white;
+        }
+        .stat-card .stat-num { font-size: 2.2em; font-weight: 900; }
+        .stat-card .stat-label { font-size: 0.9em; opacity: 0.8; margin-top: 5px; }
+
+        .card {
+            background: white;
+            border-radius: 24px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            margin-bottom: 30px;
+        }
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .card-header h2 { font-size: 1.3em; color: #2c3e50; }
+
+        .search-box {
+            padding: 10px 18px;
+            border: 2px solid #e0e7ff;
+            border-radius: 12px;
+            font-family: 'Kanit', sans-serif;
+            font-size: 0.95em;
+            width: 250px;
+            transition: border-color 0.3s;
+        }
+        .search-box:focus { outline: none; border-color: #667eea; }
+
+        .user-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 8px;
+        }
+        .user-table th {
+            text-align: left;
+            padding: 12px 15px;
+            color: #8892b0;
+            font-weight: 600;
+            font-size: 0.85em;
+            text-transform: uppercase;
+        }
+        .user-table td {
+            padding: 12px 15px;
+            background: #f8f9ff;
+            vertical-align: middle;
+        }
+        .user-table tr td:first-child { border-radius: 12px 0 0 12px; }
+        .user-table tr td:last-child { border-radius: 0 12px 12px 0; }
+
+        .role-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+        .role-admin { background: #ffeaa7; color: #d35400; }
+        .role-teacher { background: #dfe6e9; color: #2d3436; background: linear-gradient(135deg, #a78bfa, #8b5cf6); color: white; }
+        .role-student { background: #dff9fb; color: #0abde3; }
+
+        .role-select {
+            padding: 6px 12px;
+            border: 2px solid #e0e7ff;
+            border-radius: 8px;
+            font-family: 'Kanit', sans-serif;
+            font-size: 0.85em;
+            cursor: pointer;
+        }
+
+        /* Add User Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-box {
+            background: white;
+            border-radius: 24px;
+            padding: 35px;
+            max-width: 450px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: slideInModal 0.3s ease;
+        }
+        @keyframes slideInModal {
+            from { transform: translateY(-30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .modal-box h3 { margin-bottom: 20px; font-size: 1.3em; }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            font-size: 0.9em;
+            color: #555;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px 15px;
+            border: 2px solid #e0e7ff;
+            border-radius: 12px;
+            font-family: 'Kanit', sans-serif;
+            font-size: 0.95em;
+        }
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .form-actions .btn { flex: 1; }
+
+        .user-avatar-small {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 2px solid #f4b235;
+            object-fit: cover;
+        }
+        .user-info-cell {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 12px;
+            color: white;
+            font-weight: 600;
+            z-index: 2000;
+            animation: slideInModal 0.3s ease;
+        }
+        .toast-success { background: #4fb848; }
+        .toast-error { background: #ff6b6b; }
+
+        @media (max-width: 768px) {
+            .user-table th:nth-child(4), .user-table td:nth-child(4) { display: none; }
+            .search-box { width: 100%; }
+            .card-header { flex-direction: column; gap: 10px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-header">
+        <h1>🛡️ ผู้ดูแลระบบ</h1>
+        <div class="header-actions">
+            <button class="btn btn-secondary" onclick="window.location.href='teacher.html'">📊 หน้ารายงาน</button>
+            <button class="btn btn-secondary" onclick="logout()">🚪 ออกจากระบบ</button>
+        </div>
+    </div>
+
+    <div class="admin-container">
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="stat-num" id="totalUsers">-</div>
+                <div class="stat-label">ผู้ใช้ทั้งหมด</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-num" id="totalStudents">-</div>
+                <div class="stat-label">นักเรียน</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-num" id="totalTeachers">-</div>
+                <div class="stat-label">คุณครู</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-num" id="totalAdmins">-</div>
+                <div class="stat-label">ผู้ดูแล</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h2>👤 รายชื่อผู้ใช้</h2>
+                <div style="display:flex;gap:10px;align-items:center;">
+                    <input type="text" class="search-box" id="searchInput" placeholder="🔍 ค้นหาผู้ใช้..." oninput="filterUsers()">
+                    <button class="btn btn-primary" onclick="showAddModal()">+ เพิ่มผู้ใช้</button>
+                </div>
+            </div>
+            <table class="user-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>ผู้ใช้</th>
+                        <th>สิทธิ์</th>
+                        <th>เข้าใช้ล่าสุด</th>
+                        <th>จัดการ</th>
+                    </tr>
+                </thead>
+                <tbody id="usersTableBody">
+                    <tr><td colspan="5" style="text-align:center;padding:40px;">กำลังโหลด...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Add User Modal -->
+    <div class="modal-overlay" id="addUserModal">
+        <div class="modal-box">
+            <h3>➕ เพิ่มผู้ใช้ใหม่</h3>
+            <div class="form-group">
+                <label>ชื่อผู้ใช้ (Username)</label>
+                <input type="text" id="newUsername" placeholder="พิมพ์ชื่อผู้ใช้">
+            </div>
+            <div class="form-group">
+                <label>รหัสผ่าน</label>
+                <input type="password" id="newPassword" placeholder="พิมพ์รหัสผ่าน">
+            </div>
+            <div class="form-group">
+                <label>ชื่อที่แสดง</label>
+                <input type="text" id="newDisplayName" placeholder="ชื่อจริงหรือชื่อเล่น">
+            </div>
+            <div class="form-group">
+                <label>สิทธิ์</label>
+                <select id="newRole">
+                    <option value="student">ผู้เรียน</option>
+                    <option value="teacher">คุณครู</option>
+                    <option value="admin">ผู้ดูแล</option>
+                </select>
+            </div>
+            <div class="form-actions">
+                <button class="btn btn-secondary" onclick="closeAddModal()" style="color:#555;">ยกเลิก</button>
+                <button class="btn btn-primary" onclick="createUser()">สร้างผู้ใช้</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/api.js?v=20260313b"></script>
+    <script>
+        const characterImages = { 1:'01.jpg', 2:'02.jpg', 3:'03.jpg', 4:'04.jpg', 5:'05.jpg', 6:'06.jpg' };
+        let allUsers = [];
+
+        // Check auth
+        if (!localStorage.getItem('authToken')) {
+            window.location.href = 'index1.html';
+        }
+
+        loadUsers();
+
+        async function loadUsers() {
+            try {
+                allUsers = await gameAPI.getAdminUsers();
+                renderUsers(allUsers);
+                updateStats(allUsers);
+            } catch (error) {
+                if (error.message.includes('สิทธิ์') || error.message.includes('403')) {
+                    showToast('คุณไม่มีสิทธิ์เข้าถึงหน้านี้', 'error');
+                    setTimeout(() => { window.location.href = 'index1.html'; }, 2000);
+                }
+            }
+        }
+
+        function updateStats(users) {
+            document.getElementById('totalUsers').textContent = users.length;
+            document.getElementById('totalStudents').textContent = users.filter(u => (u.role || 'student') === 'student').length;
+            document.getElementById('totalTeachers').textContent = users.filter(u => u.role === 'teacher').length;
+            document.getElementById('totalAdmins').textContent = users.filter(u => u.role === 'admin').length;
+        }
+
+        function renderUsers(users) {
+            const tbody = document.getElementById('usersTableBody');
+            if (users.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px;">ไม่พบผู้ใช้</td></tr>';
+                return;
+            }
+            tbody.innerHTML = users.map((user, i) => {
+                const role = user.role || 'student';
+                const roleName = { admin: 'ผู้ดูแล', teacher: 'คุณครู', student: 'ผู้เรียน' }[role];
+                const avatarSrc = `css/${characterImages[user.characterId] || '01.jpg'}`;
+                const lastLogin = user.lastLoginAt ? new Date(user.lastLoginAt).toLocaleDateString('th-TH', { day:'numeric', month:'short', year:'2-digit', hour:'2-digit', minute:'2-digit' }) : '-';
+                return `<tr>
+                    <td>${i + 1}</td>
+                    <td><div class="user-info-cell">
+                        <img src="${avatarSrc}" class="user-avatar-small" onerror="this.src='css/01.jpg'">
+                        <div><strong>${user.displayName}</strong><br><small style="color:#888">${user.username}</small></div>
+                    </div></td>
+                    <td>
+                        <select class="role-select" onchange="changeRole('${user._id}', this.value)" ${role === 'admin' ? '' : ''}>
+                            <option value="student" ${role==='student'?'selected':''}>ผู้เรียน</option>
+                            <option value="teacher" ${role==='teacher'?'selected':''}>คุณครู</option>
+                            <option value="admin" ${role==='admin'?'selected':''}>ผู้ดูแล</option>
+                        </select>
+                    </td>
+                    <td>${lastLogin}</td>
+                    <td><button class="btn btn-danger btn-sm" onclick="deleteUserConfirm('${user._id}', '${user.displayName}')">🗑️ ลบ</button></td>
+                </tr>`;
+            }).join('');
+        }
+
+        function filterUsers() {
+            const q = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = allUsers.filter(u => u.username.toLowerCase().includes(q) || u.displayName.toLowerCase().includes(q));
+            renderUsers(filtered);
+        }
+
+        async function changeRole(userId, newRole) {
+            try {
+                await gameAPI.updateUserRole(userId, newRole);
+                showToast('เปลี่ยนสิทธิ์สำเร็จ ✅');
+                loadUsers();
+            } catch (error) {
+                showToast(error.message || 'เกิดข้อผิดพลาด', 'error');
+                loadUsers();
+            }
+        }
+
+        async function deleteUserConfirm(userId, name) {
+            if (!confirm(`⚠️ ยืนยันลบผู้ใช้ "${name}" ?\n\nข้อมูลทั้งหมดจะถูกลบถาวร!`)) return;
+            if (!confirm(`❗ ยืนยันครั้งที่ 2: ลบ "${name}" จริงๆ?`)) return;
+            try {
+                await gameAPI.deleteUser(userId);
+                showToast('ลบผู้ใช้สำเร็จ ✅');
+                loadUsers();
+            } catch (error) {
+                showToast(error.message || 'เกิดข้อผิดพลาด', 'error');
+            }
+        }
+
+        function showAddModal() { document.getElementById('addUserModal').classList.add('active'); }
+        function closeAddModal() { document.getElementById('addUserModal').classList.remove('active'); }
+
+        async function createUser() {
+            const username = document.getElementById('newUsername').value.trim();
+            const password = document.getElementById('newPassword').value;
+            const displayName = document.getElementById('newDisplayName').value.trim();
+            const role = document.getElementById('newRole').value;
+
+            if (!username || !password || !displayName) {
+                showToast('กรุณากรอกข้อมูลให้ครบ', 'error');
+                return;
+            }
+
+            try {
+                await gameAPI.createUser({ username, password, displayName, role, characterId: 1 });
+                showToast('สร้างผู้ใช้สำเร็จ ✅');
+                closeAddModal();
+                document.getElementById('newUsername').value = '';
+                document.getElementById('newPassword').value = '';
+                document.getElementById('newDisplayName').value = '';
+                loadUsers();
+            } catch (error) {
+                showToast(error.message || 'เกิดข้อผิดพลาด', 'error');
+            }
+        }
+
+        function showToast(msg, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.textContent = msg;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        function logout() {
+            localStorage.removeItem('authToken');
+            window.location.href = 'index1.html';
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>รายงานผลการเรียน - คุณครู</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Kanit', sans-serif;
+            background: linear-gradient(135deg, #e85d9e 0%, #f4b235 50%, #4fb848 100%);
+            min-height: 100vh;
+            color: #2c3e50;
+        }
+        .header {
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(20px);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+        .header h1 { color: white; font-size: 1.4em; text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+        .header .actions { display: flex; gap: 10px; }
+        .btn {
+            padding: 10px 20px; border: none; border-radius: 12px;
+            cursor: pointer; font-family: 'Kanit', sans-serif;
+            font-weight: 600; font-size: 0.95em; transition: all 0.3s ease;
+        }
+        .btn-secondary { background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.4); }
+        .btn-secondary:hover { background: rgba(255,255,255,0.3); }
+        .btn-primary { background: linear-gradient(135deg, #667eea, #764ba2); color: white; }
+
+        .container { max-width: 1100px; margin: 30px auto; padding: 0 20px; }
+
+        .stats-row { display: flex; gap: 20px; margin-bottom: 30px; flex-wrap: wrap; }
+        .stat-card {
+            background: rgba(255,255,255,0.2); backdrop-filter: blur(15px);
+            border-radius: 20px; padding: 20px 25px; flex: 1; min-width: 150px;
+            border: 1px solid rgba(255,255,255,0.3); text-align: center; color: white;
+        }
+        .stat-card .num { font-size: 2.2em; font-weight: 900; }
+        .stat-card .label { font-size: 0.9em; opacity: 0.85; margin-top: 5px; }
+
+        .card {
+            background: white; border-radius: 24px; padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15); margin-bottom: 30px;
+        }
+        .card h2 { font-size: 1.3em; margin-bottom: 20px; color: #2c3e50; }
+
+        /* Student List */
+        .student-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; }
+        .student-card {
+            background: linear-gradient(135deg, #f8f9ff 0%, #eef1ff 100%);
+            border-radius: 16px; padding: 18px; cursor: pointer;
+            border: 2px solid transparent; transition: all 0.3s ease;
+        }
+        .student-card:hover {
+            transform: translateY(-3px); border-color: #e85d9e;
+            box-shadow: 0 8px 24px rgba(232,93,158,0.2);
+        }
+        .student-card .sc-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+        .student-card .sc-avatar {
+            width: 42px; height: 42px; border-radius: 50%;
+            border: 2px solid #f4b235; object-fit: cover;
+        }
+        .student-card .sc-name { font-weight: 700; font-size: 1em; }
+        .student-card .sc-user { font-size: 0.8em; color: #888; }
+        .progress-bar { height: 8px; background: #e0e7ff; border-radius: 10px; overflow: hidden; }
+        .progress-bar .fill { height: 100%; border-radius: 10px; transition: width 0.5s ease; }
+        .progress-bar .fill.good { background: linear-gradient(90deg, #4fb848, #7fb83e); }
+        .progress-bar .fill.mid { background: linear-gradient(90deg, #f4b235, #f39c12); }
+        .progress-bar .fill.low { background: linear-gradient(90deg, #ff6b6b, #ee5a24); }
+        .sc-stats { display: flex; justify-content: space-between; margin-top: 8px; font-size: 0.8em; color: #666; }
+
+        /* Detail View */
+        .detail-overlay {
+            display: none; position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%; background: rgba(0,0,0,0.5);
+            z-index: 1000; justify-content: center; align-items: flex-start;
+            padding-top: 30px; overflow-y: auto;
+        }
+        .detail-overlay.active { display: flex; }
+        .detail-box {
+            background: white; border-radius: 24px; padding: 35px;
+            max-width: 750px; width: 95%; max-height: 90vh; overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: slideIn 0.3s ease;
+        }
+        @keyframes slideIn {
+            from { transform: translateY(-30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .detail-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+        .detail-header h3 { font-size: 1.3em; }
+        .close-btn {
+            background: #f0f0f0; border: none; width: 36px; height: 36px;
+            border-radius: 50%; cursor: pointer; font-size: 1.2em; transition: all 0.3s;
+        }
+        .close-btn:hover { background: #ff6b6b; color: white; transform: rotate(90deg); }
+
+        .detail-stats { display: flex; gap: 15px; margin-bottom: 25px; flex-wrap: wrap; }
+        .ds-card {
+            flex: 1; min-width: 100px; text-align: center; padding: 15px;
+            border-radius: 16px; background: #f8f9ff;
+        }
+        .ds-card .ds-num { font-size: 1.8em; font-weight: 900; }
+        .ds-card .ds-label { font-size: 0.8em; color: #888; margin-top: 3px; }
+        .ds-card.correct .ds-num { color: #4fb848; }
+        .ds-card.wrong .ds-num { color: #ff6b6b; }
+        .ds-card.accuracy .ds-num { color: #667eea; }
+
+        .level-section { margin-bottom: 20px; }
+        .level-title {
+            font-weight: 700; font-size: 1em; padding: 8px 15px;
+            background: linear-gradient(90deg, #e85d9e, #f4b235);
+            color: white; border-radius: 10px; margin-bottom: 10px;
+        }
+        .word-row {
+            display: flex; align-items: center; gap: 10px; padding: 8px 12px;
+            border-bottom: 1px solid #f0f0f0; font-size: 0.9em;
+        }
+        .word-row:last-child { border-bottom: none; }
+        .word-status { font-size: 1.2em; }
+        .word-detail { flex: 1; }
+        .word-error { color: #ff6b6b; font-size: 0.8em; }
+        .word-date { color: #aaa; font-size: 0.75em; }
+
+        /* History chart (simple bars) */
+        .history-section { margin-top: 25px; }
+        .history-bars { display: flex; gap: 4px; align-items: flex-end; height: 100px; padding: 10px 0; }
+        .history-bar {
+            flex: 1; min-width: 8px; border-radius: 4px 4px 0 0;
+            position: relative; cursor: pointer;
+        }
+        .history-bar.correct { background: #4fb848; }
+        .history-bar.wrong { background: #ff6b6b; }
+        .history-dates { display: flex; gap: 4px; font-size: 0.6em; color: #aaa; }
+        .history-dates span { flex: 1; text-align: center; min-width: 8px; overflow: hidden; }
+
+        .search-bar {
+            padding: 10px 18px; border: 2px solid #e0e7ff; border-radius: 12px;
+            font-family: 'Kanit', sans-serif; font-size: 0.95em; width: 100%;
+            max-width: 350px; margin-bottom: 20px;
+        }
+        .search-bar:focus { outline: none; border-color: #e85d9e; }
+
+        .toast {
+            position: fixed; top: 20px; right: 20px; padding: 15px 25px;
+            border-radius: 12px; color: white; font-weight: 600; z-index: 2000;
+            animation: slideIn 0.3s ease;
+        }
+        .toast-error { background: #ff6b6b; }
+
+        @media (max-width: 768px) {
+            .student-list { grid-template-columns: 1fr; }
+            .detail-stats { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📊 รายงานผลการเรียน</h1>
+        <div class="actions">
+            <button class="btn btn-secondary" onclick="logout()">🚪 ออกจากระบบ</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="num" id="sTotal">-</div>
+                <div class="label">นักเรียนทั้งหมด</div>
+            </div>
+            <div class="stat-card">
+                <div class="num" id="sAvgScore">-</div>
+                <div class="label">คะแนนเฉลี่ย</div>
+            </div>
+            <div class="stat-card">
+                <div class="num" id="sAvgLevel">-</div>
+                <div class="label">ด่านเฉลี่ย</div>
+            </div>
+            <div class="stat-card">
+                <div class="num" id="sAvgAnswered">-</div>
+                <div class="label">ตอบเฉลี่ย/100</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>👨‍🎓 รายชื่อนักเรียน</h2>
+            <input type="text" class="search-bar" id="searchInput" placeholder="🔍 ค้นหานักเรียน..." oninput="filterStudents()">
+            <div class="student-list" id="studentList">
+                <p style="text-align:center;padding:40px;color:#888;">กำลังโหลด...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Student Detail Overlay -->
+    <div class="detail-overlay" id="detailOverlay">
+        <div class="detail-box" id="detailBox">
+            <div class="detail-header">
+                <h3 id="detailName">-</h3>
+                <button class="close-btn" onclick="closeDetail()">✕</button>
+            </div>
+            <div class="detail-stats">
+                <div class="ds-card correct">
+                    <div class="ds-num" id="dCorrect">0</div>
+                    <div class="ds-label">ตอบถูก</div>
+                </div>
+                <div class="ds-card wrong">
+                    <div class="ds-num" id="dWrong">0</div>
+                    <div class="ds-label">ตอบผิด</div>
+                </div>
+                <div class="ds-card accuracy">
+                    <div class="ds-num" id="dAccuracy">0%</div>
+                    <div class="ds-label">ความแม่นยำ</div>
+                </div>
+                <div class="ds-card">
+                    <div class="ds-num" id="dTotal">0</div>
+                    <div class="ds-label">ครั้งทั้งหมด</div>
+                </div>
+            </div>
+
+            <div id="detailLevels"></div>
+
+            <div class="history-section" id="historySection" style="display:none;">
+                <h4 style="margin-bottom:10px;">📈 แนวโน้มการเล่น (รายวัน)</h4>
+                <div class="history-bars" id="historyBars"></div>
+                <div class="history-dates" id="historyDates"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/api.js?v=20260313b"></script>
+    <script>
+        const characterImages = { 1:'01.jpg', 2:'02.jpg', 3:'03.jpg', 4:'04.jpg', 5:'05.jpg', 6:'06.jpg' };
+        let allStudents = [];
+
+        if (!localStorage.getItem('authToken')) {
+            window.location.href = 'index1.html';
+        }
+
+        loadStudents();
+
+        async function loadStudents() {
+            try {
+                allStudents = await gameAPI.getStudentsList();
+                renderStudents(allStudents);
+                updateOverview(allStudents);
+            } catch (error) {
+                if (error.message && (error.message.includes('สิทธิ์') || error.message.includes('403'))) {
+                    document.getElementById('studentList').innerHTML = '<p style="text-align:center;padding:40px;color:#e85d9e;">คุณไม่มีสิทธิ์เข้าถึงหน้านี้</p>';
+                    setTimeout(() => { window.location.href = 'index1.html'; }, 2000);
+                }
+            }
+        }
+
+        function updateOverview(students) {
+            document.getElementById('sTotal').textContent = students.length;
+            if (students.length > 0) {
+                const avgScore = Math.round(students.reduce((s, st) => s + st.totalScore, 0) / students.length);
+                const avgLevel = (students.reduce((s, st) => s + st.maxUnlocked, 0) / students.length).toFixed(1);
+                const avgAnswered = Math.round(students.reduce((s, st) => s + st.totalAnswered, 0) / students.length);
+                document.getElementById('sAvgScore').textContent = avgScore;
+                document.getElementById('sAvgLevel').textContent = avgLevel;
+                document.getElementById('sAvgAnswered').textContent = avgAnswered;
+            }
+        }
+
+        function renderStudents(students) {
+            const container = document.getElementById('studentList');
+            if (students.length === 0) {
+                container.innerHTML = '<p style="text-align:center;padding:40px;color:#888;">ไม่พบนักเรียน</p>';
+                return;
+            }
+            container.innerHTML = students.map(st => {
+                const pct = Math.round((st.totalAnswered / 100) * 100);
+                const fillClass = pct >= 70 ? 'good' : pct >= 40 ? 'mid' : 'low';
+                const avatarSrc = `css/${characterImages[st.characterId] || '01.jpg'}`;
+                const lastLogin = st.lastLoginAt ? new Date(st.lastLoginAt).toLocaleDateString('th-TH', { day:'numeric', month:'short' }) : '-';
+                return `<div class="student-card" onclick="showDetail('${st.id}')">
+                    <div class="sc-header">
+                        <img src="${avatarSrc}" class="sc-avatar" onerror="this.src='css/01.jpg'">
+                        <div>
+                            <div class="sc-name">${st.displayName}</div>
+                            <div class="sc-user">${st.username}</div>
+                        </div>
+                    </div>
+                    <div class="progress-bar"><div class="fill ${fillClass}" style="width:${pct}%"></div></div>
+                    <div class="sc-stats">
+                        <span>ตอบ ${st.totalAnswered}/100</span>
+                        <span>ด่าน ${st.maxUnlocked}/10</span>
+                        <span>${lastLogin}</span>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function filterStudents() {
+            const q = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = allStudents.filter(s => s.username.toLowerCase().includes(q) || s.displayName.toLowerCase().includes(q));
+            renderStudents(filtered);
+        }
+
+        async function showDetail(studentId) {
+            document.getElementById('detailOverlay').classList.add('active');
+            document.getElementById('detailLevels').innerHTML = '<p style="text-align:center;padding:20px;color:#888;">กำลังโหลด...</p>';
+
+            try {
+                const [detail, history] = await Promise.all([
+                    gameAPI.getStudentDetail(studentId),
+                    gameAPI.getStudentHistory(studentId)
+                ]);
+
+                document.getElementById('detailName').textContent = `${detail.student.displayName} (${detail.student.username})`;
+                document.getElementById('dCorrect').textContent = detail.stats.correctAttempts;
+                document.getElementById('dWrong').textContent = detail.stats.wrongAttempts;
+                document.getElementById('dAccuracy').textContent = detail.stats.accuracy + '%';
+                document.getElementById('dTotal').textContent = detail.stats.totalAttempts;
+
+                // Render levels
+                let levelsHtml = '';
+                for (let level = 1; level <= 10; level++) {
+                    const logs = detail.logsByLevel[String(level)];
+                    if (!logs || logs.length === 0) continue;
+
+                    levelsHtml += `<div class="level-section">
+                        <div class="level-title">ด่านที่ ${level}</div>`;
+
+                    // Group by word, show latest attempt
+                    const wordMap = {};
+                    logs.forEach(log => {
+                        const key = log.word;
+                        if (!wordMap[key]) wordMap[key] = [];
+                        wordMap[key].push(log);
+                    });
+
+                    for (const [word, attempts] of Object.entries(wordMap)) {
+                        const latest = attempts[0]; // sorted desc
+                        const date = new Date(latest.playedAt).toLocaleDateString('th-TH', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' });
+                        const totalAttempts = attempts.length;
+                        const correctCount = attempts.filter(a => a.isCorrect).length;
+
+                        levelsHtml += `<div class="word-row">
+                            <span class="word-status">${latest.isCorrect ? '✅' : '❌'}</span>
+                            <div class="word-detail">
+                                <strong>${word}</strong>
+                                ${latest.userAnswer !== word ? ` → ตอบ: ${latest.userAnswer}` : ''}
+                                ${!latest.isCorrect && latest.errorType ? `<div class="word-error">${latest.errorType}</div>` : ''}
+                                <div style="font-size:0.75em;color:#aaa;">เล่น ${totalAttempts} ครั้ง (ถูก ${correctCount})</div>
+                            </div>
+                            <span class="word-date">${date}</span>
+                        </div>`;
+                    }
+                    levelsHtml += '</div>';
+                }
+
+                document.getElementById('detailLevels').innerHTML = levelsHtml || '<p style="text-align:center;color:#888;">ยังไม่มีประวัติการเล่น</p>';
+
+                // Render history chart
+                if (history.totalLogs > 0) {
+                    document.getElementById('historySection').style.display = 'block';
+                    const dates = Object.keys(history.dailyStats).slice(-14); // last 14 days
+                    const maxVal = Math.max(...dates.map(d => history.dailyStats[d].total), 1);
+
+                    let barsHtml = '';
+                    let datesHtml = '';
+                    dates.forEach(date => {
+                        const stat = history.dailyStats[date];
+                        const correctH = Math.max((stat.correct / maxVal) * 80, 2);
+                        const wrongH = Math.max((stat.wrong / maxVal) * 80, stat.wrong > 0 ? 2 : 0);
+                        barsHtml += `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:1px;align-self:flex-end;">
+                            <div class="history-bar correct" style="width:100%;height:${correctH}px;" title="${date}: ถูก ${stat.correct}"></div>
+                            ${wrongH > 0 ? `<div class="history-bar wrong" style="width:100%;height:${wrongH}px;" title="${date}: ผิด ${stat.wrong}"></div>` : ''}
+                        </div>`;
+                        datesHtml += `<span>${date.slice(-2)}</span>`;
+                    });
+
+                    document.getElementById('historyBars').innerHTML = barsHtml;
+                    document.getElementById('historyDates').innerHTML = datesHtml;
+                } else {
+                    document.getElementById('historySection').style.display = 'none';
+                }
+            } catch (error) {
+                document.getElementById('detailLevels').innerHTML = `<p style="color:#ff6b6b;">เกิดข้อผิดพลาด: ${error.message}</p>`;
+            }
+        }
+
+        function closeDetail() { document.getElementById('detailOverlay').classList.remove('active'); }
+
+        function logout() {
+            localStorage.removeItem('authToken');
+            window.location.href = 'index1.html';
+        }
+    </script>
+</body>
+</html>

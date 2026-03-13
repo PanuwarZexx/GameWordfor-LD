@@ -1,6 +1,6 @@
 // API Client for Thai Word Game
 const API_BASE_URL = 'https://gamewordfor-ld.onrender.com/api';
-
+// const API_BASE_URL = 'http://localhost:3000/api';
 class GameAPI {
     constructor() {
         this.token = localStorage.getItem('authToken');
@@ -171,6 +171,119 @@ class GameAPI {
         } catch (error) {
             console.error('Get users summary error:', error);
             throw error;
+        }
+    }
+
+    // ==================== ADMIN ====================
+
+    async getAdminUsers() {
+        try {
+            const response = await fetch(`${API_BASE_URL}/admin/users`, {
+                method: 'GET',
+                headers: this.getHeaders()
+            });
+            return await this.handleResponse(response);
+        } catch (error) {
+            console.error('Admin get users error:', error);
+            throw error;
+        }
+    }
+
+    async createUser(userData) {
+        try {
+            const response = await fetch(`${API_BASE_URL}/admin/users`, {
+                method: 'POST',
+                headers: this.getHeaders(),
+                body: JSON.stringify(userData)
+            });
+            return await this.handleResponse(response);
+        } catch (error) {
+            console.error('Admin create user error:', error);
+            throw error;
+        }
+    }
+
+    async updateUserRole(userId, role) {
+        try {
+            const response = await fetch(`${API_BASE_URL}/admin/users/${userId}/role`, {
+                method: 'PUT',
+                headers: this.getHeaders(),
+                body: JSON.stringify({ role })
+            });
+            return await this.handleResponse(response);
+        } catch (error) {
+            console.error('Admin update role error:', error);
+            throw error;
+        }
+    }
+
+    async deleteUser(userId) {
+        try {
+            const response = await fetch(`${API_BASE_URL}/admin/users/${userId}`, {
+                method: 'DELETE',
+                headers: this.getHeaders()
+            });
+            return await this.handleResponse(response);
+        } catch (error) {
+            console.error('Admin delete user error:', error);
+            throw error;
+        }
+    }
+
+    // ==================== TEACHER ====================
+
+    async getStudentsList() {
+        try {
+            const response = await fetch(`${API_BASE_URL}/teacher/students`, {
+                method: 'GET',
+                headers: this.getHeaders()
+            });
+            return await this.handleResponse(response);
+        } catch (error) {
+            console.error('Teacher get students error:', error);
+            throw error;
+        }
+    }
+
+    async getStudentDetail(studentId) {
+        try {
+            const response = await fetch(`${API_BASE_URL}/teacher/students/${studentId}`, {
+                method: 'GET',
+                headers: this.getHeaders()
+            });
+            return await this.handleResponse(response);
+        } catch (error) {
+            console.error('Teacher get student detail error:', error);
+            throw error;
+        }
+    }
+
+    async getStudentHistory(studentId) {
+        try {
+            const response = await fetch(`${API_BASE_URL}/teacher/students/${studentId}/history`, {
+                method: 'GET',
+                headers: this.getHeaders()
+            });
+            return await this.handleResponse(response);
+        } catch (error) {
+            console.error('Teacher get history error:', error);
+            throw error;
+        }
+    }
+
+    // ==================== PLAY LOGGING ====================
+
+    async logPlayAttempt(data) {
+        try {
+            const response = await fetch(`${API_BASE_URL}/progress/log`, {
+                method: 'POST',
+                headers: this.getHeaders(),
+                body: JSON.stringify(data)
+            });
+            return await this.handleResponse(response);
+        } catch (error) {
+            console.error('Log play attempt error:', error);
+            // Don't throw - logging should not block gameplay
         }
     }
 }

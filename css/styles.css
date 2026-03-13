@@ -2484,13 +2484,13 @@ body::before {
     align-items: center;
 }
 
-/* ปุ่มตรวจสอบขึ้นบรรทัดใหม่ อยู่กึ่งกลาง ชิด 3 ปุ่มบน */
+/* ปุ่มตรวจสอบอยู่ในแถวเดียวกับ 3 ปุ่มบน */
 .game-controls .check-button-img {
-    flex-basis: 100%;
+    flex-basis: auto;
     display: flex;
     justify-content: center;
-    margin-top: 2px;
-    max-width: 100%;
+    margin-top: 0;
+    max-width: 22%;
 }
 
 @media (max-width: 480px) {
@@ -2541,7 +2541,7 @@ body::before {
     justify-content: center;
     outline: none;
     flex-shrink: 1;
-    max-width: 28%;
+    max-width: 22%;
 }
 
 .img-button:hover {
@@ -2554,13 +2554,13 @@ body::before {
 }
 
 .img-button img.btn-top {
-    height: 115px;
+    height: 110px;
     width: auto;
     object-fit: contain;
 }
 
 .img-button.check-button-img img.btn-bottom {
-    height: 125px;
+    height: 110px;
     width: auto;
     object-fit: contain;
 }
