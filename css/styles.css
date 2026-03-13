@@ -2385,23 +2385,23 @@ body::before {
 }
 
 .img-button img.btn-top {
-    height: 65px;
+    height: 100px;
     width: auto;
     object-fit: contain;
 }
 
 .img-button.check-button-img img.btn-bottom {
-    height: 100px; /* Make the ตรวจสอบ button noticeably larger */
+    height: 140px; /* Make the ตรวจสอบ button noticeably larger */
     width: auto;
     object-fit: contain;
 }
 
 @media (max-width: 480px) {
     .img-button img.btn-top {
-        height: 50px;
+        height: 80px;
     }
     .img-button.check-button-img img.btn-bottom {
-        height: 75px;
+        height: 110px;
     }
 }
 
