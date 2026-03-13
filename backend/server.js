@@ -427,7 +427,7 @@ app.get('/api/admin/users', authenticateToken, requireRole('admin'), async (req,
 // Create user (admin only)
 app.post('/api/admin/users', authenticateToken, requireRole('admin'), async (req, res) => {
     try {
-        const { username, password, displayName, role, characterId } = req.body;
+        const { username, password, displayName, role, characterId, studentId, classroom } = req.body;
 
         const existing = await User.findOne({ username });
         if (existing) {
@@ -441,7 +441,9 @@ app.post('/api/admin/users', authenticateToken, requireRole('admin'), async (req
             displayName,
             characterId: characterId || 1,
             characterImage: `${characterId || 1}.png`,
-            role: role || 'student'
+            role: role || 'student',
+            studentId: studentId || '',
+            classroom: classroom || ''
         });
 
         await user.save();
@@ -500,12 +502,14 @@ app.put('/api/admin/users/:id/role', authenticateToken, requireRole('admin'), as
 // Edit user (admin only) - update displayName, password, role
 app.put('/api/admin/users/:id', authenticateToken, requireRole('admin'), async (req, res) => {
     try {
-        const { displayName, password, role } = req.body;
+        const { displayName, password, role, studentId, classroom } = req.body;
         const updateFields = {};
 
         if (displayName) updateFields.displayName = displayName;
         if (role && ['admin', 'teacher', 'student'].includes(role)) updateFields.role = role;
         if (password) updateFields.password = await bcrypt.hash(password, 10);
+        if (studentId !== undefined) updateFields.studentId = studentId;
+        if (classroom !== undefined) updateFields.classroom = classroom;
 
         const user = await User.findByIdAndUpdate(
             req.params.id,

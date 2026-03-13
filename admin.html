@@ -326,6 +326,14 @@
                     <option value="admin">ผู้ดูแล</option>
                 </select>
             </div>
+            <div class="form-group">
+                <label>รหัสนักเรียน</label>
+                <input type="text" id="newStudentId" placeholder="เช่น S01">
+            </div>
+            <div class="form-group">
+                <label>ชั้น / ห้อง</label>
+                <input type="text" id="newClassroom" placeholder="เช่น ป.1/1">
+            </div>
             <div class="form-actions">
                 <button class="btn btn-secondary" onclick="closeAddModal()" style="color:#555;">ยกเลิก</button>
                 <button class="btn btn-primary" onclick="createUser()">สร้างผู้ใช้</button>
@@ -357,6 +365,14 @@
                     <option value="teacher">คุณครู</option>
                     <option value="admin">ผู้ดูแล</option>
                 </select>
+            </div>
+            <div class="form-group">
+                <label>รหัสนักเรียน</label>
+                <input type="text" id="editStudentId" placeholder="เช่น S01">
+            </div>
+            <div class="form-group">
+                <label>ชั้น / ห้อง</label>
+                <input type="text" id="editClassroom" placeholder="เช่น ป.1/1">
             </div>
             <div class="form-actions">
                 <button class="btn btn-secondary" onclick="closeEditModal()" style="color:#555;">ยกเลิก</button>
@@ -463,11 +479,14 @@
         function closeAddModal() { document.getElementById('addUserModal').classList.remove('active'); }
 
         function showEditModal(userId, username, displayName, role) {
+            const user = allUsers.find(u => u._id === userId);
             document.getElementById('editUserId').value = userId;
             document.getElementById('editUsername').value = username;
             document.getElementById('editDisplayName').value = displayName;
             document.getElementById('editPassword').value = '';
             document.getElementById('editRole').value = role;
+            document.getElementById('editStudentId').value = user ? (user.studentId || '') : '';
+            document.getElementById('editClassroom').value = user ? (user.classroom || '') : '';
             document.getElementById('editUserModal').classList.add('active');
         }
         function closeEditModal() { document.getElementById('editUserModal').classList.remove('active'); }
@@ -485,6 +504,8 @@
 
             const data = { displayName, role };
             if (password) data.password = password;
+            data.studentId = document.getElementById('editStudentId').value.trim();
+            data.classroom = document.getElementById('editClassroom').value.trim();
 
             try {
                 await gameAPI.editUser(userId, data);
@@ -501,6 +522,8 @@
             const password = document.getElementById('newPassword').value;
             const displayName = document.getElementById('newDisplayName').value.trim();
             const role = document.getElementById('newRole').value;
+            const studentId = document.getElementById('newStudentId').value.trim();
+            const classroom = document.getElementById('newClassroom').value.trim();
 
             if (!username || !password || !displayName) {
                 showToast('กรุณากรอกข้อมูลให้ครบ', 'error');
@@ -508,12 +531,14 @@
             }
 
             try {
-                await gameAPI.createUser({ username, password, displayName, role, characterId: 1 });
+                await gameAPI.createUser({ username, password, displayName, role, characterId: 1, studentId, classroom });
                 showToast('สร้างผู้ใช้สำเร็จ ✅');
                 closeAddModal();
                 document.getElementById('newUsername').value = '';
                 document.getElementById('newPassword').value = '';
                 document.getElementById('newDisplayName').value = '';
+                document.getElementById('newStudentId').value = '';
+                document.getElementById('newClassroom').value = '';
                 loadUsers();
             } catch (error) {
                 showToast(error.message || 'เกิดข้อผิดพลาด', 'error');

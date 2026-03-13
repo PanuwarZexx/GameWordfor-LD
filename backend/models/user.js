@@ -48,6 +48,14 @@ const userSchema = new mongoose.Schema({
         type: String,
         enum: ['admin', 'teacher', 'student'],
         default: 'student'
+    },
+    studentId: {
+        type: String,
+        default: ''
+    },
+    classroom: {
+        type: String,
+        default: ''
     }
 }, {
     timestamps: true
