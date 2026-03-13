@@ -271,6 +271,12 @@
         </div>
     </div>
 
+    <!-- Teacher Footer -->
+    <div style="text-align:center;padding:20px;color:#1e3a5f;font-size:0.9em;opacity:0.7;">
+        <span>ผู้ดูรายงาน: </span><span id="teacherName" style="font-weight:700;">-</span>
+        <span style="margin-left:15px;">เวลาเข้าสู่ระบบ: <span id="loginTime">-</span></span>
+    </div>
+
     <!-- Student Detail Overlay -->
     <div class="detail-overlay" id="detailOverlay" onclick="if(event.target===this)closeDetail()">
         <div class="detail-box" id="detailBox">
@@ -292,6 +298,7 @@
         }
 
         loadStudents();
+        loadTeacherInfo();
 
         async function loadStudents() {
             try {
@@ -618,6 +625,16 @@
                 document.querySelector('.detail-overlay').style.display = '';
                 document.getElementById('detailOverlay').classList.add('active');
             }, 500);
+        }
+
+        async function loadTeacherInfo() {
+            try {
+                const profile = await gameAPI.getUserProfile();
+                document.getElementById('teacherName').textContent = profile.displayName || profile.username;
+                document.getElementById('loginTime').textContent = new Date().toLocaleString('th-TH', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' });
+            } catch (e) {
+                console.error('Load teacher info error:', e);
+            }
         }
 
         function closeDetail() { document.getElementById('detailOverlay').classList.remove('active'); }

@@ -552,6 +552,47 @@ app.delete('/api/admin/users/:id', authenticateToken, requireRole('admin'), asyn
     }
 });
 
+// Admin: Get recent activity log (logins + play)
+app.get('/api/admin/activity', authenticateToken, requireRole('admin'), async (req, res) => {
+    try {
+        const users = await User.find({ lastLoginAt: { $exists: true } })
+            .select('username displayName role lastLoginAt')
+            .sort({ lastLoginAt: -1 })
+            .limit(50)
+            .lean();
+
+        const loginActivity = users.map(u => ({
+            type: 'login',
+            username: u.username,
+            displayName: u.displayName,
+            role: u.role || 'student',
+            time: u.lastLoginAt
+        }));
+
+        const recentPlays = await PlayLog.find()
+            .sort({ playedAt: -1 })
+            .limit(100)
+            .populate('userId', 'username displayName role')
+            .lean();
+
+        const playActivity = recentPlays.map(p => ({
+            type: 'play',
+            username: p.userId?.username || '-',
+            displayName: p.userId?.displayName || '-',
+            role: p.userId?.role || 'student',
+            level: p.level,
+            word: p.word,
+            isCorrect: p.isCorrect,
+            time: p.playedAt
+        }));
+
+        res.json({ loginActivity, playActivity });
+    } catch (error) {
+        console.error('Admin activity error:', error);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
 // ==================== TEACHER ROUTES ====================
 
 // Get all students with progress summary (teacher/admin)

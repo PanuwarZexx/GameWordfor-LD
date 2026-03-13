@@ -302,6 +302,32 @@
         </div>
     </div>
 
+    <!-- Activity Log Section -->
+    <div class="admin-card" style="margin-top:25px;">
+        <h2 style="margin-bottom:15px;">📋 บันทึกกิจกรรมล่าสุด</h2>
+        <div style="display:flex;gap:10px;margin-bottom:15px;flex-wrap:wrap;">
+            <button onclick="loadActivity('all')" style="background:#2563a8;color:white;padding:8px 16px;border-radius:10px;border:none;cursor:pointer;font-family:'Kanit',sans-serif;font-weight:600;">ทั้งหมด</button>
+            <button onclick="loadActivity('login')" style="background:#4fb848;color:white;padding:8px 16px;border-radius:10px;border:none;cursor:pointer;font-family:'Kanit',sans-serif;font-weight:600;">🔑 เข้าสู่ระบบ</button>
+            <button onclick="loadActivity('play')" style="background:#f4b235;color:white;padding:8px 16px;border-radius:10px;border:none;cursor:pointer;font-family:'Kanit',sans-serif;font-weight:600;">🎮 เล่นเกม</button>
+        </div>
+        <div style="max-height:400px;overflow-y:auto;border-radius:12px;">
+            <table class="user-table" style="font-size:0.85em;">
+                <thead>
+                    <tr>
+                        <th>ประเภท</th>
+                        <th>ผู้ใช้</th>
+                        <th>บทบาท</th>
+                        <th>รายละเอียด</th>
+                        <th>เวลา</th>
+                    </tr>
+                </thead>
+                <tbody id="activityTableBody">
+                    <tr><td colspan="5" style="text-align:center;padding:30px;color:#888;">กดปุ่มด้านบนเพื่อโหลดข้อมูล</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
     <!-- Add User Modal -->
     <div class="modal-overlay" id="addUserModal">
         <div class="modal-box">
@@ -551,6 +577,62 @@
             toast.textContent = msg;
             document.body.appendChild(toast);
             setTimeout(() => toast.remove(), 3000);
+        }
+
+        let cachedActivity = null;
+        async function loadActivity(filter) {
+            const tbody = document.getElementById('activityTableBody');
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:30px;">กำลังโหลด...</td></tr>';
+            try {
+                if (!cachedActivity) {
+                    cachedActivity = await gameAPI.getActivityLog();
+                }
+                const roleMap = { admin: '👑 แอดมิน', teacher: '👩‍🏫 ครู', student: '👨‍🎓 นักเรียน' };
+                let events = [];
+
+                if (filter === 'all' || filter === 'login') {
+                    cachedActivity.loginActivity.forEach(a => {
+                        events.push({
+                            type: '🔑 เข้าสู่ระบบ',
+                            typeCls: 'color:#4fb848;',
+                            user: a.displayName || a.username,
+                            role: roleMap[a.role] || a.role,
+                            detail: 'เข้าสู่ระบบ',
+                            time: new Date(a.time)
+                        });
+                    });
+                }
+                if (filter === 'all' || filter === 'play') {
+                    cachedActivity.playActivity.forEach(a => {
+                        events.push({
+                            type: '🎮 เล่นเกม',
+                            typeCls: 'color:#f4b235;',
+                            user: a.displayName || a.username,
+                            role: roleMap[a.role] || a.role,
+                            detail: `ด่าน ${a.level} คำ "${a.word}" ${a.isCorrect ? '✅ ถูก' : '❌ ผิด'}`,
+                            time: new Date(a.time)
+                        });
+                    });
+                }
+
+                events.sort((a, b) => b.time - a.time);
+                events = events.slice(0, 100);
+
+                if (events.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:30px;color:#888;">ไม่พบข้อมูล</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = events.map(e => `<tr>
+                    <td style="${e.typeCls}font-weight:700;">${e.type}</td>
+                    <td>${e.user}</td>
+                    <td>${e.role}</td>
+                    <td>${e.detail}</td>
+                    <td style="font-size:0.8em;color:#888;">${e.time.toLocaleString('th-TH', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' })}</td>
+                </tr>`).join('');
+            } catch (error) {
+                tbody.innerHTML = `<tr><td colspan="5" style="color:#ff6b6b;text-align:center;padding:30px;">${error.message}</td></tr>`;
+            }
         }
 
         function logout() {

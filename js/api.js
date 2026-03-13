@@ -244,6 +244,19 @@ class GameAPI {
         }
     }
 
+    async getActivityLog() {
+        try {
+            const response = await fetch(`${API_BASE_URL}/admin/activity`, {
+                method: 'GET',
+                headers: this.getHeaders()
+            });
+            return await this.handleResponse(response);
+        } catch (error) {
+            console.error('Admin activity log error:', error);
+            throw error;
+        }
+    }
+
     // ==================== TEACHER ====================
 
     async getStudentsList() {
