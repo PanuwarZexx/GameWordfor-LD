@@ -16,6 +16,9 @@ try {
     unlockNotificationShown = {};
 }
 
+// Combo System state
+let currentCombo = 0;
+
 // Character image mapping (ใช้ร่วมกัน)
 const characterImages = {
     1: '01.jpg',
@@ -919,7 +922,23 @@ function loadWordDirect() {
     }
 
     const wordData = levelData.words[currentWordIndex];
-    setupWordDisplay(wordData);
+    
+    // Smooth Transition (WOW Feature)
+    const gameRight = document.querySelector('.game-right');
+    if (gameRight) {
+        gameRight.classList.add('transitioning');
+        setTimeout(() => {
+            try {
+                setupWordDisplay(wordData);
+            } catch (e) {
+                console.error('setupWordDisplay error:', e);
+            }
+            // Always remove transitioning class even if setupWordDisplay fails
+            gameRight.classList.remove('transitioning');
+        }, 400);
+    } else {
+        setupWordDisplay(wordData);
+    }
 }
 
 function setupWordDisplay(wordData) {
@@ -933,25 +952,119 @@ function setupWordDisplay(wordData) {
         this.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"%3E%3Crect width="400" height="300" fill="%23f0f0f0"/%3E%3Ctext x="200" y="150" font-size="24" text-anchor="middle" fill="%23999"%3E' + encodeURIComponent(wordData.word) + '%3C/text%3E%3C/svg%3E';
     };
 
-    // Generate answer slots - จำนวนช่องเท่ากับจำนวนตัวอักษร
+    // Generate answer slots - แบบ 2D Grid (แต่ละตัวอักษรมีกล่องของตัวเอง)
     const slotsContainer = document.getElementById('answerSlots');
     slotsContainer.innerHTML = '';
+    slotsContainer.classList.add('cluster-layout');
     currentAnswer = [];
     
-    const wordChars = wordData.word.split('');
-    for (let i = 0; i < wordChars.length; i++) {
-        const slot = document.createElement('div');
-        slot.className = 'answer-slot answer-slot-char';
-        slot.id = `slot-${i}`;
-        slotsContainer.appendChild(slot);
+    const wordStr = wordData.word;
+    
+    // ฟังก์ชันตรวจว่าเป็นตัวอักษรบน (สระบน, วรรณยุกต์, การันต์ ฯลฯ)
+    const isAboveChar = (char) => {
+        const code = char.charCodeAt(0);
+        return code === 0x0E31 ||                      // ั ไม้หันอากาศ
+               (code >= 0x0E34 && code <= 0x0E37) ||   // ิ ี ึ ื สระบน
+               code === 0x0E47 ||                      // ็ ไม้ไต่คู้
+               (code >= 0x0E48 && code <= 0x0E4C) ||   // ่ ้ ๊ ๋ ์ วรรณยุกต์/การันต์
+               code === 0x0E4D ||                      // ํ นิคหิต
+               code === 0x0E4E;                        // ฎ ยามักการ
+    };
+    
+    // ฟังก์ชันตรวจว่าเป็นตัวอักษรล่าง (สระล่าง, พินทุ)
+    const isBelowChar = (char) => {
+        const code = char.charCodeAt(0);
+        return (code >= 0x0E38 && code <= 0x0E3A);     // ุ ู ฺ
+    };
+    
+    // จัดกลุ่ม cluster (พยัญชนะ + สระบน/ล่าง + วรรณยุกต์)
+    window.currentWordClusters = [];
+    let clusterIndex = -1;
+    
+    for (let i = 0; i < wordStr.length; i++) {
+        const char = wordStr[i];
+        const above = isAboveChar(char);
+        const below = isBelowChar(char);
+        
+        if (!above && !below) {
+            // ตัวอักษรตำแหน่งกลาง (พยัญชนะ, สระหน้า/หลัง) = เริ่ม cluster ใหม่
+            clusterIndex++;
+            window.currentWordClusters.push({
+                topChars: [],
+                middleChar: { char: char, index: i },
+                bottomChars: []
+            });
+        } else if (above && clusterIndex >= 0) {
+            window.currentWordClusters[clusterIndex].topChars.push({ char: char, index: i });
+        } else if (below && clusterIndex >= 0) {
+            window.currentWordClusters[clusterIndex].bottomChars.push({ char: char, index: i });
+        }
+    }
+    
+    // Map charIndex -> slotId (สำหรับ updateAnswerSlots)
+    window.charSlotMap = {};
+    
+    // สร้าง column สำหรับแต่ละ cluster
+    for (let c = 0; c < window.currentWordClusters.length; c++) {
+        const cluster = window.currentWordClusters[c];
+        const column = document.createElement('div');
+        column.className = 'cluster-column';
+        
+        // === โซนบน (สระบน/วรรณยุกต์) ===
+        const topZone = document.createElement('div');
+        topZone.className = 'cluster-zone cluster-top';
+        if (cluster.topChars.length > 0) {
+            // กลับด้าน เพื่อให้วรรณยุกต์อยู่บนสุด สระบนอยู่ใต้ลงมา
+            const reversed = [...cluster.topChars].reverse();
+            for (const tc of reversed) {
+                const slot = document.createElement('div');
+                slot.className = 'answer-slot slot-above';
+                slot.id = `slot-${tc.index}`;
+                window.charSlotMap[tc.index] = slot.id;
+                topZone.appendChild(slot);
+            }
+        } else {
+            const ph = document.createElement('div');
+            ph.className = 'slot-placeholder-above';
+            topZone.appendChild(ph);
+        }
+        column.appendChild(topZone);
+        
+        // === โซนกลาง (พยัญชนะ) ===
+        const midSlot = document.createElement('div');
+        midSlot.className = 'answer-slot slot-main';
+        midSlot.id = `slot-${cluster.middleChar.index}`;
+        window.charSlotMap[cluster.middleChar.index] = midSlot.id;
+        column.appendChild(midSlot);
+        
+        // === โซนล่าง (สระล่าง) ===
+        const bottomZone = document.createElement('div');
+        bottomZone.className = 'cluster-zone cluster-bottom';
+        if (cluster.bottomChars.length > 0) {
+            for (const bc of cluster.bottomChars) {
+                const slot = document.createElement('div');
+                slot.className = 'answer-slot slot-below';
+                slot.id = `slot-${bc.index}`;
+                window.charSlotMap[bc.index] = slot.id;
+                bottomZone.appendChild(slot);
+            }
+        } else {
+            const ph = document.createElement('div');
+            ph.className = 'slot-placeholder-below';
+            bottomZone.appendChild(ph);
+        }
+        column.appendChild(bottomZone);
+        
+        slotsContainer.appendChild(column);
     }
 
     // Generate keyboard with relevant characters
     generateKeyboard(wordData.word);
     
-    // Hide next button, hide spelling display
+    // Hide next button, show check button
     document.getElementById('nextButton').style.display = 'none';
-    document.querySelector('.check-button').style.display = 'inline-block';
+    const checkBtn = document.querySelector('.check-button-img') || document.querySelector('.check-button');
+    if (checkBtn) checkBtn.style.display = 'inline-block';
     hideSpelling();
     
     // อัพเดทตัวนับข้อ
@@ -968,14 +1081,10 @@ function setupWordDisplay(wordData) {
 
 // แสดงคำสะกด/คำอ่าน + เล่นเสียงสะกดคำ
 function showSpelling() {
-    const levelData = gameData[currentLevel];
-    const wordData = levelData.words[currentWordIndex];
-    const spellingText = wordData.spelling || wordData.word;
-    
+    // ซ่อนคำอ่านตามที่ User ร้องขอ (ได้ยินแค่เสียง)
     const spellingDisplay = document.getElementById('spellingDisplay');
     if (spellingDisplay) {
-        spellingDisplay.textContent = spellingText;
-        spellingDisplay.style.display = 'block';
+        spellingDisplay.style.display = 'none';
     }
     
     // เล่นเสียงสะกดคำจากโฟลเดอร์ เสียงสะกดคำ/ด่านที่X/N_คำ.mp3
@@ -1312,16 +1421,29 @@ function selectCharacter(char, button) {
     playCharacterSound(char);
 }
 
-// อัปเดตช่องแสดงผลแต่ละช่อง
+// อัปเดตช่องแสดงผลแต่ละช่อง - ใช้ charSlotMap (แต่ละตัวอักษรมีกล่องของตัวเอง)
 function updateAnswerSlots() {
+    if (!window.charSlotMap) return;
+    
     const levelData = gameData[currentLevel];
     const wordData = levelData.words[currentWordIndex];
-    const totalSlots = wordData.word.split('').length;
+    const totalChars = wordData.word.length;
     
-    for (let i = 0; i < totalSlots; i++) {
-        const slot = document.getElementById(`slot-${i}`);
-        if (slot) {
-            slot.textContent = currentAnswer[i] || '';
+    // ล้างกล่องทั้งหมดก่อน
+    for (let i = 0; i < totalChars; i++) {
+        const slotId = window.charSlotMap[i];
+        if (slotId) {
+            const slot = document.getElementById(slotId);
+            if (slot) slot.textContent = '';
+        }
+    }
+    
+    // วาดตัวอักษรที่พิมพ์ลงไปในกล่องที่ตรงกับตำแหน่งของมัน
+    for (let i = 0; i < currentAnswer.length; i++) {
+        const slotId = window.charSlotMap[i];
+        if (slotId) {
+            const slot = document.getElementById(slotId);
+            if (slot) slot.textContent = currentAnswer[i];
         }
     }
 }
@@ -1364,6 +1486,14 @@ function checkAnswer() {
     const correctAnswer = wordData.word;
 
     if (userAnswer === correctAnswer) {
+        // Combo System: Increment combo
+        currentCombo++;
+        let bonusPoints = 0;
+        if (currentCombo >= 3) {
+            bonusPoints = Math.floor(currentCombo / 2); // เพิ่มโบนัสตามรอบคอมโบ
+            showComboUI(currentCombo);
+        }
+
         showResultModal(true);
         
         // บันทึกคำที่ตอบถูก และเพิ่มคะแนนเฉพาะครั้งแรกที่ตอบถูก
@@ -1376,7 +1506,8 @@ function checkAnswer() {
         const isFirstTime = !answeredWords[levelKey].includes(currentWordIndex);
         
         if (isFirstTime) {
-            score++;
+            // บวกคะแนนพื้นฐาน 1 พร้อมคะแนนโบนัสคอมโบ
+            score += (1 + bonusPoints);
             answeredWords[levelKey].push(currentWordIndex);
             saveUserData();
         }
@@ -1385,7 +1516,8 @@ function checkAnswer() {
         updateGameTotalScore();
         
         document.getElementById('nextButton').style.display = 'inline-block';
-        document.querySelector('.check-button').style.display = 'none';
+        const checkBtn2 = document.querySelector('.check-button-img') || document.querySelector('.check-button');
+        if (checkBtn2) checkBtn2.style.display = 'none';
         
         // ตรวจสอบว่าตอบได้ 5 ข้อหรือยัง — ถ้าครบแล้ว ให้แสดงปุ่มให้ผู้เล่นปลดล็อคเอง
         if (answeredWords[levelKey].length >= 5 && currentLevel === unlockedLevels && currentLevel < 10) {
@@ -1406,11 +1538,105 @@ function checkAnswer() {
             nextWord();
         }, 1200);
     } else {
-        showResultModal(false);
+        // Combo System: Reset on wrong answer
+        currentCombo = 0;
+        hideComboUI();
+
+        // วิเคราะห์ข้อผิดพลาดทั้งหมดอย่างละเอียด
+        let hasConsonantError = false;
+        let hasVowelError = false;
+        let hasToneError = false;
+        let hasMissing = false;
+        let hasExtra = false;
+        
+        const toneMarks = ['่', '้', '๊', '๋'];
+        const vowelChars = ['ะ', 'า', 'ิ', 'ี', 'ึ', 'ื', 'ุ', 'ู', 'เ', 'แ', 'โ', 'ใ', 'ไ', 'ำ', 'ั', '็', '์', 'ํ'];
+        
+        const maxLen = Math.max(userAnswer.length, correctAnswer.length);
+        
+        for (let i = 0; i < maxLen; i++) {
+            const userChar = userAnswer[i];
+            const correctChar = correctAnswer[i];
+            
+            if (userChar === correctChar) continue;
+            
+            if (!userChar) {
+                // ผู้เล่นกรอกไม่ครบ
+                hasMissing = true;
+            } else if (!correctChar) {
+                // ผู้เล่นกรอกเกิน
+                hasExtra = true;
+            } else {
+                // ตัวอักษรผิด - จำแนกประเภทจากตัวที่ควรจะเป็น (correctChar)
+                if (toneMarks.includes(correctChar) || toneMarks.includes(userChar)) {
+                    hasToneError = true;
+                } else if (vowelChars.includes(correctChar) || vowelChars.includes(userChar)) {
+                    hasVowelError = true;
+                } else if (thaiConsonants.includes(correctChar) || thaiConsonants.includes(userChar)) {
+                    hasConsonantError = true;
+                }
+            }
+        }
+        
+        // สร้างข้อความแจ้งเตือนรวม
+        let errorType = '';
+        let errorParts = [];
+        
+        if (hasMissing) {
+            errorParts.push('กรอกตัวอักษรไม่ครบ');
+        }
+        if (hasExtra) {
+            errorParts.push('มีตัวอักษรเกิน');
+        }
+        if (hasConsonantError && hasVowelError && hasToneError) {
+            errorParts.push('ใส่พยัญชนะ สระ และวรรณยุกต์ผิด');
+        } else if (hasConsonantError && hasVowelError) {
+            errorParts.push('ใส่พยัญชนะและสระผิด');
+        } else if (hasConsonantError && hasToneError) {
+            errorParts.push('ใส่พยัญชนะและวรรณยุกต์ผิด');
+        } else if (hasVowelError && hasToneError) {
+            errorParts.push('ใส่สระและวรรณยุกต์ผิด');
+        } else {
+            if (hasConsonantError) errorParts.push('ใส่พยัญชนะผิด');
+            if (hasVowelError) errorParts.push('ใส่สระผิด');
+            if (hasToneError) errorParts.push('ใส่วรรณยุกต์ผิด');
+        }
+        
+        if (errorParts.length > 0) {
+            errorType = errorParts.join(' และ') + 'ครับ';
+        } else {
+            errorType = 'คำตอบไม่ถูกต้องครับ';
+        }
+
+        showResultModal(false, errorType);
         // Reset answer
         setTimeout(() => {
             resetAnswer();
         }, 1500);
+    }
+}
+
+// ฟังก์ชันแสดงและซ่อน Combo UI
+function showComboUI(comboCount) {
+    const comboDisplay = document.getElementById('comboDisplay');
+    const multiplier = document.getElementById('comboMultiplier');
+    
+    if (comboDisplay && multiplier) {
+        multiplier.textContent = `x${comboCount}`;
+        comboDisplay.style.display = 'flex';
+        
+        // Re-trigger animation
+        comboDisplay.classList.remove('animate-combo');
+        void comboDisplay.offsetWidth; // trigger reflow
+        comboDisplay.classList.add('animate-combo');
+    }
+}
+
+function hideComboUI() {
+    const comboDisplay = document.getElementById('comboDisplay');
+    if (comboDisplay) {
+        comboDisplay.style.display = 'none';
+        comboDisplay.classList.remove('animate-combo');
     }
 }
 
@@ -1440,7 +1666,7 @@ function skipWord() {
     }
 }
 
-function showResultModal(isCorrect) {
+function showResultModal(isCorrect, errorMsg = '') {
     const modal = document.getElementById('resultModal');
     const modalContent = modal.querySelector('.modal-content');
     const modalIcon = document.getElementById('modalIcon');
@@ -1451,11 +1677,46 @@ function showResultModal(isCorrect) {
         modalIcon.textContent = '✓';
         modalTitle.textContent = 'คำตอบถูกต้อง';
         playCorrectSound();
+        
+        // อ่านผลลัพธ์ด้วยเสียง (ตอบถูก)
+        if ('speechSynthesis' in window) {
+            setTimeout(() => {
+                try {
+                    window.speechSynthesis.cancel();
+                    const utterance = new SpeechSynthesisUtterance('ถูกต้อง เก่งมาก!');
+                    utterance.lang = 'th-TH';
+                    utterance.rate = 0.9;
+                    utterance.volume = 1.0;
+                    utterance.pitch = 1.2;
+                    window.speechSynthesis.speak(utterance);
+                } catch (e) {
+                    console.error('TTS error:', e);
+                }
+            }, 400);
+        }
     } else {
         modalContent.className = 'modal-content modal-wrong';
         modalIcon.textContent = '✕';
-        modalTitle.textContent = 'คำตอบไม่ถูกต้อง';
+        modalTitle.textContent = errorMsg || 'คำตอบไม่ถูกต้อง';
         playWrongSound();
+        
+        // อ่านข้อผิดพลาดด้วยเสียง (อ่านเสมอไม่ว่า soundEnabled จะเปิดหรือปิด)
+        if (errorMsg && 'speechSynthesis' in window) {
+            setTimeout(() => {
+                try {
+                    window.speechSynthesis.cancel();
+                    const utterance = new SpeechSynthesisUtterance(errorMsg);
+                    utterance.lang = 'th-TH';
+                    utterance.rate = 0.85;
+                    utterance.volume = 1.0;
+                    utterance.pitch = 1.0;
+                    window.speechSynthesis.speak(utterance);
+                    console.log('TTS speaking:', errorMsg);
+                } catch (e) {
+                    console.error('TTS error:', e);
+                }
+            }, 600);
+        }
     }
 
     modal.classList.add('active');
@@ -1532,7 +1793,7 @@ function playCorrectSound() {
 }
 
 function playCorrectSound() {
-    if (!soundEnabled) return;
+    // เล่นเสียงเสมอ ไม่ว่า soundEnabled จะเปิดหรือปิด
     
     // สร้างเสียงพลุ (celebration sound) ดังขึ้น
     const audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -1551,7 +1812,7 @@ function playCorrectSound() {
             oscillator.type = 'sine';
             
             // ลดเสียงค่อยๆ
-            gainNode.gain.setValueAtTime(0.5, audioContext.currentTime);
+            gainNode.gain.setValueAtTime(0.7, audioContext.currentTime);
             gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
             
             oscillator.start(audioContext.currentTime);
@@ -1561,7 +1822,7 @@ function playCorrectSound() {
 }
 
 function playWrongSound() {
-    if (!soundEnabled) return;
+    // เล่นเสียงเสมอ ไม่ว่า soundEnabled จะเปิดหรือปิด
     
     // สร้างเสียงแตร (buzzer sound)
     const audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -1575,7 +1836,7 @@ function playWrongSound() {
     oscillator.frequency.setValueAtTime(200, audioContext.currentTime);
     oscillator.type = 'sawtooth';
     
-    gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+    gainNode.gain.setValueAtTime(0.4, audioContext.currentTime);
     gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
     
     oscillator.start(audioContext.currentTime);

@@ -9,7 +9,7 @@
     * {
         max-width: 100%;
     }
-    
+
     html {
         overflow-x: hidden;
     }
@@ -30,7 +30,7 @@ body::before {
     left: 0;
     width: 100%;
     height: 100%;
-    background: 
+    background:
         radial-gradient(ellipse at 20% 30%, rgba(255, 182, 193, 0.4) 0%, transparent 60%),
         radial-gradient(ellipse at 80% 70%, rgba(255, 218, 185, 0.4) 0%, transparent 60%),
         radial-gradient(ellipse at 50% 50%, rgba(221, 160, 221, 0.3) 0%, transparent 70%),
@@ -42,11 +42,14 @@ body::before {
 }
 
 @keyframes backgroundMove {
-    0%, 100% { 
+
+    0%,
+    100% {
         transform: translate(0, 0) scale(1);
         opacity: 0.5;
     }
-    50% { 
+
+    50% {
         transform: translate(20px, -20px) scale(1.1);
         opacity: 0.8;
     }
@@ -68,87 +71,63 @@ body::before {
 }
 
 /* Floating shapes in background */
+/* Immersive Background / Particles (WOW Feature) */
 .floating-shape {
-    position: fixed;
+    position: absolute;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0) 70%);
+    border-radius: 50%;
+    filter: blur(4px);
+    opacity: 0.6;
     animation: floatShape 20s infinite ease-in-out;
     pointer-events: none;
     z-index: 0;
-    filter: blur(1px);
 }
 
 .floating-shape:nth-child(1) {
-    width: 100px;
-    height: 100px;
-    top: 10%;
+    width: 150px;
+    height: 150px;
+    top: 5%;
     left: 10%;
-    animation-delay: 0s;
-}
-
-.floating-shape:nth-child(1)::before {
-    content: '⭐';
-    font-size: 60px;
-    position: absolute;
-    animation: rotate 8s linear infinite;
+    animation-duration: 25s;
+    background: radial-gradient(circle, rgba(232, 93, 158, 0.4) 0%, rgba(255, 255, 255, 0) 70%);
 }
 
 .floating-shape:nth-child(2) {
-    width: 80px;
-    height: 80px;
-    top: 70%;
+    width: 200px;
+    height: 200px;
+    top: 60%;
     left: 80%;
-    animation-delay: 5s;
-}
-
-.floating-shape:nth-child(2)::before {
-    content: '🌟';
-    font-size: 50px;
-    position: absolute;
-    animation: rotate 10s linear infinite reverse;
+    animation-duration: 30s;
+    animation-delay: -5s;
+    background: radial-gradient(circle, rgba(79, 184, 72, 0.3) 0%, rgba(255, 255, 255, 0) 70%);
 }
 
 .floating-shape:nth-child(3) {
-    width: 90px;
-    height: 90px;
-    top: 50%;
-    left: 50%;
-    animation-delay: 10s;
-}
-
-.floating-shape:nth-child(3)::before {
-    content: '✨';
-    font-size: 55px;
-    position: absolute;
-    animation: rotate 12s linear infinite;
+    width: 120px;
+    height: 120px;
+    top: 40%;
+    left: 20%;
+    animation-duration: 22s;
+    animation-delay: -10s;
+    background: radial-gradient(circle, rgba(56, 189, 248, 0.4) 0%, rgba(255, 255, 255, 0) 70%);
 }
 
 .floating-shape:nth-child(4) {
-    width: 110px;
-    height: 110px;
-    top: 20%;
-    right: 20%;
-    animation-delay: 15s;
-}
-
-.floating-shape:nth-child(4)::before {
-    content: '💫';
-    font-size: 65px;
-    position: absolute;
-    animation: rotate 9s linear infinite reverse;
+    width: 80px;
+    height: 80px;
+    top: 15%;
+    left: 75%;
+    animation-duration: 18s;
+    background: radial-gradient(circle, rgba(245, 158, 11, 0.4) 0%, rgba(255, 255, 255, 0) 70%);
 }
 
 .floating-shape:nth-child(5) {
-    width: 70px;
-    height: 70px;
-    top: 30%;
-    left: 25%;
-    animation-delay: 3s;
-}
-
-.floating-shape:nth-child(5)::before {
-    content: '🌈';
-    font-size: 45px;
-    position: absolute;
-    animation: rotate 15s linear infinite;
+    width: 250px;
+    height: 250px;
+    top: 70%;
+    left: 15%;
+    animation-duration: 35s;
+    background: radial-gradient(circle, rgba(167, 139, 250, 0.3) 0%, rgba(255, 255, 255, 0) 70%);
 }
 
 .floating-shape:nth-child(6) {
@@ -159,26 +138,12 @@ body::before {
     animation-delay: 7s;
 }
 
-.floating-shape:nth-child(6)::before {
-    content: '☀️';
-    font-size: 58px;
-    position: absolute;
-    animation: rotate 11s linear infinite;
-}
-
 .floating-shape:nth-child(7) {
     width: 85px;
     height: 85px;
     top: 15%;
     left: 70%;
     animation-delay: 12s;
-}
-
-.floating-shape:nth-child(7)::before {
-    content: '🎈';
-    font-size: 52px;
-    position: absolute;
-    animation: rotate 13s linear infinite reverse;
 }
 
 .floating-shape:nth-child(8) {
@@ -189,26 +154,12 @@ body::before {
     animation-delay: 18s;
 }
 
-.floating-shape:nth-child(8)::before {
-    content: '🎨';
-    font-size: 48px;
-    position: absolute;
-    animation: rotate 14s linear infinite;
-}
-
 .floating-shape:nth-child(9) {
     width: 90px;
     height: 90px;
     top: 40%;
     right: 15%;
     animation-delay: 9s;
-}
-
-.floating-shape:nth-child(9)::before {
-    content: '🎵';
-    font-size: 55px;
-    position: absolute;
-    animation: rotate 10s linear infinite reverse;
 }
 
 .floating-shape:nth-child(10) {
@@ -219,26 +170,12 @@ body::before {
     animation-delay: 6s;
 }
 
-.floating-shape:nth-child(10)::before {
-    content: '🌸';
-    font-size: 50px;
-    position: absolute;
-    animation: rotate 16s linear infinite;
-}
-
 .floating-shape:nth-child(11) {
     width: 70px;
     height: 70px;
     top: 25%;
     left: 45%;
     animation-delay: 14s;
-}
-
-.floating-shape:nth-child(11)::before {
-    content: '🦋';
-    font-size: 45px;
-    position: absolute;
-    animation: rotate 9s linear infinite reverse;
 }
 
 .floating-shape:nth-child(12) {
@@ -249,26 +186,12 @@ body::before {
     animation-delay: 11s;
 }
 
-.floating-shape:nth-child(12)::before {
-    content: '🎯';
-    font-size: 60px;
-    position: absolute;
-    animation: rotate 12s linear infinite;
-}
-
 .floating-shape:nth-child(13) {
     width: 65px;
     height: 65px;
     top: 5%;
     left: 55%;
     animation-delay: 4s;
-}
-
-.floating-shape:nth-child(13)::before {
-    content: '🎪';
-    font-size: 42px;
-    position: absolute;
-    animation: rotate 17s linear infinite reverse;
 }
 
 .floating-shape:nth-child(14) {
@@ -279,13 +202,6 @@ body::before {
     animation-delay: 8s;
 }
 
-.floating-shape:nth-child(14)::before {
-    content: '🎁';
-    font-size: 52px;
-    position: absolute;
-    animation: rotate 13s linear infinite;
-}
-
 .floating-shape:nth-child(15) {
     width: 95px;
     height: 95px;
@@ -294,26 +210,23 @@ body::before {
     animation-delay: 16s;
 }
 
-.floating-shape:nth-child(15)::before {
-    content: '🌟';
-    font-size: 58px;
-    position: absolute;
-    animation: rotate 11s linear infinite reverse;
-}
-
 @keyframes floatShape {
     0% {
         transform: translate(0, 0) rotate(0deg) scale(1);
     }
+
     25% {
         transform: translate(100px, -80px) rotate(90deg) scale(1.2);
     }
+
     50% {
         transform: translate(-50px, 100px) rotate(180deg) scale(0.8);
     }
+
     75% {
         transform: translate(80px, 50px) rotate(270deg) scale(1.1);
     }
+
     100% {
         transform: translate(0, 0) rotate(360deg) scale(1);
     }
@@ -331,40 +244,103 @@ body::before {
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; transform: scale(0.9); }
-    to { opacity: 1; transform: scale(1); }
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
 
 @keyframes bounce {
-    0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
-    40% { transform: translateY(-20px); }
-    60% { transform: translateY(-10px); }
+
+    0%,
+    20%,
+    50%,
+    80%,
+    100% {
+        transform: translateY(0);
+    }
+
+    40% {
+        transform: translateY(-20px);
+    }
+
+    60% {
+        transform: translateY(-10px);
+    }
 }
 
 @keyframes pulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.05); }
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
 }
 
 @keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-    20%, 40%, 60%, 80% { transform: translateX(5px); }
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    10%,
+    30%,
+    50%,
+    70%,
+    90% {
+        transform: translateX(-5px);
+    }
+
+    20%,
+    40%,
+    60%,
+    80% {
+        transform: translateX(5px);
+    }
 }
 
 @keyframes glow {
-    0%, 100% { box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
-    50% { box-shadow: 0 4px 20px rgba(255, 200, 0, 0.6); }
+
+    0%,
+    100% {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    50% {
+        box-shadow: 0 4px 20px rgba(255, 200, 0, 0.6);
+    }
 }
 
 @keyframes slideInUp {
-    from { transform: translateY(50px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
+    from {
+        transform: translateY(50px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
 }
 
 @keyframes rotate {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 /* Auth Screens */
@@ -385,7 +361,7 @@ body::before {
     color: #2563a8;
     font-weight: bold;
     margin-bottom: 20px;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .auth-input {
@@ -397,7 +373,7 @@ body::before {
     border-radius: 12px;
     margin-bottom: 12px;
     font-family: 'Kanit', 'Prompt', sans-serif;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
 }
 
@@ -455,27 +431,27 @@ body::before {
     border: 4px solid transparent;
     transition: all 0.3s ease;
     background: white;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 @media (max-width: 480px) {
     .character-container {
         padding: 30px 15px;
     }
-    
+
     .character-grid {
         grid-template-columns: repeat(3, 1fr);
         gap: 15px;
         margin: 25px 0;
     }
-    
+
     .character-option {
         width: 95px;
         height: 95px;
         border-radius: 18px;
         border: 3px solid transparent;
     }
-    
+
     .character-option.selected {
         border-width: 3px;
     }
@@ -483,7 +459,7 @@ body::before {
 
 .character-option:hover {
     transform: scale(1.1);
-    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
 }
 
 .character-option.selected {
@@ -522,9 +498,9 @@ body::before {
     overflow: hidden;
     text-transform: uppercase;
     letter-spacing: 1px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2), 
-                0 4px 8px rgba(0, 0, 0, 0.15),
-                inset 0 -3px 0 rgba(0, 0, 0, 0.2);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2),
+        0 4px 8px rgba(0, 0, 0, 0.15),
+        inset 0 -3px 0 rgba(0, 0, 0, 0.2);
 }
 
 .edit-button::before {
@@ -550,9 +526,9 @@ body::before {
 
 .save-button:hover {
     transform: translateY(-4px) scale(1.05);
-    box-shadow: 0 12px 28px rgba(76, 175, 80, 0.5), 
-                0 6px 12px rgba(76, 175, 80, 0.3),
-                inset 0 -3px 0 rgba(0, 0, 0, 0.3);
+    box-shadow: 0 12px 28px rgba(76, 175, 80, 0.5),
+        0 6px 12px rgba(76, 175, 80, 0.3),
+        inset 0 -3px 0 rgba(0, 0, 0, 0.3);
 }
 
 .cancel-button {
@@ -563,15 +539,15 @@ body::before {
 
 .cancel-button:hover {
     transform: translateY(-4px) scale(1.05);
-    box-shadow: 0 12px 28px rgba(255, 107, 107, 0.5), 
-                0 6px 12px rgba(255, 107, 107, 0.3),
-                inset 0 -3px 0 rgba(0, 0, 0, 0.3);
+    box-shadow: 0 12px 28px rgba(255, 107, 107, 0.5),
+        0 6px 12px rgba(255, 107, 107, 0.3),
+        inset 0 -3px 0 rgba(0, 0, 0, 0.3);
 }
 
 .edit-button:active {
     transform: translateY(-1px) scale(0.98);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2),
-                inset 0 3px 8px rgba(0, 0, 0, 0.3);
+        inset 0 3px 8px rgba(0, 0, 0, 0.3);
 }
 
 /* Responsive Edit Buttons */
@@ -580,7 +556,7 @@ body::before {
         gap: 15px;
         max-width: 90%;
     }
-    
+
     .edit-button {
         font-size: 1.5em;
         font-size: 1.1em;
@@ -593,7 +569,7 @@ body::before {
         gap: 12px;
         max-width: 280px;
     }
-    
+
     .edit-button {
         padding: 14px 20px;
         font-size: 1em;
@@ -605,7 +581,7 @@ body::before {
     .edit-buttons {
         max-width: 600px;
     }
-    
+
     .edit-button {
         padding: 18px 40px;
         font-size: 1.4em;
@@ -624,8 +600,8 @@ body::before {
     padding: 8px 18px;
     border-radius: 50px;
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12),
-                0 3px 6px rgba(0, 0, 0, 0.08),
-                inset 0 1px 0 rgba(255, 255, 255, 0.8);
+        0 3px 6px rgba(0, 0, 0, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8);
     transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
     border: 2px solid rgba(255, 255, 255, 0.8);
 }
@@ -633,8 +609,8 @@ body::before {
 .user-info:hover {
     transform: translateY(-2px) scale(1.02);
     box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18),
-                0 5px 10px rgba(0, 0, 0, 0.12),
-                inset 0 1px 0 rgba(255, 255, 255, 1);
+        0 5px 10px rgba(0, 0, 0, 0.12),
+        inset 0 1px 0 rgba(255, 255, 255, 1);
 }
 
 .user-avatar {
@@ -644,7 +620,7 @@ body::before {
     border: 3px solid #f4b235;
     object-fit: cover;
     box-shadow: 0 3px 10px rgba(244, 178, 53, 0.4),
-                inset 0 2px 4px rgba(0, 0, 0, 0.1);
+        inset 0 2px 4px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
 }
 
@@ -670,13 +646,13 @@ body::before {
         gap: 8px;
         padding: 6px 14px;
     }
-    
+
     .user-avatar {
         width: 38px;
         height: 38px;
         border: 2.5px solid #f4b235;
     }
-    
+
     .user-name {
         font-size: 1em;
     }
@@ -690,20 +666,20 @@ body::before {
         padding: 0;
         margin: 0;
     }
-    
+
     .user-info {
         top: 10px;
         left: 10px;
         gap: 8px;
         padding: 6px 12px;
     }
-    
+
     .user-avatar {
         width: 35px;
         height: 35px;
         border: 2px solid #f4b235;
     }
-    
+
     .user-name {
         font-size: 0.9em;
         max-width: 120px;
@@ -711,25 +687,25 @@ body::before {
         text-overflow: ellipsis;
         white-space: nowrap;
     }
-    
+
     .auth-input {
         max-width: 100%;
         font-size: 1.05em;
         padding: 14px 18px;
         border-radius: 14px;
     }
-    
+
     .auth-title {
         font-size: 1.5em;
         margin-bottom: 18px;
     }
-    
+
     .auth-container {
         padding: 30px 25px;
         max-width: 92%;
         margin: 20px auto;
     }
-    
+
     .character-container {
         padding: 20px 15px;
         max-width: 95%;
@@ -748,7 +724,7 @@ body::before {
     font-size: 1.1em;
     font-weight: bold;
     cursor: pointer;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     transition: all 0.3s ease;
     font-family: 'Kanit', 'Prompt', sans-serif;
     z-index: 1000;
@@ -801,7 +777,7 @@ body::before {
     color: #2563a8;
     font-weight: bold;
     margin-bottom: 10px;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .game-subtitle {
@@ -811,7 +787,7 @@ body::before {
     -webkit-text-stroke: 3px #2563a8;
     paint-order: stroke fill;
     margin: 20px 0;
-    text-shadow: 4px 4px 0px rgba(0,0,0,0.1);
+    text-shadow: 4px 4px 0px rgba(0, 0, 0, 0.1);
 }
 
 .thai-subtitle {
@@ -837,20 +813,29 @@ body::before {
 }
 
 @keyframes float {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-20px); }
+
+    0%,
+    100% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-20px);
+    }
 }
 
 .start-button {
     background: linear-gradient(145deg, #b8e986 0%, #7fb83e 100%);
     color: white;
-    font-size: 1.3em;
+    font-size: 1.5em;
+    /* ขยายขนาดตัวหนังสือ */
     font-weight: bold;
-    padding: 12px 40px;
+    padding: 15px 50px;
+    /* ขยายขนาดปุ่ม */
     border: none;
     border-radius: 35px;
     cursor: pointer;
-    box-shadow: 
+    box-shadow:
         0 6px 15px rgba(127, 184, 62, 0.4),
         0 3px 6px rgba(0, 0, 0, 0.2),
         inset 0 -2px 4px rgba(0, 0, 0, 0.1),
@@ -865,8 +850,8 @@ body::before {
 
 @media (max-width: 768px) {
     .start-button {
-        font-size: 1.1em;
-        padding: 10px 32px;
+        font-size: 1.25em;
+        padding: 12px 40px;
         border-radius: 30px;
         margin-top: 8px;
         max-width: 90%;
@@ -875,8 +860,8 @@ body::before {
 
 @media (max-width: 480px) {
     .start-button {
-        font-size: 0.95em;
-        padding: 9px 24px;
+        font-size: 1.1em;
+        padding: 11px 30px;
         border-radius: 28px;
         margin-top: 6px;
         max-width: 85%;
@@ -885,7 +870,7 @@ body::before {
 
 .start-button:hover {
     transform: scale(1.1);
-    box-shadow: 0 12px 25px rgba(0,0,0,0.3);
+    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.3);
 }
 
 .start-button:active {
@@ -901,7 +886,7 @@ body::before {
     width: 0;
     height: 0;
     border-radius: 50%;
-    background: rgba(255,255,255,0.3);
+    background: rgba(255, 255, 255, 0.3);
     transform: translate(-50%, -50%);
     transition: width 0.6s, height 0.6s;
 }
@@ -925,7 +910,7 @@ body::before {
     color: white;
     font-size: 24px;
     cursor: pointer;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     transition: all 0.3s ease;
     animation: pulse 3s infinite;
     z-index: 999;
@@ -943,7 +928,7 @@ body::before {
 
 .sound-icon:hover {
     transform: scale(1.1) rotate(15deg);
-    box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
 }
 
 .sound-icon:active {
@@ -973,7 +958,7 @@ body::before {
     padding: 20px;
     border-radius: 30px;
     margin-bottom: 30px;
-    box-shadow: 0 6px 15px rgba(0,0,0,0.12);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.12);
     position: relative;
     overflow: hidden;
 }
@@ -1024,7 +1009,7 @@ body::before {
         gap: 20px;
         margin-bottom: 20px;
     }
-    
+
     .level-select {
         padding: 15px;
     }
@@ -1034,7 +1019,7 @@ body::before {
     background: white;
     border-radius: 30px;
     padding: 30px;
-    box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
     text-align: center;
     transition: all 0.3s ease;
     animation: slideInUp 0.5s ease-out;
@@ -1067,7 +1052,7 @@ body::before {
 
 .level-card:hover {
     transform: translateY(-10px);
-    box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
 }
 
 .level-card-title {
@@ -1094,6 +1079,7 @@ body::before {
         border: 2.5px solid #e0e7ff;
         position: relative;
     }
+
     .level-card-title {
         font-size: 1.2em;
         margin-bottom: 10px;
@@ -1103,6 +1089,7 @@ body::before {
         letter-spacing: 0.5px;
         text-shadow: 0 1px 0 #fff, 0 2px 6px #b6c6e6;
     }
+
     .word-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -1112,9 +1099,11 @@ body::before {
         padding: 0 8px;
         box-sizing: border-box;
     }
+
     .level-card .level-btn {
         margin: 0;
     }
+
     /* ปุ่มใน level card */
     .level-card .level-btn {
         width: 44vw;
@@ -1126,23 +1115,27 @@ body::before {
         background: linear-gradient(90deg, #4ade80 0%, #38bdf8 100%);
         color: #fff;
         font-weight: 600;
-        box-shadow: 0 2px 8px rgba(56,189,248,0.10);
+        box-shadow: 0 2px 8px rgba(56, 189, 248, 0.10);
         border: none;
         transition: transform 0.12s, box-shadow 0.12s, background 0.18s;
         position: relative;
         overflow: hidden;
     }
+
     .level-card .level-btn:active {
         transform: scale(0.97);
-        box-shadow: 0 1px 3px rgba(56,189,248,0.10);
+        box-shadow: 0 1px 3px rgba(56, 189, 248, 0.10);
         background: linear-gradient(90deg, #38bdf8 0%, #4ade80 100%);
     }
+
     .level-card .level-btn:hover {
         filter: brightness(1.08);
-        box-shadow: 0 4px 12px rgba(56,189,248,0.13);
+        box-shadow: 0 4px 12px rgba(56, 189, 248, 0.13);
     }
+
     /* ปุ่มเสียงในปุ่ม */
-    .level-card .level-btn .sound-icon, .level-card .level-btn .sound-btn {
+    .level-card .level-btn .sound-icon,
+    .level-card .level-btn .sound-btn {
         background: #fff;
         color: #38bdf8;
         border-radius: 50%;
@@ -1153,18 +1146,23 @@ body::before {
         justify-content: center;
         font-size: 1.1em;
         margin-left: 8px;
-        box-shadow: 0 1px 4px rgba(56,189,248,0.10);
+        box-shadow: 0 1px 4px rgba(56, 189, 248, 0.10);
         border: 1.5px solid #bae6fd;
         transition: background 0.15s, color 0.15s;
     }
-    .level-card .level-btn .sound-icon:active, .level-card .level-btn .sound-btn:active {
+
+    .level-card .level-btn .sound-icon:active,
+    .level-card .level-btn .sound-btn:active {
         background: #bae6fd;
         color: #2563a8;
     }
-    .level-card .level-btn .sound-icon:hover, .level-card .level-btn .sound-btn:hover {
+
+    .level-card .level-btn .sound-icon:hover,
+    .level-card .level-btn .sound-btn:hover {
         background: #e0f2fe;
         color: #0ea5e9;
     }
+
     /* เพิ่มลูกเล่น background ฟุ้งๆ */
     .level-card::before {
         content: '';
@@ -1179,7 +1177,9 @@ body::before {
         border-radius: 50%;
         pointer-events: none;
     }
-    .level-card .level-btn, .level-card .level-btn * {
+
+    .level-card .level-btn,
+    .level-card .level-btn * {
         z-index: 1;
         position: relative;
     }
@@ -1221,17 +1221,17 @@ body::before {
         max-width: 100%;
         box-sizing: border-box;
     }
-    
+
     .word-text {
         font-size: 1em;
         line-height: 1.3;
     }
-    
+
     .sound-icon-word {
         font-size: 0.85em !important;
         padding: 3px !important;
     }
-    
+
     .level-words {
         gap: 12px;
         margin-bottom: 18px;
@@ -1240,7 +1240,7 @@ body::before {
 
 .word-item:hover {
     transform: scale(1.05);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .word-item:active {
@@ -1290,7 +1290,7 @@ body::before {
         margin-top: 18px;
         border-radius: 22px;
     }
-    
+
     .level-button,
     [id^="startLevel"] {
         font-size: 1.1em;
@@ -1320,7 +1320,7 @@ body::before {
     padding: 15px 25px;
     border-radius: 25px;
     margin-bottom: 20px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 @media (max-width: 480px) {
@@ -1373,23 +1373,23 @@ body::before {
         width: 48px;
         height: 48px;
     }
-    
+
     .player-label {
         font-size: 1em;
     }
-    
+
     .player-value {
         font-size: 1.35em;
         padding: 5px 14px;
     }
-    
+
     .menu-button {
         font-size: 0.8em;
         padding: 8px 14px;
         border-radius: 14px;
         min-width: auto;
     }
-    
+
     .sound-icon {
         font-size: 1.7em;
         width: 52px;
@@ -1397,9 +1397,9 @@ body::before {
         bottom: 18px;
         right: 18px;
     }
-    
+
     .next-button,
-    .check-button {
+    .check-button-img {
         font-size: 1.1em;
         padding: 12px 24px;
         min-width: 90px;
@@ -1413,40 +1413,40 @@ body::before {
         padding: 10px 15px;
         background: white;
         border-radius: 20px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         margin-bottom: 15px;
     }
-    
+
     .player-info-game {
         width: auto;
         justify-content: flex-start;
         gap: 8px;
         flex: 1;
     }
-    
+
     .player-avatar {
         width: 36px;
         height: 36px;
         border: 2px solid #f4b235;
     }
-    
+
     .player-stats {
         display: flex;
         flex-direction: column;
         gap: 3px;
     }
-    
+
     .player-label {
         font-size: 0.8em;
         line-height: 1.2;
     }
-    
+
     .player-value {
         font-size: 1em;
         padding: 3px 10px;
         border-radius: 12px;
     }
-    
+
     .game-buttons {
         width: auto;
         justify-content: flex-end;
@@ -1454,7 +1454,7 @@ body::before {
         flex-shrink: 0;
         align-items: center;
     }
-    
+
     .menu-button {
         font-size: 0.7em;
         padding: 8px 12px;
@@ -1463,17 +1463,17 @@ body::before {
         white-space: nowrap;
         font-weight: 700;
     }
-    
+
     .home-button {
         width: 40px;
         height: 40px;
     }
-    
+
     .skip-button {
         width: 40px;
         height: 40px;
     }
-    
+
     .sound-icon {
         font-size: 1.2em;
         width: 42px;
@@ -1498,7 +1498,7 @@ body::before {
     border: none;
     border-radius: 20px;
     cursor: pointer;
-    box-shadow: 
+    box-shadow:
         0 6px 12px rgba(243, 156, 18, 0.4),
         0 2px 4px rgba(0, 0, 0, 0.2),
         inset 0 -2px 4px rgba(0, 0, 0, 0.1),
@@ -1509,7 +1509,7 @@ body::before {
 
 .menu-button:hover {
     transform: scale(1.1);
-    box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
 }
 
 .menu-button:active {
@@ -1555,7 +1555,7 @@ body::before {
     justify-content: center;
     border: none;
     cursor: pointer;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     transition: all 0.3s ease;
     flex-shrink: 0;
     position: relative;
@@ -1590,7 +1590,7 @@ body::before {
     background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%);
     padding: 12px 28px;
     border-radius: 50px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     margin: 0 auto 20px auto;
     max-width: fit-content;
     border: 2px solid rgba(79, 184, 72, 0.3);
@@ -1652,7 +1652,7 @@ body::before {
     background: white;
     padding: 15px 25px;
     border-radius: 50px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
     margin-bottom: 20px;
     transition: all 0.3s ease;
     max-width: fit-content;
@@ -1660,7 +1660,7 @@ body::before {
 
 .user-profile-display:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
 }
 
 .profile-avatar {
@@ -1677,7 +1677,8 @@ body::before {
     gap: 5px;
 }
 
-.profile-name, .profile-score {
+.profile-name,
+.profile-score {
     font-size: 1.3em;
     color: #2c3e50;
     font-weight: 600;
@@ -1692,7 +1693,7 @@ body::before {
     padding: 20px;
     border-radius: 30px;
     margin-bottom: 20px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .summary-stats {
@@ -1710,7 +1711,7 @@ body::before {
     background: white;
     padding: 15px 30px;
     border-radius: 20px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     min-width: 150px;
     min-height: 100px;
     display: flex;
@@ -1737,11 +1738,11 @@ body::before {
         font-size: 1.3em;
         padding: 10px;
     }
-    
+
     .summary-stats {
         gap: 10px;
     }
-    
+
     .stat-card {
         padding: 10px 20px;
         min-width: 100px;
@@ -1755,7 +1756,7 @@ body::before {
         padding: 12px 18px;
         border-radius: 25px;
     }
-    
+
     .summary-stats {
         flex-direction: row;
         flex-wrap: wrap;
@@ -1764,23 +1765,23 @@ body::before {
         justify-content: center;
         padding: 0 10px;
     }
-    
+
     .stat-card {
         width: calc(50% - 5px);
         min-width: auto;
         padding: 12px 18px;
         border-radius: 18px;
     }
-    
+
     .stat-label {
         font-size: 0.9em;
         margin-bottom: 6px;
     }
-    
+
     .stat-value {
         font-size: 1.8em;
     }
-    
+
     .game-content {
         padding: 15px 10px;
         border-radius: 24px;
@@ -1788,7 +1789,7 @@ body::before {
         margin: 0 auto;
         max-width: calc(100% - 20px);
     }
-    
+
     .word-image {
         max-width: 240px;
         max-height: 240px;
@@ -1796,14 +1797,14 @@ body::before {
         margin: 0 auto;
         display: block;
     }
-    
+
     .answer-slots {
         gap: 10px;
         margin: 18px auto;
         padding: 8px;
         justify-content: center;
     }
-    
+
     .answer-slot {
         min-width: 180px;
         max-width: calc(100% - 40px);
@@ -1811,14 +1812,14 @@ body::before {
         font-size: 1.8em;
         height: 80px;
     }
-    
+
 }
 
 .game-content {
     background: white;
     border-radius: 30px;
     padding: 40px;
-    box-shadow: 
+    box-shadow:
         0 15px 35px rgba(255, 105, 180, 0.25),
         0 5px 15px rgba(0, 0, 0, 0.15),
         inset 0 1px 0 rgba(255, 255, 255, 0.9);
@@ -1831,6 +1832,22 @@ body::before {
     overflow: visible;
     max-width: 1400px;
     margin: 0 auto;
+}
+
+@media (max-width: 900px) {
+    .game-content {
+        grid-template-columns: 1fr;
+        display: flex;
+        flex-direction: column-reverse;
+        padding: 20px;
+        gap: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .game-content {
+        padding: 15px 10px;
+    }
 }
 
 .game-left {
@@ -1850,7 +1867,7 @@ body::before {
 .game-right {
     display: flex;
     flex-direction: column;
-    gap: 25px;
+    gap: 8px;
     align-items: center;
     width: 100%;
 }
@@ -1858,7 +1875,7 @@ body::before {
 @media (max-width: 480px) {
     .game-right {
         padding: 0 5px;
-        gap: 20px;
+        gap: 5px;
     }
 }
 
@@ -1907,6 +1924,61 @@ body::before {
     .image-section {
         padding: 0 5px;
     }
+}
+
+/* Micro-animations: Ripple effect for Thai Keys */
+.thai-key {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 249, 250, 0.95) 100%);
+    border: 2px solid rgba(255, 255, 255, 0.8);
+    border-radius: 12px;
+    padding: 10px 5px;
+    font-size: 1.6em;
+    font-weight: 700;
+    color: #2c3e50;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1),
+        inset 0 -2px 5px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Kanit', sans-serif;
+    position: relative;
+    overflow: hidden;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.thai-key::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100%;
+    height: 100%;
+    background: rgba(232, 93, 158, 0.2);
+    border-radius: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0;
+    transition: transform 0.4s ease-out, opacity 0.4s ease-out;
+}
+
+.thai-key:active::after {
+    transform: translate(-50%, -50%) scale(2);
+    opacity: 1;
+    transition: 0s;
+}
+
+.thai-key:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 6px 12px rgba(232, 93, 158, 0.2);
+    border-color: rgba(232, 93, 158, 0.4);
+    z-index: 10;
+}
+
+.thai-key:active {
+    transform: translateY(2px) scale(0.95);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .answer-section {
@@ -2066,30 +2138,70 @@ body::before {
 }
 
 @keyframes float1 {
-    0%, 100% { transform: translate(0, 0) rotate(0deg); }
-    25% { transform: translate(12px, -8px) rotate(8deg); }
-    50% { transform: translate(-10px, 6px) rotate(-5deg); }
-    75% { transform: translate(8px, -10px) rotate(6deg); }
+
+    0%,
+    100% {
+        transform: translate(0, 0) rotate(0deg);
+    }
+
+    25% {
+        transform: translate(12px, -8px) rotate(8deg);
+    }
+
+    50% {
+        transform: translate(-10px, 6px) rotate(-5deg);
+    }
+
+    75% {
+        transform: translate(8px, -10px) rotate(6deg);
+    }
 }
 
 @keyframes float2 {
-    0%, 100% { transform: translate(0, 0) rotate(0deg); }
-    33% { transform: translate(-8px, 10px) rotate(-6deg); }
-    66% { transform: translate(10px, -8px) rotate(7deg); }
+
+    0%,
+    100% {
+        transform: translate(0, 0) rotate(0deg);
+    }
+
+    33% {
+        transform: translate(-8px, 10px) rotate(-6deg);
+    }
+
+    66% {
+        transform: translate(10px, -8px) rotate(7deg);
+    }
 }
 
 @keyframes float3 {
-    0%, 100% { transform: translate(0, 0) rotate(0deg) scale(1); }
-    50% { transform: translate(5px, -12px) rotate(-8deg) scale(1.1); }
+
+    0%,
+    100% {
+        transform: translate(0, 0) rotate(0deg) scale(1);
+    }
+
+    50% {
+        transform: translate(5px, -12px) rotate(-8deg) scale(1.1);
+    }
 }
 
 @keyframes float4 {
-    0%, 100% { transform: translate(0, 0) rotate(0deg); }
-    40% { transform: translate(10px, 8px) rotate(10deg); }
-    80% { transform: translate(-12px, -6px) rotate(-7deg); }
+
+    0%,
+    100% {
+        transform: translate(0, 0) rotate(0deg);
+    }
+
+    40% {
+        transform: translate(10px, 8px) rotate(10deg);
+    }
+
+    80% {
+        transform: translate(-12px, -6px) rotate(-7deg);
+    }
 }
 
-.game-content > * {
+.game-content>* {
     position: relative;
     z-index: 1;
 }
@@ -2128,7 +2240,7 @@ body::before {
         padding: 4px 2px;
         max-width: 85%;
     }
-    
+
     .thai-key {
         font-size: 0.9em;
         border-radius: 9px;
@@ -2141,7 +2253,7 @@ body::before {
         gap: 6px;
         padding: 8px 5px;
     }
-    
+
     .thai-key {
         font-size: 1.2em;
         border-radius: 10px;
@@ -2158,7 +2270,7 @@ body::before {
     border: none;
     border-radius: 15px;
     cursor: pointer;
-    box-shadow: 
+    box-shadow:
         0 6px 12px rgba(243, 156, 18, 0.4),
         0 2px 4px rgba(0, 0, 0, 0.2),
         inset 0 -2px 4px rgba(0, 0, 0, 0.1),
@@ -2171,7 +2283,7 @@ body::before {
 
 .thai-key:hover:not(.disabled) {
     transform: translateY(-3px) scale(1.05);
-    box-shadow: 
+    box-shadow:
         0 8px 20px rgba(243, 156, 18, 0.6),
         0 4px 8px rgba(0, 0, 0, 0.3),
         inset 0 -2px 4px rgba(0, 0, 0, 0.1),
@@ -2187,7 +2299,7 @@ body::before {
 .thai-key.selected {
     background: linear-gradient(145deg, #4fb848 0%, #7fb83e 100%);
     animation: bounce 0.5s;
-    box-shadow: 
+    box-shadow:
         0 6px 16px rgba(79, 184, 72, 0.5),
         0 2px 4px rgba(0, 0, 0, 0.2),
         inset 0 -2px 4px rgba(0, 0, 0, 0.1),
@@ -2210,6 +2322,7 @@ body::before {
 }
 
 @media (max-width: 480px) {
+
     /* Reduce speaker icon size specifically on mobile */
     .thai-key-sound {
         top: 3px;
@@ -2236,16 +2349,16 @@ body::before {
 
 .word-image {
     width: 100%;
-    max-width: 350px;
-    height: 280px;
+    max-width: 280px;
+    height: 180px;
     object-fit: contain;
-    border-radius: 20px;
+    border-radius: 16px;
     animation: fadeIn 0.5s ease-in;
     transition: transform 0.3s ease;
     image-orientation: from-image;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
     background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
-    padding: 15px;
+    padding: 10px;
 }
 
 .word-image:hover {
@@ -2276,17 +2389,17 @@ body::before {
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 8px 30px rgba(232, 93, 158, 0.8), 
-                0 0 50px rgba(232, 93, 158, 0.5),
-                inset 0 -4px 15px rgba(0, 0, 0, 0.3),
-                0 0 20px rgba(255, 255, 255, 0.4);
+    box-shadow: 0 8px 30px rgba(232, 93, 158, 0.8),
+        0 0 50px rgba(232, 93, 158, 0.5),
+        inset 0 -4px 15px rgba(0, 0, 0, 0.3),
+        0 0 20px rgba(255, 255, 255, 0.4);
     animation: slideInUp 0.3s ease-out;
     transition: all 0.3s ease;
     border: 5px solid rgba(255, 255, 255, 0.7);
     text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.6),
-                 -2px -2px 4px rgba(255, 255, 255, 0.3),
-                 0 0 20px rgba(255, 255, 255, 0.5),
-                 0 0 30px rgba(232, 93, 158, 0.8);
+        -2px -2px 4px rgba(255, 255, 255, 0.3),
+        0 0 20px rgba(255, 255, 255, 0.5),
+        0 0 30px rgba(232, 93, 158, 0.8);
     letter-spacing: 4px;
     font-family: 'Kanit', sans-serif;
 }
@@ -2312,7 +2425,11 @@ body::before {
     cursor: pointer;
     font-weight: 700;
 }
-.unlock-button:hover { transform: translateY(-2px); }
+
+.unlock-button:hover {
+    transform: translateY(-2px);
+}
+
 .unlock-status {
     display: inline-block;
     margin-left: 8px;
@@ -2348,7 +2465,7 @@ body::before {
 [id^="startLevel"].unlock-action,
 .start-button.unlock-action {
     background: linear-gradient(135deg, #31c14a 0%, #4fb848 100%);
-    box-shadow: 0 8px 20px rgba(79,184,72,0.45);
+    box-shadow: 0 8px 20px rgba(79, 184, 72, 0.45);
     transform: translateY(-2px);
 }
 
@@ -2359,20 +2476,28 @@ body::before {
 
 .game-controls {
     display: flex;
-    gap: 15px;
+    gap: 6px;
     justify-content: center;
-    margin-top: 20px;
+    margin-top: 0;
     flex-wrap: wrap;
     width: 100%;
+    align-items: center;
+}
+
+/* ปุ่มตรวจสอบขึ้นบรรทัดใหม่ อยู่กึ่งกลาง ชิด 3 ปุ่มบน */
+.game-controls .check-button-img {
+    flex-basis: 100%;
+    display: flex;
+    justify-content: center;
+    margin-top: 2px;
+    max-width: 100%;
 }
 
 @media (max-width: 480px) {
     .game-controls {
-        gap: 12px;
-        margin-top: 15px;
-        align-items: center;
-        justify-content: center;
-        padding: 0 10px;
+        gap: 5px;
+        margin-top: 3px;
+        padding: 0 5px;
     }
 }
 
@@ -2397,160 +2522,62 @@ body::before {
     }
 }
 
-.play-sound-button {
-    background: linear-gradient(135deg, #ff8247 0%, #ff6b35 100%);
-    color: white;
-    font-size: 1.2em;
-    padding: 12px 30px;
+/* Hide old text-based buttons (replaced by image buttons) */
+.play-sound-button,
+.spelling-button,
+.delete-char-button {
+    display: none;
+}
+
+/* Image Buttons Formatting */
+.img-button {
+    background: transparent;
     border: none;
-    border-radius: 50px;
+    padding: 0;
     cursor: pointer;
-    box-shadow: 0 4px 12px rgba(255, 130, 71, 0.4);
+    transition: transform 0.2s ease, filter 0.2s ease;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    transition: all 0.3s ease;
-    font-weight: 600;
+    outline: none;
+    flex-shrink: 1;
+    max-width: 28%;
 }
 
-@media (max-width: 480px) {
-    .play-sound-button {
-        font-size: 1.2em;
-        padding: 13px 32px;
-        border-radius: 42px;
-        gap: 8px;
-    }
-}
-
-.play-sound-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(255, 130, 71, 0.5);
-}
-
-.play-sound-button:active {
-    transform: translateY(0);
-}
-
-.check-button {
-    background: linear-gradient(135deg, #2563a8 0%, #1e4a8a 100%);
-    color: white;
-    font-size: 1.2em;
-    font-weight: 700;
-    padding: 12px 30px;
-    border: none;
-    border-radius: 50px;
-    cursor: pointer;
-    box-shadow: 0 4px 12px rgba(37, 99, 168, 0.4);
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
-}
-
-@media (max-width: 480px) {
-    .check-button {
-        font-size: 1.2em;
-        padding: 13px 32px;
-        border-radius: 42px;
-    }
-}
-
-.check-button:hover {
+.img-button:hover {
     transform: scale(1.05);
-    box-shadow: 0 6px 16px rgba(0,0,0,0.3);
-    animation: pulse 1s infinite;
+    filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.2)) brightness(1.05);
 }
 
-.check-button:active {
+.img-button:active {
     transform: scale(0.95);
 }
 
-.delete-char-button {
-    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
-    color: white;
-    font-size: 1.2em;
-    font-weight: 600;
-    padding: 12px 30px;
-    border: none;
-    border-radius: 50px;
-    cursor: pointer;
-    box-shadow: 0 4px 12px rgba(255, 107, 107, 0.4);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    transition: all 0.3s ease;
+.img-button img.btn-top {
+    height: 115px;
+    width: auto;
+    object-fit: contain;
+}
+
+.img-button.check-button-img img.btn-bottom {
+    height: 125px;
+    width: auto;
+    object-fit: contain;
 }
 
 @media (max-width: 480px) {
-    .delete-char-button {
-        font-size: 1.1em;
-        padding: 13px 28px;
-        border-radius: 42px;
-        gap: 6px;
+    .img-button img.btn-top {
+        height: 60px;
+    }
+
+    .img-button.check-button-img img.btn-bottom {
+        height: 60px;
     }
 }
 
-.delete-char-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(255, 107, 107, 0.5);
-}
-
-.delete-char-button:active {
-    transform: translateY(0);
-}
-
-/* Spelling Button - ปุ่มคำสะกด */
-.spelling-button {
-    background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
-    color: white;
-    font-size: 1.2em;
-    font-weight: 600;
-    padding: 12px 30px;
-    border: none;
-    border-radius: 50px;
-    cursor: pointer;
-    box-shadow: 0 4px 12px rgba(155, 89, 182, 0.4);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    transition: all 0.3s ease;
-}
-
-.spelling-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(155, 89, 182, 0.5);
-}
-
-.spelling-button:active {
-    transform: translateY(0);
-}
-
-@media (max-width: 480px) {
-    .spelling-button {
-        font-size: 1.1em;
-        padding: 13px 28px;
-        border-radius: 42px;
-        gap: 6px;
-    }
-}
-
-/* Spelling Display - แสดงคำสะกด */
+/* Spelling Display - ซ่อนถาวรแล้ว เหลือแค่เสียง */
 .spelling-display {
-    background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
-    color: #6a1b9a;
-    font-size: 1.8em;
-    font-weight: 700;
-    padding: 18px 30px;
-    border-radius: 20px;
-    text-align: center;
-    margin-top: 15px;
-    border: 3px solid #ce93d8;
-    box-shadow: 0 4px 15px rgba(155, 89, 182, 0.3);
-    animation: slideInUp 0.4s ease-out;
-    letter-spacing: 3px;
-    width: 100%;
+    display: none !important;
 }
 
 @media (max-width: 480px) {
@@ -2561,41 +2588,145 @@ body::before {
     }
 }
 
-/* Individual Answer Slot Characters */
-.answer-slot.answer-slot-char {
+/* ============================================ */
+/* 2D Cluster Layout for Thai Answer Slots       */
+/* ============================================ */
+
+.cluster-layout {
+    display: flex !important;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.cluster-column {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+}
+
+.cluster-zone {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+/* กล่องหลัก - พยัญชนะ/สระหน้า/สระหลัง */
+.answer-slot.slot-main {
     min-width: 50px;
-    width: 60px;
-    height: 70px;
+    width: 65px;
+    height: 65px;
     font-size: 2.2em;
-    padding: 8px;
+    font-weight: 900;
+    background: linear-gradient(135deg, #e85d9e 0%, #d64a8a 100%);
+    color: white;
+    border-radius: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 5px 15px rgba(232, 93, 158, 0.5),
+        inset 0 -2px 6px rgba(0, 0, 0, 0.2);
+    border: 3px solid rgba(255, 255, 255, 0.5);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
+    transition: all 0.3s ease;
+    font-family: 'Kanit', sans-serif;
+    padding: 4px;
+}
+
+/* กล่องเล็ก - สระบน/วรรณยุกต์ */
+.answer-slot.slot-above {
+    min-width: 32px;
+    width: 40px;
+    height: 35px;
+    font-size: 1.4em;
+    font-weight: 800;
+    background: linear-gradient(135deg, #a78bfa 0%, #8b5cf6 100%);
+    color: white;
+    border-radius: 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 3px 8px rgba(139, 92, 246, 0.4),
+        inset 0 -2px 4px rgba(0, 0, 0, 0.15);
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+    font-family: 'Kanit', sans-serif;
+    padding: 2px;
+}
+
+/* กล่องเล็ก - สระล่าง */
+.answer-slot.slot-below {
+    min-width: 32px;
+    width: 40px;
+    height: 35px;
+    font-size: 1.4em;
+    font-weight: 800;
+    background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%);
+    color: white;
+    border-radius: 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 3px 8px rgba(14, 165, 233, 0.4),
+        inset 0 -2px 4px rgba(0, 0, 0, 0.15);
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+    font-family: 'Kanit', sans-serif;
+    padding: 2px;
+}
+
+/* Placeholder สำหรับจัดตำแหน่งให้สมมาตร */
+.slot-placeholder-above,
+.slot-placeholder-below {
+    width: 40px;
+    height: 35px;
+    visibility: hidden;
+}
+
+/* Bounce animation when character is filled */
+.answer-slot.slot-main:not(:empty),
+.answer-slot.slot-above:not(:empty),
+.answer-slot.slot-below:not(:empty) {
+    animation: bounce 0.4s ease;
 }
 
 @media (max-width: 480px) {
-    .answer-slot.answer-slot-char {
-        min-width: 38px;
-        width: 46px;
-        height: 56px;
-        font-size: 1.6em;
-        padding: 6px;
+    .cluster-layout {
+        gap: 4px;
+    }
+
+    .answer-slot.slot-main {
+        min-width: 42px;
+        width: 55px;
+        height: 55px;
+        font-size: 1.8em;
+    }
+
+    .answer-slot.slot-above,
+    .answer-slot.slot-below {
+        min-width: 28px;
+        width: 35px;
+        height: 30px;
+        font-size: 1.2em;
+    }
+
+    .slot-placeholder-above,
+    .slot-placeholder-below {
+        width: 35px;
+        height: 30px;
     }
 }
 
-.check-button::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.3);
-    transform: translate(-50%, -50%);
-    transition: width 0.6s, height 0.6s;
-}
-
-.check-button:hover::after {
-    width: 300px;
-    height: 300px;
+/* Ripple effect for check-button-img */
+.check-button-img {
+    position: relative;
+    overflow: hidden;
 }
 
 .next-button {
@@ -2632,7 +2763,7 @@ body::before {
 
 .next-button:hover {
     transform: scale(1.05) translateX(5px);
-    box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
 }
 
 .next-button:active {
@@ -2668,7 +2799,7 @@ body::before {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0,0,0,0.5);
+    background: rgba(0, 0, 0, 0.5);
     z-index: 1000;
     justify-content: center;
     align-items: flex-start;
@@ -2688,7 +2819,7 @@ body::before {
     padding: 40px;
     text-align: center;
     max-width: 500px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
     position: relative;
     animation: slideInModal 0.4s ease-out;
     transform: translateY(0);
@@ -2700,17 +2831,17 @@ body::before {
         border-radius: 25px;
         max-width: 90%;
     }
-    
+
     .modal-icon {
         font-size: 4em;
         margin-bottom: 15px;
     }
-    
+
     .modal-title {
         font-size: 2em;
         margin-bottom: 15px;
     }
-    
+
     .modal-close {
         font-size: 1.2em;
         padding: 12px 32px;
@@ -2723,6 +2854,7 @@ body::before {
         transform: translateY(-50px);
         opacity: 0;
     }
+
     100% {
         transform: translateY(0);
         opacity: 1;
@@ -2772,7 +2904,7 @@ body::before {
 
 .modal-close:hover {
     transform: scale(1.1);
-    box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
 }
 
 .modal-close:active {
@@ -2849,9 +2981,9 @@ body::before {
         font-size: 3em;
         padding: 10px 20px;
         text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.6),
-                     -1px -1px 3px rgba(255, 255, 255, 0.3),
-                     0 0 15px rgba(255, 255, 255, 0.5),
-                     0 0 25px rgba(232, 93, 158, 0.8);
+            -1px -1px 3px rgba(255, 255, 255, 0.3),
+            0 0 15px rgba(255, 255, 255, 0.5),
+            0 0 25px rgba(232, 93, 158, 0.8);
         letter-spacing: 3px;
     }
 }
@@ -2871,6 +3003,7 @@ body::before {
         transform: translateY(-100px) rotate(0deg);
         opacity: 1;
     }
+
     100% {
         transform: translateY(100vh) rotate(720deg);
         opacity: 0;
@@ -2905,7 +3038,7 @@ body::before {
     width: 90%;
     text-align: center;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3),
-                0 0 0 1px rgba(255, 255, 255, 0.5) inset;
+        0 0 0 1px rgba(255, 255, 255, 0.5) inset;
     animation: slideInAlert 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
     position: relative;
     overflow: hidden;
@@ -2918,11 +3051,39 @@ body::before {
     left: -50%;
     width: 200%;
     height: 200%;
-    background: linear-gradient(45deg, 
-        transparent 30%, 
-        rgba(255, 255, 255, 0.3) 50%, 
-        transparent 70%);
+    background: linear-gradient(45deg,
+            transparent 30%,
+            rgba(255, 255, 255, 0.3) 50%,
+            transparent 70%);
     animation: shimmer 3s infinite;
+}
+
+.answer-section {
+    padding: 10px;
+    margin-bottom: 5px;
+}
+
+/* ============================================ */
+/* Smooth Word Transitions (WOW Feature) */
+/* ============================================ */
+.game-right {
+    transition: opacity 0.4s ease-out, transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.game-right.transitioning {
+    opacity: 0;
+    transform: translateY(20px) scale(0.98);
+}
+
+.word-transition-enter {
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+.word-transition-enter-active {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.3s ease-out, transform 0.3s ease-out;
 }
 
 .custom-alert-icon {
@@ -2954,7 +3115,7 @@ body::before {
     cursor: pointer;
     transition: all 0.3s ease;
     box-shadow: 0 8px 20px rgba(76, 175, 80, 0.4),
-                0 0 0 3px rgba(255, 255, 255, 0.3) inset;
+        0 0 0 3px rgba(255, 255, 255, 0.3) inset;
     position: relative;
     overflow: hidden;
     z-index: 1;
@@ -2966,24 +3127,24 @@ body::before {
         padding: 30px 35px;
         border-radius: 25px;
     }
-    
+
     .custom-alert-icon {
         font-size: 70px;
         margin-bottom: 18px;
     }
-    
+
     .custom-alert-message {
         font-size: 1.2em;
         margin-bottom: 25px;
     }
-    
+
     .custom-alert-button {
         padding: 13px 38px;
         font-size: 1.15em;
         margin: 8px;
         min-width: 130px;
     }
-    
+
     .cancel-button {
         margin-top: 5px !important;
     }
@@ -3010,7 +3171,7 @@ body::before {
 .custom-alert-button:hover {
     transform: translateY(-2px) scale(1.05);
     box-shadow: 0 12px 30px rgba(76, 175, 80, 0.5),
-                0 0 0 4px rgba(255, 255, 255, 0.4) inset;
+        0 0 0 4px rgba(255, 255, 255, 0.4) inset;
 }
 
 .custom-alert-button:active {
@@ -3022,6 +3183,7 @@ body::before {
         transform: translateY(-100px) scale(0.5);
         opacity: 0;
     }
+
     100% {
         transform: translateY(0) scale(1);
         opacity: 1;
@@ -3033,9 +3195,11 @@ body::before {
         transform: scale(0);
         opacity: 0;
     }
+
     50% {
         transform: scale(1.2);
     }
+
     100% {
         transform: scale(1);
         opacity: 1;
@@ -3046,6 +3210,7 @@ body::before {
     0% {
         transform: translateX(-100%) translateY(-100%) rotate(45deg);
     }
+
     100% {
         transform: translateX(100%) translateY(100%) rotate(45deg);
     }
@@ -3075,7 +3240,7 @@ body::before {
 
 .word-counter-value {
     font-size: 1.2em;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 /* ============================================ */
@@ -3092,10 +3257,11 @@ body::before {
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
     box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4),
-                0 4px 8px rgba(0, 0, 0, 0.15),
-                inset 0 -3px 0 rgba(0, 0, 0, 0.2);
+        0 4px 8px rgba(0, 0, 0, 0.15),
+        inset 0 -3px 0 rgba(0, 0, 0, 0.2);
     font-family: 'Kanit', 'Prompt', sans-serif;
-    margin-top: 10px;
+    margin-top: 35px;
+    /* ขยับปุ่มลงมาด้านล่างมากขึ้น */
     position: relative;
     overflow: hidden;
 }
@@ -3118,7 +3284,7 @@ body::before {
 .results-button:hover {
     transform: translateY(-4px) scale(1.05);
     box-shadow: 0 12px 28px rgba(102, 126, 234, 0.6),
-                0 6px 12px rgba(0, 0, 0, 0.2);
+        0 6px 12px rgba(0, 0, 0, 0.2);
 }
 
 .results-button:active {
@@ -3129,6 +3295,8 @@ body::before {
     .results-button {
         font-size: 1.1em;
         padding: 14px 30px;
+        margin-top: 25px;
+        /* ขยับปุ่มลงมาในมือถือด้วย */
     }
 }
 
@@ -3144,6 +3312,69 @@ body::before {
     font-weight: bold;
     color: #4fb848;
     font-size: 1.1em;
+}
+
+/* ============================================ */
+/* Combo Streak Display (WOW Feature)           */
+/* ============================================ */
+.combo-display {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(135deg, #ff4e50 0%, #f9d423 100%);
+    padding: 5px 15px;
+    border-radius: 30px;
+    box-shadow: 0 0 15px rgba(255, 78, 80, 0.6), inset 0 0 10px rgba(255, 255, 255, 0.5);
+    margin-left: auto;
+    border: 2px solid #fff;
+    transform: scale(0);
+}
+
+.combo-text {
+    color: white;
+    font-size: 1.1em;
+    font-weight: 900;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+    letter-spacing: 2px;
+}
+
+.combo-multiplier {
+    color: #fff;
+    font-size: 1.5em;
+    font-weight: 900;
+    text-shadow: 2px 2px 0px #ff4e50, -1px -1px 0px #f9d423;
+}
+
+.animate-combo {
+    animation: comboPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards, comboPulse 1.5s infinite alternate ease-in-out;
+}
+
+@keyframes comboPop {
+    0% {
+        transform: scale(0) rotate(-10deg);
+        opacity: 0;
+    }
+
+    80% {
+        transform: scale(1.1) rotate(5deg);
+        opacity: 1;
+    }
+
+    100% {
+        transform: scale(1) rotate(0deg);
+        opacity: 1;
+    }
+}
+
+@keyframes comboPulse {
+    0% {
+        filter: drop-shadow(0 0 5px rgba(255, 78, 80, 0.6));
+    }
+
+    100% {
+        filter: drop-shadow(0 0 15px #f9d423);
+        transform: scale(1.05);
+    }
 }
 
 /* ============================================ */
@@ -3176,7 +3407,7 @@ body::before {
     max-height: 90vh;
     overflow: hidden;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3),
-                0 8px 24px rgba(0, 0, 0, 0.15);
+        0 8px 24px rgba(0, 0, 0, 0.15);
     display: flex;
     flex-direction: column;
     animation: slideInUp 0.4s ease;
@@ -3194,12 +3425,12 @@ body::before {
 .users-summary-header h2 {
     font-size: 1.4em;
     margin: 0;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .close-summary-btn {
-    background: rgba(255,255,255,0.2);
-    border: 2px solid rgba(255,255,255,0.4);
+    background: rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.4);
     color: white;
     font-size: 1.3em;
     width: 40px;
@@ -3213,7 +3444,7 @@ body::before {
 }
 
 .close-summary-btn:hover {
-    background: rgba(255,255,255,0.4);
+    background: rgba(255, 255, 255, 0.4);
     transform: rotate(90deg) scale(1.1);
 }
 
@@ -3237,8 +3468,13 @@ body::before {
 }
 
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 /* Summary Table */
@@ -3383,9 +3619,12 @@ body::before {
 }
 
 @keyframes pulseGlow {
-    0%, 100% {
+
+    0%,
+    100% {
         box-shadow: 0 4px 8px rgba(244, 178, 53, 0.3);
     }
+
     50% {
         box-shadow: 0 4px 20px rgba(244, 178, 53, 0.7);
     }
@@ -3431,7 +3670,8 @@ body::before {
 
     .summary-table th:nth-child(6),
     .summary-table td:nth-child(6) {
-        display: none; /* Hide level details on very small screens */
+        display: none;
+        /* Hide level details on very small screens */
     }
 
     .word-counter-display {

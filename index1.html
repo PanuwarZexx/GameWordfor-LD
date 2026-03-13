@@ -1,352 +1,3681 @@
-<!DOCTYPE html>
-<html lang="th">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>เกมส์เติมคำ - LET'S PLAY</title>
-    <link rel="stylesheet" href="css/styles.css">
-</head>
-<body>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
 
-    <!-- Floating shapes -->
-    <div class="floating-shape"></div>
-    <div class="floating-shape"></div>
-    <div class="floating-shape"></div>
-    <div class="floating-shape"></div>
-    <div class="floating-shape"></div>
-    <div class="floating-shape"></div>
-    <div class="floating-shape"></div>
-    <div class="floating-shape"></div>
-    <div class="floating-shape"></div>
-    <div class="floating-shape"></div>
-    <div class="floating-shape"></div>
-    <div class="floating-shape"></div>
-    <div class="floating-shape"></div>
-    <div class="floating-shape"></div>
-    <div class="floating-shape"></div>
+@media (max-width: 480px) {
+    * {
+        max-width: 100%;
+    }
 
-    <!-- Login Screen -->
-    <div class="screen active" id="loginScreen">
-        <div class="auth-container">
-            <img src="ปุ่ม button/Logo.png" alt="Let's Play เกมส์เติมคำ" class="game-logo">
-            <h2 class="auth-title">เข้าสู่ระบบ</h2>
-            <input type="text" id="loginUsername" class="auth-input" placeholder="ชื่อผู้ใช้" autocomplete="off">
-            <input type="password" id="loginPassword" class="auth-input" placeholder="รหัสผ่าน" autocomplete="off">
-            <button class="start-button" onclick="login()">เข้าสู่ระบบ</button>
-            <p class="auth-link">ยังไม่มีบัญชี? <span onclick="showRegister()">สมัครสมาชิก</span></p>
-        </div>
-    </div>
+    html {
+        overflow-x: hidden;
+    }
+}
 
-    <!-- Register Screen -->
-    <div class="screen" id="registerScreen">
-        <div class="auth-container">
-            <img src="ปุ่ม button/Logo.png" alt="Let's Play เกมส์เติมคำ" class="game-logo">
-            <h2 class="auth-title">สมัครสมาชิก</h2>
-            <input type="text" id="registerUsername" class="auth-input" placeholder="ชื่อผู้ใช้" autocomplete="off">
-            <input type="password" id="registerPassword" class="auth-input" placeholder="รหัสผ่าน" autocomplete="off">
-            <input type="password" id="registerConfirmPassword" class="auth-input" placeholder="ยืนยันรหัสผ่าน" autocomplete="off">
-            <button class="start-button" onclick="register()">สมัครสมาชิก</button>
-            <p class="auth-link">มีบัญชีแล้ว? <span onclick="showLogin()">เข้าสู่ระบบ</span></p>
-        </div>
-    </div>
+body {
+    font-family: 'Kanit', 'Prompt', sans-serif;
+    background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 50%, #ffecd2 100%);
+    height: 100vh;
+    overflow: hidden;
+    position: relative;
+}
 
-    <!-- Character Selection Screen -->
-    <div class="screen" id="characterScreen">
-        <div class="character-container">
-            <h2 class="auth-title">เลือกตัวละครและตั้งชื่อ</h2>
-            <input type="text" id="playerName" class="auth-input" placeholder="ชื่อของคุณ" maxlength="20" autocomplete="off">
-            <div class="character-grid">
-                <div class="character-option" data-character="1">
-                    <img src="css/01.jpg" alt="ตัวละคร 1">
-                </div>
-                <div class="character-option" data-character="2">
-                    <img src="css/02.jpg" alt="ตัวละคร 2">
-                </div>
-                <div class="character-option" data-character="3">
-                    <img src="css/03.jpg" alt="ตัวละคร 3">
-                </div>
-                <div class="character-option" data-character="4">
-                    <img src="css/04.jpg" alt="ตัวละคร 4">
-                </div>
-                <div class="character-option" data-character="5">
-                    <img src="css/05.jpg" alt="ตัวละคร 5">
-                </div>
-                <div class="character-option" data-character="6">
-                    <img src="css/06.jpg" alt="ตัวละคร 6">
-                </div>
-            </div>
-            <button class="start-button" id="confirmCharacter" onclick="confirmCharacter()" disabled>เริ่มเล่น</button>
-        </div>
-    </div>
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background:
+        radial-gradient(ellipse at 20% 30%, rgba(255, 182, 193, 0.4) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 70%, rgba(255, 218, 185, 0.4) 0%, transparent 60%),
+        radial-gradient(ellipse at 50% 50%, rgba(221, 160, 221, 0.3) 0%, transparent 70%),
+        radial-gradient(circle at 10% 80%, rgba(255, 200, 220, 0.3) 0%, transparent 50%);
+    animation: backgroundMove 20s ease-in-out infinite;
+    z-index: 0;
+    pointer-events: none;
+    filter: blur(40px);
+}
 
-    <!-- Edit Profile Screen -->
-    <div class="screen" id="editProfileScreen">
-        <div class="character-container">
-            <h2 class="auth-title">แก้ไขโปรไฟล์</h2>
-            <input type="text" id="editPlayerName" class="auth-input" placeholder="ชื่อของคุณ" maxlength="20" autocomplete="off">
-            <div class="character-grid">
-                <div class="character-option edit-character" data-character="1">
-                    <img src="css/01.jpg" alt="ตัวละคร 1">
-                </div>
-                <div class="character-option edit-character" data-character="2">
-                    <img src="css/02.jpg" alt="ตัวละคร 2">
-                </div>
-                <div class="character-option edit-character" data-character="3">
-                    <img src="css/03.jpg" alt="ตัวละคร 3">
-                </div>
-                <div class="character-option edit-character" data-character="4">
-                    <img src="css/04.jpg" alt="ตัวละคร 4">
-                </div>
-                <div class="character-option edit-character" data-character="5">
-                    <img src="css/05.jpg" alt="ตัวละคร 5">
-                </div>
-                <div class="character-option edit-character" data-character="6">
-                    <img src="css/06.jpg" alt="ตัวละคร 6">
-                </div>
-            </div>
-            <div class="edit-buttons">
-                <button class="edit-button save-button" onclick="updateProfile()">บันทึก</button>
-                <button class="edit-button cancel-button" onclick="showMainMenu()">ยกเลิก</button>
-            </div>
-        </div>
-    </div>
+@keyframes backgroundMove {
 
-    <!-- Main Menu Screen -->
-    <div class="screen" id="mainMenu">
-        <div class="main-menu">
-            <div class="sound-icon" onclick="toggleSound()">🔊</div>
-            <div class="user-info" onclick="showEditProfile()" style="cursor: pointer;">
-                <img id="userAvatar" src="" alt="Avatar" class="user-avatar">
-                <span id="userName" class="user-name"></span>
-            </div>
-            <button class="logout-button" onclick="logout()">ออกจากระบบ</button>
-            <img src="ปุ่ม button/Logo.png" alt="Let's Play เกมส์เติมคำ" class="game-logo">
-            <button class="start-button" onclick="showLevelSelect()">เริ่มเกม</button>
-            <button class="results-button" onclick="showUsersSummary()">📊 ดูผลการเล่นรวม</button>
-        </div>
-    </div>
+    0%,
+    100% {
+        transform: translate(0, 0) scale(1);
+        opacity: 0.5;
+    }
 
-    <!-- Level Selection Screen -->
-    <div class="screen" id="levelSelect">
-        <div class="level-select">
-            <div class="summary-header">
-                <div class="level-title">สรุปผลการเล่นเกม</div>
-                <div class="player-summary-info" id="playerSummaryInfo">
-                    <img id="summaryPlayerAvatar" src="" alt="Avatar" class="summary-avatar">
-                    <span class="summary-player-name" id="summaryPlayerName"></span>
-                    <span class="summary-player-id">(<span id="summaryPlayerId"></span>)</span>
-                </div>
-                <div class="summary-stats">
-                    <div class="stat-card">
-                        <div class="stat-label">เปอร์เซ็นต์การเล่นเกม</div>
-                        <div class="stat-value" id="totalScore">0%</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-label">จำนวนด่านที่ปลดล็อค</div>
-                        <div class="stat-value" id="unlockedCount">1/10</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-label">จำนวนข้อที่ตอบได้</div>
-                        <div class="stat-value" id="answeredFraction">0/10</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-label"> ระดับทักษะ </div>
-                        <div class="stat-value" id="gradeLevel">-</div>
-                    </div>
-                    <button class="home-button" onclick="showMainMenu()"><img src="ปุ่ม button/3.png" alt="Home"></button>
-                </div>
-            </div>
-            
-            <div class="levels-grid">
-                <!-- Level 1 -->
-                <div class="level-card">
-                    <div class="level-card-title">ด่าน 1 : หมวดสัตว์</div>
-                    <div class="word-grid" id="level1Words"></div>
-                    <div class="level-score" id="level1Score">0/10</div>
-                    <button id="startLevel1" class="start-button" style="font-size: 1.5em; padding: 15px 40px; margin-top: 15px;" onclick="startLevel(1)">เล่นด่าน 1</button>
-                </div>
+    50% {
+        transform: translate(20px, -20px) scale(1.1);
+        opacity: 0.8;
+    }
+}
 
-                <!-- Level 2 -->
-                <div class="level-card">
-                    <div class="level-card-title">ด่าน 2 : หมวดสิ่งของ</div>
-                    <div class="word-grid" id="level2Words"></div>
-                    <div class="level-score" id="level2Score">0/10</div>
-                    <button id="startLevel2" class="start-button" style="font-size: 1.5em; padding: 15px 40px; margin-top: 15px;" onclick="startLevel(2)">เล่นด่าน 2</button>
-                </div>
+.screen {
+    position: relative;
+    z-index: 1;
+}
 
-                <!-- Level 3 -->
-                <div class="level-card">
-                    <div class="level-card-title">ด่าน 3 : หมวดร่างกาย</div>
-                    <div class="word-grid" id="level3Words"></div>
-                    <div class="level-score" id="level3Score">0/10</div>
-                    <button id="startLevel3" class="start-button" style="font-size: 1.5em; padding: 15px 40px; margin-top: 15px;" onclick="startLevel(3)">เล่นด่าน 3</button>
-                </div>
+@media (max-width: 480px) {
+    .screen {
+        padding: 0 5px;
+        margin: 0 auto;
+        max-width: 100vw;
+        overflow-x: hidden;
+        box-sizing: border-box;
+    }
+}
 
-                <!-- Level 4 -->
-                <div class="level-card">
-                    <div class="level-card-title">ด่าน 4 : หมวดธรรมชาติ </div>
-                    <div class="word-grid" id="level4Words"></div>
-                    <div class="level-score" id="level4Score">0/10</div>
-                    <button id="startLevel4" class="start-button" style="font-size: 1.5em; padding: 15px 40px; margin-top: 15px;" onclick="startLevel(4)">เล่นด่าน 4</button>
-                </div>
+/* Floating shapes in background */
+/* Immersive Background / Particles (WOW Feature) */
+.floating-shape {
+    position: absolute;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0) 70%);
+    border-radius: 50%;
+    filter: blur(4px);
+    opacity: 0.6;
+    animation: floatShape 20s infinite ease-in-out;
+    pointer-events: none;
+    z-index: 0;
+}
 
-                <!-- Level 5 -->
-                <div class="level-card">
-                    <div class="level-card-title">ด่าน 5 : หมวดคนในครอบครัว / คนรอบตัว</div>
-                    <div class="word-grid" id="level5Words"></div>
-                    <div class="level-score" id="level5Score">0/10</div>
-                    <button id="startLevel5" class="start-button" style="font-size: 1.5em; padding: 15px 40px; margin-top: 15px;" onclick="startLevel(5)">เล่นด่าน 5</button>
-                </div>
+.floating-shape:nth-child(1) {
+    width: 150px;
+    height: 150px;
+    top: 5%;
+    left: 10%;
+    animation-duration: 25s;
+    background: radial-gradient(circle, rgba(232, 93, 158, 0.4) 0%, rgba(255, 255, 255, 0) 70%);
+}
 
-                <!-- Level 6 -->
-                <div class="level-card">
-                    <div class="level-card-title">ด่าน 6 : คำง่ายมาก เห็นภาพได้ทันที</div>
-                    <div class="word-grid" id="level6Words"></div>
-                    <div class="level-score" id="level6Score">0/10</div>
-                    <button id="startLevel6" class="start-button" style="font-size: 1.5em; padding: 15px 40px; margin-top: 15px;" onclick="startLevel(6)">เล่นด่าน 6</button>
-                </div>
+.floating-shape:nth-child(2) {
+    width: 200px;
+    height: 200px;
+    top: 60%;
+    left: 80%;
+    animation-duration: 30s;
+    animation-delay: -5s;
+    background: radial-gradient(circle, rgba(79, 184, 72, 0.3) 0%, rgba(255, 255, 255, 0) 70%);
+}
 
-                <!-- Level 7 -->
-                <div class="level-card">
-                    <div class="level-card-title">ด่าน 7 : คำอาหารและผลไม้ + คำทั่วไป</div>
-                    <div class="word-grid" id="level7Words"></div>
-                    <div class="level-score" id="level7Score">0/10</div>
-                    <button id="startLevel7" class="start-button" style="font-size: 1.5em; padding: 15px 40px; margin-top: 15px;" onclick="startLevel(7)">เล่นด่าน 7</button>
-                </div>
+.floating-shape:nth-child(3) {
+    width: 120px;
+    height: 120px;
+    top: 40%;
+    left: 20%;
+    animation-duration: 22s;
+    animation-delay: -10s;
+    background: radial-gradient(circle, rgba(56, 189, 248, 0.4) 0%, rgba(255, 255, 255, 0) 70%);
+}
 
-                <!-- Level 8 -->
-                <div class="level-card">
-                    <div class="level-card-title">ด่าน 8 : หมวดธรรมชาติ + สิ่งของ + สัตว์ผสม </div>
-                    <div class="word-grid" id="level8Words"></div>
-                    <div class="level-score" id="level8Score">0/10</div>
-                    <button id="startLevel8" class="start-button" style="font-size: 1.5em; padding: 15px 40px; margin-top: 15px;" onclick="startLevel(8)">เล่นด่าน 8</button>
-                </div>
+.floating-shape:nth-child(4) {
+    width: 80px;
+    height: 80px;
+    top: 15%;
+    left: 75%;
+    animation-duration: 18s;
+    background: radial-gradient(circle, rgba(245, 158, 11, 0.4) 0%, rgba(255, 255, 255, 0) 70%);
+}
 
-                <!-- Level 9 -->
-                <div class="level-card">
-                    <div class="level-card-title">ด่าน 9 : หมวดโรงเรียน + ชีวิตประจำวัน</div>
-                    <div class="word-grid" id="level9Words"></div>
-                    <div class="level-score" id="level9Score">0/10</div>
-                    <button id="startLevel9" class="start-button" style="font-size: 1.5em; padding: 15px 40px; margin-top: 15px;" onclick="startLevel(9)">เล่นด่าน 9</button>
-                </div>
+.floating-shape:nth-child(5) {
+    width: 250px;
+    height: 250px;
+    top: 70%;
+    left: 15%;
+    animation-duration: 35s;
+    background: radial-gradient(circle, rgba(167, 139, 250, 0.3) 0%, rgba(255, 255, 255, 0) 70%);
+}
 
-                <!-- Level 10 -->
-                <div class="level-card">
-                    <div class="level-card-title">ด่าน 10 : คำยาวขึ้นเล็กน้อย แต่ความหมายชัด</div>
-                    <div class="word-grid" id="level10Words"></div>
-                    <div class="level-score" id="level10Score">0/10</div>
-                    <button id="startLevel10" class="start-button" style="font-size: 1.5em; padding: 15px 40px; margin-top: 15px;" onclick="startLevel(10)">เล่นด่าน 10</button>
-                </div>
-            </div>
-        </div>
-    </div>
+.floating-shape:nth-child(6) {
+    width: 95px;
+    height: 95px;
+    top: 80%;
+    left: 50%;
+    animation-delay: 7s;
+}
 
-    <!-- Game Screen -->
-    <div class="screen" id="gameScreen">
-        <div class="game-screen">
-            <div class="game-header">
-                <div class="player-info">
-                    <img id="gameUserAvatar" src="" alt="Player" class="player-avatar">
-                    <div class="player-stats">
-                        <div class="player-label">ผู้เล่น : <span id="gameUserName" style="color: #2563a8; font-weight: bold;"></span></div>
-                        <div class="player-label score-display">ด่านนี้ : <span class="player-value" id="currentScore">0</span> | รวม : <span class="player-value" id="gameTotalScore" style="color: #e85d9e;">0</span></div>
-                    </div>
-                </div>
-                <div class="word-counter-display">
-                    <span class="word-counter-label">ข้อ</span>
-                    <span class="word-counter-value" id="wordCounter">1/10</span>
-                </div>
-                <div class="game-buttons">
-                    <button class="menu-button" onclick="showLevelSelect()">เมนู</button>
-                    <button class="home-button" onclick="showMainMenu()"><img src="ปุ่ม button/3.png" alt="Home"></button>
-                    <button class="skip-button" onclick="skipWord()"><img src="ปุ่ม button/9.png" alt="Skip"></button>
-                </div>
-            </div>
+.floating-shape:nth-child(7) {
+    width: 85px;
+    height: 85px;
+    top: 15%;
+    left: 70%;
+    animation-delay: 12s;
+}
 
-            <div class="game-content">
-                <div class="game-left">
-                    <div class="keyboard-section">
-                        <div class="thai-keyboard" id="thaiKeyboard">
-                            <!-- Keys will be generated by JavaScript -->
-                        </div>
-                    </div>
-                </div>
+.floating-shape:nth-child(8) {
+    width: 75px;
+    height: 75px;
+    top: 60%;
+    left: 15%;
+    animation-delay: 18s;
+}
 
-                <div class="game-right">
-                    <div class="level-indicator">
-                        <h2 id="currentWord" style="color: #4fb848; font-size: 2em; margin: 0; text-shadow: 2px 2px 4px rgba(0,0,0,0.1);">ด่าน 1</h2>
-                    </div>
-                    <div class="image-section">
-                        <img id="wordImage" src="" alt="Word Image" class="word-image">
-                    </div>
-                    <div class="answer-section">
-                        <div class="answer-slots" id="answerSlots">
-                            <!-- Slots will be generated by JavaScript -->
-                        </div>
-                    </div>
-                    <div class="game-controls">
-                        <button class="play-sound-button" onclick="playWordSound()">🔊 ฟังเสียง</button>
-                        <button class="spelling-button" onclick="showSpelling()">📖🔊 คำสะกด</button>
-                        <button class="delete-char-button" onclick="deleteLastChar()">⌫ ลบตัวอักษร</button>
-                        <button class="check-button" onclick="checkAnswer()">✔️ ตรวจสอบ</button>
-                        <button class="next-button" id="nextButton" onclick="nextWord()">🎯 ถัดไป ➜</button>
-                    </div>
-                    <div class="spelling-display" id="spellingDisplay" style="display:none;"></div>
-                </div>
-            </div>
-        </div>
-    </div>
+.floating-shape:nth-child(9) {
+    width: 90px;
+    height: 90px;
+    top: 40%;
+    right: 15%;
+    animation-delay: 9s;
+}
 
-    <!-- Modal for Correct/Wrong Answer -->
-    <div class="modal" id="resultModal">
-        <div class="modal-content">
-            <button class="close-modal" onclick="closeModal()">✕</button>
-            <div class="modal-icon" id="modalIcon">✓</div>
-            <div class="modal-title" id="modalTitle">คำตอบถูกต้อง</div>
-            <button class="modal-close" onclick="closeModal()">ปิด</button>
-        </div>
-    </div>
+.floating-shape:nth-child(10) {
+    width: 80px;
+    height: 80px;
+    top: 85%;
+    right: 30%;
+    animation-delay: 6s;
+}
 
-    <!-- Custom Alert Modal -->
-    <div class="custom-alert-overlay" id="customAlertOverlay">
-        <div class="custom-alert-box">
-            <div class="custom-alert-icon" id="customAlertIcon">ℹ️</div>
-            <div class="custom-alert-message" id="customAlertMessage">ข้อความแจ้งเตือน</div>
-            <button class="custom-alert-button" onclick="closeCustomAlert()">ตกลง</button>
-        </div>
-    </div>
+.floating-shape:nth-child(11) {
+    width: 70px;
+    height: 70px;
+    top: 25%;
+    left: 45%;
+    animation-delay: 14s;
+}
 
-    <!-- Users Summary Modal -->
-    <div class="users-summary-modal" id="usersSummaryModal">
-        <div class="users-summary-content">
-            <div class="users-summary-header">
-                <h2>📊 สรุปผลการเล่นรวม (30 คนล่าสุด)</h2>
-                <button class="close-summary-btn" onclick="closeUsersSummary()">✕</button>
-            </div>
-            <div class="summary-loading" id="summaryLoading">
-                <div class="loading-spinner"></div>
-                <p>กำลังโหลดข้อมูล...</p>
-            </div>
-            <div class="summary-table-wrapper">
-                <table class="summary-table">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>ผู้เล่น</th>
-                            <th>ตอบถูก</th>
-                            <th>ด่าน</th>
-                            <th>ระดับ</th>
-                            <th>รายละเอียด (ด่าน:คะแนน)</th>
-                        </tr>
-                    </thead>
-                    <tbody id="summaryTableBody">
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
+.floating-shape:nth-child(12) {
+    width: 100px;
+    height: 100px;
+    top: 55%;
+    right: 10%;
+    animation-delay: 11s;
+}
 
-    <script src="js/api.js"></script>
-    <script src="js/game.js"></script>
-</body>
-</html>
+.floating-shape:nth-child(13) {
+    width: 65px;
+    height: 65px;
+    top: 5%;
+    left: 55%;
+    animation-delay: 4s;
+}
+
+.floating-shape:nth-child(14) {
+    width: 85px;
+    height: 85px;
+    top: 75%;
+    left: 35%;
+    animation-delay: 8s;
+}
+
+.floating-shape:nth-child(15) {
+    width: 95px;
+    height: 95px;
+    top: 45%;
+    left: 85%;
+    animation-delay: 16s;
+}
+
+@keyframes floatShape {
+    0% {
+        transform: translate(0, 0) rotate(0deg) scale(1);
+    }
+
+    25% {
+        transform: translate(100px, -80px) rotate(90deg) scale(1.2);
+    }
+
+    50% {
+        transform: translate(-50px, 100px) rotate(180deg) scale(0.8);
+    }
+
+    75% {
+        transform: translate(80px, 50px) rotate(270deg) scale(1.1);
+    }
+
+    100% {
+        transform: translate(0, 0) rotate(360deg) scale(1);
+    }
+}
+
+.screen {
+    display: none;
+    animation: fadeIn 0.5s;
+    height: 100vh;
+    overflow-y: auto;
+}
+
+.screen.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes bounce {
+
+    0%,
+    20%,
+    50%,
+    80%,
+    100% {
+        transform: translateY(0);
+    }
+
+    40% {
+        transform: translateY(-20px);
+    }
+
+    60% {
+        transform: translateY(-10px);
+    }
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+@keyframes shake {
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    10%,
+    30%,
+    50%,
+    70%,
+    90% {
+        transform: translateX(-5px);
+    }
+
+    20%,
+    40%,
+    60%,
+    80% {
+        transform: translateX(5px);
+    }
+}
+
+@keyframes glow {
+
+    0%,
+    100% {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    50% {
+        box-shadow: 0 4px 20px rgba(255, 200, 0, 0.6);
+    }
+}
+
+@keyframes slideInUp {
+    from {
+        transform: translateY(50px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes rotate {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Auth Screens */
+.auth-container {
+    text-align: center;
+    max-width: 380px;
+    margin: 0 auto;
+    padding: 20px 20px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.auth-title {
+    font-size: 1.8em;
+    color: #2563a8;
+    font-weight: bold;
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.auth-input {
+    width: 100%;
+    max-width: 320px;
+    padding: 12px 16px;
+    font-size: 1.05em;
+    border: 3px solid rgba(255, 182, 193, 0.6);
+    border-radius: 12px;
+    margin-bottom: 12px;
+    font-family: 'Kanit', 'Prompt', sans-serif;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.auth-input:focus {
+    outline: none;
+    border-color: #f4b235;
+    box-shadow: 0 6px 12px rgba(244, 178, 53, 0.3);
+    transform: translateY(-2px);
+}
+
+.auth-link {
+    margin-top: 15px;
+    font-size: 1em;
+    color: #666;
+}
+
+.auth-link span {
+    color: #2563a8;
+    font-weight: bold;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.auth-link span:hover {
+    color: #f4b235;
+}
+
+/* Character Selection */
+.character-container {
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.character-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin: 30px 0;
+    max-width: 100%;
+}
+
+.character-option {
+    width: 120px;
+    height: 120px;
+    border-radius: 20px;
+    overflow: hidden;
+    cursor: pointer;
+    border: 4px solid transparent;
+    transition: all 0.3s ease;
+    background: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+@media (max-width: 480px) {
+    .character-container {
+        padding: 30px 15px;
+    }
+
+    .character-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
+        margin: 25px 0;
+    }
+
+    .character-option {
+        width: 95px;
+        height: 95px;
+        border-radius: 18px;
+        border: 3px solid transparent;
+    }
+
+    .character-option.selected {
+        border-width: 3px;
+    }
+}
+
+.character-option:hover {
+    transform: scale(1.1);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.character-option.selected {
+    border-color: #4fb848;
+    box-shadow: 0 8px 20px rgba(79, 184, 72, 0.5);
+    animation: bounce 0.5s;
+}
+
+.character-option img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    pointer-events: none;
+}
+
+/* Edit Profile Buttons */
+.edit-buttons {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin-top: 30px;
+    width: 100%;
+    max-width: 500px;
+}
+
+.edit-button {
+    flex: 1;
+    padding: 16px 32px;
+    font-size: 1.3em;
+    font-weight: 700;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    position: relative;
+    overflow: hidden;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2),
+        0 4px 8px rgba(0, 0, 0, 0.15),
+        inset 0 -3px 0 rgba(0, 0, 0, 0.2);
+}
+
+.edit-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.5s;
+}
+
+.edit-button:hover::before {
+    left: 100%;
+}
+
+.save-button {
+    background: linear-gradient(145deg, #4CAF50 0%, #45a049 50%, #3d8b40 100%);
+    color: white;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.save-button:hover {
+    transform: translateY(-4px) scale(1.05);
+    box-shadow: 0 12px 28px rgba(76, 175, 80, 0.5),
+        0 6px 12px rgba(76, 175, 80, 0.3),
+        inset 0 -3px 0 rgba(0, 0, 0, 0.3);
+}
+
+.cancel-button {
+    background: linear-gradient(145deg, #ff6b6b 0%, #ee5a52 50%, #c92a2a 100%);
+    color: white;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.cancel-button:hover {
+    transform: translateY(-4px) scale(1.05);
+    box-shadow: 0 12px 28px rgba(255, 107, 107, 0.5),
+        0 6px 12px rgba(255, 107, 107, 0.3),
+        inset 0 -3px 0 rgba(0, 0, 0, 0.3);
+}
+
+.edit-button:active {
+    transform: translateY(-1px) scale(0.98);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2),
+        inset 0 3px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Responsive Edit Buttons */
+@media (max-width: 768px) {
+    .edit-buttons {
+        gap: 15px;
+        max-width: 90%;
+    }
+
+    .edit-button {
+        font-size: 1.5em;
+        font-size: 1.1em;
+    }
+}
+
+@media (max-width: 480px) {
+    .edit-buttons {
+        flex-direction: column;
+        gap: 12px;
+        max-width: 280px;
+    }
+
+    .edit-button {
+        padding: 14px 20px;
+        font-size: 1em;
+        width: 100%;
+    }
+}
+
+@media (min-width: 1200px) {
+    .edit-buttons {
+        max-width: 600px;
+    }
+
+    .edit-button {
+        padding: 18px 40px;
+        font-size: 1.4em;
+    }
+}
+
+/* User Info */
+.user-info {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    padding: 8px 18px;
+    border-radius: 50px;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12),
+        0 3px 6px rgba(0, 0, 0, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    border: 2px solid rgba(255, 255, 255, 0.8);
+}
+
+.user-info:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18),
+        0 5px 10px rgba(0, 0, 0, 0.12),
+        inset 0 1px 0 rgba(255, 255, 255, 1);
+}
+
+.user-avatar {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    border: 3px solid #f4b235;
+    object-fit: cover;
+    box-shadow: 0 3px 10px rgba(244, 178, 53, 0.4),
+        inset 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.user-info:hover .user-avatar {
+    transform: rotate(5deg) scale(1.05);
+    border-color: #ffd700;
+    box-shadow: 0 5px 14px rgba(255, 215, 0, 0.6);
+}
+
+.user-name {
+    font-size: 1.2em;
+    color: #2563a8;
+    font-weight: 700;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    letter-spacing: 0.3px;
+}
+
+/* Responsive User Info */
+@media (max-width: 768px) {
+    .user-info {
+        top: 10px;
+        left: 10px;
+        gap: 8px;
+        padding: 6px 14px;
+    }
+
+    .user-avatar {
+        width: 38px;
+        height: 38px;
+        border: 2.5px solid #f4b235;
+    }
+
+    .user-name {
+        font-size: 1em;
+    }
+}
+
+@media (max-width: 480px) {
+    body {
+        overflow-y: auto;
+        height: auto;
+        min-height: 100vh;
+        padding: 0;
+        margin: 0;
+    }
+
+    .user-info {
+        top: 10px;
+        left: 10px;
+        gap: 8px;
+        padding: 6px 12px;
+    }
+
+    .user-avatar {
+        width: 35px;
+        height: 35px;
+        border: 2px solid #f4b235;
+    }
+
+    .user-name {
+        font-size: 0.9em;
+        max-width: 120px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .auth-input {
+        max-width: 100%;
+        font-size: 1.05em;
+        padding: 14px 18px;
+        border-radius: 14px;
+    }
+
+    .auth-title {
+        font-size: 1.5em;
+        margin-bottom: 18px;
+    }
+
+    .auth-container {
+        padding: 30px 25px;
+        max-width: 92%;
+        margin: 20px auto;
+    }
+
+    .character-container {
+        padding: 20px 15px;
+        max-width: 95%;
+    }
+}
+
+.logout-button {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: #ff6b6b;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 15px;
+    font-size: 1.1em;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+    font-family: 'Kanit', 'Prompt', sans-serif;
+    z-index: 1000;
+}
+
+.logout-button:hover {
+    background: #ff5252;
+    transform: scale(1.05);
+}
+
+@media (max-width: 480px) {
+    .logout-button {
+        top: 10px;
+        right: 10px;
+        padding: 8px 16px;
+        font-size: 0.95em;
+        border-radius: 12px;
+    }
+}
+
+/* Main Menu Screen */
+.main-menu {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    position: relative;
+    padding: 20px;
+}
+
+.game-logo {
+    max-width: 280px;
+    width: 85%;
+    margin-bottom: 20px;
+    animation: pulse 2s infinite;
+}
+
+@media (max-width: 480px) {
+    .game-logo {
+        max-width: 200px;
+        width: 80%;
+        margin-bottom: 15px;
+    }
+}
+
+.game-title {
+    font-size: 2.5em;
+    color: #2563a8;
+    font-weight: bold;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.game-subtitle {
+    font-size: 4em;
+    color: #f4b235;
+    font-weight: bold;
+    -webkit-text-stroke: 3px #2563a8;
+    paint-order: stroke fill;
+    margin: 20px 0;
+    text-shadow: 4px 4px 0px rgba(0, 0, 0, 0.1);
+}
+
+.thai-subtitle {
+    font-size: 2.5em;
+    color: #2563a8;
+    font-weight: bold;
+    margin-bottom: 40px;
+}
+
+.character {
+    width: 200px;
+    height: 200px;
+    margin: 0 40px;
+    animation: float 3s ease-in-out infinite;
+}
+
+.character-left {
+    animation-delay: 0s;
+}
+
+.character-right {
+    animation-delay: 1.5s;
+}
+
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-20px);
+    }
+}
+
+.start-button {
+    background: linear-gradient(145deg, #b8e986 0%, #7fb83e 100%);
+    color: white;
+    font-size: 1.5em;
+    /* ขยายขนาดตัวหนังสือ */
+    font-weight: bold;
+    padding: 15px 50px;
+    /* ขยายขนาดปุ่ม */
+    border: none;
+    border-radius: 35px;
+    cursor: pointer;
+    box-shadow:
+        0 6px 15px rgba(127, 184, 62, 0.4),
+        0 3px 6px rgba(0, 0, 0, 0.2),
+        inset 0 -2px 4px rgba(0, 0, 0, 0.1),
+        inset 0 2px 3px rgba(255, 255, 255, 0.3);
+    transition: all 0.3s ease;
+    margin-top: 10px;
+    animation: pulse 2s infinite;
+    position: relative;
+    overflow: hidden;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+}
+
+@media (max-width: 768px) {
+    .start-button {
+        font-size: 1.25em;
+        padding: 12px 40px;
+        border-radius: 30px;
+        margin-top: 8px;
+        max-width: 90%;
+    }
+}
+
+@media (max-width: 480px) {
+    .start-button {
+        font-size: 1.1em;
+        padding: 11px 30px;
+        border-radius: 28px;
+        margin-top: 6px;
+        max-width: 85%;
+    }
+}
+
+.start-button:hover {
+    transform: scale(1.1);
+    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.3);
+}
+
+.start-button:active {
+    transform: scale(0.95);
+    animation: none;
+}
+
+.start-button::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.start-button:hover::before {
+    width: 300px;
+    height: 300px;
+}
+
+.sound-icon {
+    position: fixed;
+    bottom: 15px;
+    right: 15px;
+    width: 50px;
+    height: 50px;
+    background: #ff8247;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+    animation: pulse 3s infinite;
+    z-index: 999;
+}
+
+@media (max-width: 480px) {
+    .sound-icon {
+        width: 45px;
+        height: 45px;
+        font-size: 20px;
+        bottom: 12px;
+        right: 12px;
+    }
+}
+
+.sound-icon:hover {
+    transform: scale(1.1) rotate(15deg);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+.sound-icon:active {
+    transform: scale(0.9);
+}
+
+/* Level Selection Screen */
+.level-select {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+@media (max-width: 480px) {
+    .level-select {
+        padding: 15px 10px;
+        margin: 0 auto;
+    }
+}
+
+.level-title {
+    text-align: center;
+    font-size: 2.5em;
+    color: #4fb848;
+    font-weight: bold;
+    background: white;
+    padding: 20px;
+    border-radius: 30px;
+    margin-bottom: 30px;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.12);
+    position: relative;
+    overflow: hidden;
+}
+
+@media (max-width: 480px) {
+    .level-title {
+        font-size: 1.4em;
+        padding: 15px 20px;
+        margin-bottom: 20px;
+        border-radius: 25px;
+    }
+}
+
+.level-title::before {
+    content: '🎊 🎉 🎈';
+    position: absolute;
+    top: 20%;
+    left: 10%;
+    font-size: 50px;
+    opacity: 0.12;
+    pointer-events: none;
+    letter-spacing: 30px;
+    transform: rotate(-15deg);
+}
+
+.level-title::after {
+    content: '✨ 🌟 ⭐';
+    position: absolute;
+    bottom: 20%;
+    right: 10%;
+    font-size: 45px;
+    opacity: 0.12;
+    pointer-events: none;
+    letter-spacing: 25px;
+    transform: rotate(18deg);
+}
+
+.levels-grid {
+    display: grid;
+    /* Desktop: 2 cards per row as requested */
+    grid-template-columns: repeat(2, 1fr);
+    gap: 30px;
+    margin-bottom: 30px;
+}
+
+@media (max-width: 480px) {
+    .levels-grid {
+        gap: 20px;
+        margin-bottom: 20px;
+    }
+
+    .level-select {
+        padding: 15px;
+    }
+}
+
+.level-card {
+    background: white;
+    border-radius: 30px;
+    padding: 30px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    transition: all 0.3s ease;
+    animation: slideInUp 0.5s ease-out;
+    position: relative;
+    overflow: hidden;
+}
+
+.level-card::before {
+    content: '🎮';
+    position: absolute;
+    top: 20%;
+    left: 15%;
+    font-size: 60px;
+    opacity: 0.12;
+    pointer-events: none;
+    transform: rotate(-25deg);
+}
+
+.level-card::after {
+    content: '🏆 🎯 ⭐';
+    position: absolute;
+    bottom: 15%;
+    right: 10%;
+    font-size: 50px;
+    opacity: 0.12;
+    pointer-events: none;
+    letter-spacing: 15px;
+    transform: rotate(20deg);
+}
+
+.level-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+}
+
+.level-card-title {
+    font-size: 1.5em;
+    color: #2563a8;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+@media (max-width: 480px) {
+    .level-card {
+        width: 90vw;
+        max-width: 350px;
+        min-width: unset;
+        margin: 0 auto 16px auto;
+        border-radius: 20px;
+        box-shadow: 0 8px 24px rgba(40, 120, 200, 0.10), 0 1.5px 8px rgba(255, 105, 180, 0.10);
+        padding: 18px 0 18px 0;
+        background: linear-gradient(135deg, #f8fafc 60%, #e0e7ff 100%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        box-sizing: border-box;
+        border: 2.5px solid #e0e7ff;
+        position: relative;
+    }
+
+    .level-card-title {
+        font-size: 1.2em;
+        margin-bottom: 10px;
+        color: #2563a8;
+        font-weight: bold;
+        text-align: center;
+        letter-spacing: 0.5px;
+        text-shadow: 0 1px 0 #fff, 0 2px 6px #b6c6e6;
+    }
+
+    .word-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px 18px;
+        margin-bottom: 18px;
+        width: 100%;
+        padding: 0 8px;
+        box-sizing: border-box;
+    }
+
+    .level-card .level-btn {
+        margin: 0;
+    }
+
+    /* ปุ่มใน level card */
+    .level-card .level-btn {
+        width: 44vw;
+        min-width: 120px;
+        max-width: 160px;
+        margin: 6px 0;
+        font-size: 1.1em;
+        border-radius: 16px;
+        background: linear-gradient(90deg, #4ade80 0%, #38bdf8 100%);
+        color: #fff;
+        font-weight: 600;
+        box-shadow: 0 2px 8px rgba(56, 189, 248, 0.10);
+        border: none;
+        transition: transform 0.12s, box-shadow 0.12s, background 0.18s;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .level-card .level-btn:active {
+        transform: scale(0.97);
+        box-shadow: 0 1px 3px rgba(56, 189, 248, 0.10);
+        background: linear-gradient(90deg, #38bdf8 0%, #4ade80 100%);
+    }
+
+    .level-card .level-btn:hover {
+        filter: brightness(1.08);
+        box-shadow: 0 4px 12px rgba(56, 189, 248, 0.13);
+    }
+
+    /* ปุ่มเสียงในปุ่ม */
+    .level-card .level-btn .sound-icon,
+    .level-card .level-btn .sound-btn {
+        background: #fff;
+        color: #38bdf8;
+        border-radius: 50%;
+        width: 26px;
+        height: 26px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1em;
+        margin-left: 8px;
+        box-shadow: 0 1px 4px rgba(56, 189, 248, 0.10);
+        border: 1.5px solid #bae6fd;
+        transition: background 0.15s, color 0.15s;
+    }
+
+    .level-card .level-btn .sound-icon:active,
+    .level-card .level-btn .sound-btn:active {
+        background: #bae6fd;
+        color: #2563a8;
+    }
+
+    .level-card .level-btn .sound-icon:hover,
+    .level-card .level-btn .sound-btn:hover {
+        background: #e0f2fe;
+        color: #0ea5e9;
+    }
+
+    /* เพิ่มลูกเล่น background ฟุ้งๆ */
+    .level-card::before {
+        content: '';
+        position: absolute;
+        top: -30px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80%;
+        height: 40px;
+        background: radial-gradient(ellipse at center, #bae6fd55 0%, transparent 80%);
+        z-index: 0;
+        border-radius: 50%;
+        pointer-events: none;
+    }
+
+    .level-card .level-btn,
+    .level-card .level-btn * {
+        z-index: 1;
+        position: relative;
+    }
+}
+
+.word-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+@media (max-width: 480px) {
+    .word-grid {
+        width: 100%;
+        box-sizing: border-box;
+    }
+}
+
+.word-item {
+    background: linear-gradient(135deg, #4fb848 0%, #7fb83e 100%);
+    color: white;
+    padding: 12px;
+    border-radius: 15px;
+    font-size: 1.2em;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+@media (max-width: 480px) {
+    .word-item {
+        padding: 10px 12px;
+        font-size: 1.05em;
+        border-radius: 12px;
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+
+    .word-text {
+        font-size: 1em;
+        line-height: 1.3;
+    }
+
+    .sound-icon-word {
+        font-size: 0.85em !important;
+        padding: 3px !important;
+    }
+
+    .level-words {
+        gap: 12px;
+        margin-bottom: 18px;
+    }
+}
+
+.word-item:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.word-item:active {
+    transform: scale(0.98);
+}
+
+.word-item.answered {
+    background: linear-gradient(135deg, #4fb848 0%, #7fb83e 100%);
+}
+
+.word-item.unanswered {
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+}
+
+.word-item.danger {
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+}
+
+.level-score {
+    background: #e85d9e;
+    color: white;
+    font-size: 2em;
+    font-weight: bold;
+    padding: 15px;
+    border-radius: 20px;
+    margin-top: 20px;
+}
+
+.level-button,
+[id^="startLevel"] {
+    background: linear-gradient(135deg, #4fb848 0%, #7fb83e 100%);
+    color: white;
+    font-size: 1.2em;
+    font-weight: bold;
+    padding: 12px 30px;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(79, 184, 72, 0.4);
+}
+
+@media (max-width: 480px) {
+    .level-score {
+        font-size: 1.6em;
+        padding: 12px;
+        margin-top: 18px;
+        border-radius: 22px;
+    }
+
+    .level-button,
+    [id^="startLevel"] {
+        font-size: 1.1em;
+        padding: 12px 28px;
+        border-radius: 42px;
+    }
+}
+
+/* Game Screen */
+.game-screen {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 10px;
+}
+
+@media (max-width: 480px) {
+    .game-screen {
+        padding: 0 10px;
+    }
+}
+
+.game-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: white;
+    padding: 15px 25px;
+    border-radius: 25px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+@media (max-width: 480px) {
+    .game-header {
+        padding: 12px 15px;
+        border-radius: 20px;
+        margin-bottom: 15px;
+    }
+}
+
+.player-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.player-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+}
+
+.player-stats {
+    text-align: left;
+}
+
+.player-label {
+    font-size: 1.1em;
+    color: #666;
+}
+
+.player-value {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #2563a8;
+    background: #4fb848;
+    color: white;
+    padding: 5px 15px;
+    border-radius: 15px;
+    display: inline-block;
+}
+
+.score-display {
+    display: none !important;
+}
+
+/* Responsive adjustments for mobile */
+@media (max-width: 768px) {
+    .player-avatar {
+        width: 48px;
+        height: 48px;
+    }
+
+    .player-label {
+        font-size: 1em;
+    }
+
+    .player-value {
+        font-size: 1.35em;
+        padding: 5px 14px;
+    }
+
+    .menu-button {
+        font-size: 0.8em;
+        padding: 8px 14px;
+        border-radius: 14px;
+        min-width: auto;
+    }
+
+    .sound-icon {
+        font-size: 1.7em;
+        width: 52px;
+        height: 52px;
+        bottom: 18px;
+        right: 18px;
+    }
+
+    .next-button,
+    .check-button-img {
+        font-size: 1.1em;
+        padding: 12px 24px;
+        min-width: 90px;
+    }
+}
+
+@media (max-width: 480px) {
+    .summary-header {
+        flex-direction: row;
+        gap: 10px;
+        padding: 10px 15px;
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        margin-bottom: 15px;
+    }
+
+    .player-info-game {
+        width: auto;
+        justify-content: flex-start;
+        gap: 8px;
+        flex: 1;
+    }
+
+    .player-avatar {
+        width: 36px;
+        height: 36px;
+        border: 2px solid #f4b235;
+    }
+
+    .player-stats {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+    }
+
+    .player-label {
+        font-size: 0.8em;
+        line-height: 1.2;
+    }
+
+    .player-value {
+        font-size: 1em;
+        padding: 3px 10px;
+        border-radius: 12px;
+    }
+
+    .game-buttons {
+        width: auto;
+        justify-content: flex-end;
+        gap: 8px;
+        flex-shrink: 0;
+        align-items: center;
+    }
+
+    .menu-button {
+        font-size: 0.7em;
+        padding: 8px 12px;
+        border-radius: 12px;
+        min-width: auto;
+        white-space: nowrap;
+        font-weight: 700;
+    }
+
+    .home-button {
+        width: 40px;
+        height: 40px;
+    }
+
+    .skip-button {
+        width: 40px;
+        height: 40px;
+    }
+
+    .sound-icon {
+        font-size: 1.2em;
+        width: 42px;
+        height: 42px;
+        bottom: 15px;
+        right: 15px;
+    }
+}
+
+.game-buttons {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.menu-button {
+    background: linear-gradient(145deg, #f4b235 0%, #f39c12 100%);
+    color: white;
+    font-size: 1.3em;
+    font-weight: bold;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    box-shadow:
+        0 6px 12px rgba(243, 156, 18, 0.4),
+        0 2px 4px rgba(0, 0, 0, 0.2),
+        inset 0 -2px 4px rgba(0, 0, 0, 0.1),
+        inset 0 1px 2px rgba(255, 255, 255, 0.3);
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.menu-button:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+}
+
+.menu-button:active {
+    transform: scale(0.95);
+}
+
+.home-button {
+    background: transparent;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: pulse 3s infinite;
+    position: relative;
+    z-index: 5;
+    cursor: pointer;
+    pointer-events: auto;
+    border: none;
+    flex-shrink: 0;
+}
+
+.home-button img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.home-button:hover {
+    animation: rotate 0.5s ease-in-out;
+}
+
+.skip-button {
+    background: rgba(255, 255, 255, 0.4);
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 5;
+}
+
+.skip-button img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.skip-button:hover {
+    transform: scale(1.1);
+}
+
+.skip-button:active {
+    transform: scale(0.95);
+}
+
+/* Summary Header - สรุปผลการเล่น */
+.summary-header {
+    margin-bottom: 30px;
+}
+
+/* Player Summary Info - ข้อมูลผู้เล่นในหน้าสรุปผล */
+.player-summary-info {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%);
+    padding: 12px 28px;
+    border-radius: 50px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    margin: 0 auto 20px auto;
+    max-width: fit-content;
+    border: 2px solid rgba(79, 184, 72, 0.3);
+    transition: all 0.3s ease;
+}
+
+.player-summary-info:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(79, 184, 72, 0.2);
+    border-color: rgba(79, 184, 72, 0.5);
+}
+
+.summary-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 3px solid #4fb848;
+    object-fit: cover;
+    box-shadow: 0 2px 8px rgba(79, 184, 72, 0.3);
+}
+
+.summary-player-name {
+    font-size: 1.3em;
+    font-weight: 700;
+    color: #2c3e50;
+}
+
+.summary-player-id {
+    font-size: 1.1em;
+    color: #888;
+    font-weight: 500;
+}
+
+@media (max-width: 480px) {
+    .player-summary-info {
+        padding: 10px 18px;
+        gap: 8px;
+    }
+
+    .summary-avatar {
+        width: 36px;
+        height: 36px;
+    }
+
+    .summary-player-name {
+        font-size: 1em;
+    }
+
+    .summary-player-id {
+        font-size: 0.85em;
+    }
+}
+
+/* User Profile Display */
+.user-profile-display {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: white;
+    padding: 15px 25px;
+    border-radius: 50px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    margin-bottom: 20px;
+    transition: all 0.3s ease;
+    max-width: fit-content;
+}
+
+.user-profile-display:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+.profile-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 3px solid #4fb848;
+    object-fit: cover;
+}
+
+.profile-info {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.profile-name,
+.profile-score {
+    font-size: 1.3em;
+    color: #2c3e50;
+    font-weight: 600;
+}
+
+.summary-header .level-title {
+    text-align: center;
+    font-size: 2em;
+    color: #4fb848;
+    font-weight: bold;
+    background: white;
+    padding: 20px;
+    border-radius: 30px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.summary-stats {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    position: relative;
+    z-index: 1;
+}
+
+.stat-card {
+    text-align: center;
+    background: white;
+    padding: 15px 30px;
+    border-radius: 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    min-width: 150px;
+    min-height: 100px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.stat-label {
+    font-size: 1.2em;
+    color: #666;
+    margin-bottom: 5px;
+}
+
+.stat-value {
+    font-size: 2.5em;
+    font-weight: bold;
+    color: #2563a8;
+}
+
+/* Responsive สำหรับแท็บเล็ต */
+@media (max-width: 768px) and (min-width: 481px) {
+    .summary-header .level-title {
+        font-size: 1.3em;
+        padding: 10px;
+    }
+
+    .summary-stats {
+        gap: 10px;
+    }
+
+    .stat-card {
+        padding: 10px 20px;
+        min-width: 100px;
+        flex: 1;
+    }
+}
+
+@media (max-width: 480px) {
+    .summary-header .level-title {
+        font-size: 1.3em;
+        padding: 12px 18px;
+        border-radius: 25px;
+    }
+
+    .summary-stats {
+        flex-direction: row;
+        flex-wrap: wrap;
+        width: 100%;
+        gap: 10px;
+        justify-content: center;
+        padding: 0 10px;
+    }
+
+    .stat-card {
+        width: calc(50% - 5px);
+        min-width: auto;
+        padding: 12px 18px;
+        border-radius: 18px;
+    }
+
+    .stat-label {
+        font-size: 0.9em;
+        margin-bottom: 6px;
+    }
+
+    .stat-value {
+        font-size: 1.8em;
+    }
+
+    .game-content {
+        padding: 15px 10px;
+        border-radius: 24px;
+        gap: 20px;
+        margin: 0 auto;
+        max-width: calc(100% - 20px);
+    }
+
+    .word-image {
+        max-width: 240px;
+        max-height: 240px;
+        padding: 12px;
+        margin: 0 auto;
+        display: block;
+    }
+
+    .answer-slots {
+        gap: 10px;
+        margin: 18px auto;
+        padding: 8px;
+        justify-content: center;
+    }
+
+    .answer-slot {
+        min-width: 180px;
+        max-width: calc(100% - 40px);
+        padding: 12px 20px;
+        font-size: 1.8em;
+        height: 80px;
+    }
+
+}
+
+.game-content {
+    background: white;
+    border-radius: 30px;
+    padding: 40px;
+    box-shadow:
+        0 15px 35px rgba(255, 105, 180, 0.25),
+        0 5px 15px rgba(0, 0, 0, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 40px;
+    align-items: start;
+    border: 3px solid rgba(255, 182, 193, 0.6);
+    position: relative;
+    overflow: visible;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+@media (max-width: 900px) {
+    .game-content {
+        grid-template-columns: 1fr;
+        display: flex;
+        flex-direction: column-reverse;
+        padding: 20px;
+        gap: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .game-content {
+        padding: 15px 10px;
+    }
+}
+
+.game-left {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+@media (max-width: 480px) {
+    .game-left {
+        padding: 0 5px;
+    }
+}
+
+.game-right {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: center;
+    width: 100%;
+}
+
+@media (max-width: 480px) {
+    .game-right {
+        padding: 0 5px;
+        gap: 5px;
+    }
+}
+
+.level-indicator {
+    width: 100%;
+    text-align: center;
+    padding: 15px;
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+    border-radius: 20px;
+    border: 2px solid #4fb848;
+    box-shadow: 0 4px 12px rgba(79, 184, 72, 0.2);
+}
+
+/* Tablet: make the category pill fit its text */
+@media (min-width: 481px) and (max-width: 1024px) {
+    .level-indicator {
+        width: 80%;
+        max-width: 420px;
+        min-width: 220px;
+        box-sizing: border-box;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 12px 0;
+        margin: 0 auto 16px auto;
+        font-size: 1.15em;
+    }
+}
+
+@media (max-width: 480px) {
+    .level-indicator {
+        padding: 10px;
+        margin: 0 auto;
+        max-width: calc(100% - 20px);
+        font-size: 0.95em;
+    }
+}
+
+.image-section {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+@media (max-width: 480px) {
+    .image-section {
+        padding: 0 5px;
+    }
+}
+
+/* Micro-animations: Ripple effect for Thai Keys */
+.thai-key {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 249, 250, 0.95) 100%);
+    border: 2px solid rgba(255, 255, 255, 0.8);
+    border-radius: 12px;
+    padding: 10px 5px;
+    font-size: 1.6em;
+    font-weight: 700;
+    color: #2c3e50;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1),
+        inset 0 -2px 5px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Kanit', sans-serif;
+    position: relative;
+    overflow: hidden;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.thai-key::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100%;
+    height: 100%;
+    background: rgba(232, 93, 158, 0.2);
+    border-radius: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0;
+    transition: transform 0.4s ease-out, opacity 0.4s ease-out;
+}
+
+.thai-key:active::after {
+    transform: translate(-50%, -50%) scale(2);
+    opacity: 1;
+    transition: 0s;
+}
+
+.thai-key:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 6px 12px rgba(232, 93, 158, 0.2);
+    border-color: rgba(232, 93, 158, 0.4);
+    z-index: 10;
+}
+
+.thai-key:active {
+    transform: translateY(2px) scale(0.95);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.answer-section {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+@media (max-width: 480px) {
+    .answer-section {
+        padding: 0 5px;
+    }
+}
+
+.keyboard-section {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+    .keyboard-section {
+        width: 100%;
+        padding: 0 5px;
+        margin: 0 auto;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .keyboard-section {
+        width: 100%;
+        padding: 5px 0;
+        margin: 0 auto;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+}
+
+.game-content::before {
+    content: '⭐';
+    position: absolute;
+    top: 8%;
+    left: 12%;
+    font-size: 42px;
+    opacity: 0.25;
+    pointer-events: none;
+    z-index: 0;
+    animation: float1 12s ease-in-out infinite;
+}
+
+.game-content::after {
+    content: '🌟';
+    position: absolute;
+    top: 15%;
+    right: 18%;
+    font-size: 38px;
+    opacity: 0.22;
+    pointer-events: none;
+    z-index: 0;
+    animation: float2 15s ease-in-out infinite;
+}
+
+.input-area::before {
+    content: '✨';
+    position: absolute;
+    top: 25%;
+    left: 8%;
+    font-size: 35px;
+    opacity: 0.2;
+    pointer-events: none;
+    animation: float3 18s ease-in-out infinite;
+}
+
+.input-area::after {
+    content: '💫';
+    position: absolute;
+    bottom: 20%;
+    left: 15%;
+    font-size: 40px;
+    opacity: 0.23;
+    pointer-events: none;
+    animation: float4 14s ease-in-out infinite;
+}
+
+.image-area::before {
+    content: '🎨';
+    position: absolute;
+    top: 12%;
+    right: 10%;
+    font-size: 44px;
+    opacity: 0.2;
+    pointer-events: none;
+    animation: float1 16s ease-in-out infinite reverse;
+}
+
+.image-area::after {
+    content: '🎵';
+    position: absolute;
+    bottom: 25%;
+    right: 12%;
+    font-size: 36px;
+    opacity: 0.21;
+    pointer-events: none;
+    animation: float2 13s ease-in-out infinite;
+}
+
+.thai-keyboard::before {
+    content: '🌈';
+    position: absolute;
+    top: -5%;
+    left: 5%;
+    font-size: 32px;
+    opacity: 0.18;
+    pointer-events: none;
+    animation: float3 20s ease-in-out infinite;
+}
+
+.thai-keyboard::after {
+    content: '🎯';
+    position: absolute;
+    bottom: -8%;
+    right: 8%;
+    font-size: 38px;
+    opacity: 0.19;
+    pointer-events: none;
+    animation: float4 17s ease-in-out infinite reverse;
+}
+
+.answer-slots::before {
+    content: '🦋';
+    position: absolute;
+    top: -15px;
+    left: -10px;
+    font-size: 33px;
+    opacity: 0.2;
+    pointer-events: none;
+    animation: float1 14s ease-in-out infinite;
+}
+
+.answer-slots::after {
+    content: '🌸';
+    position: absolute;
+    top: -12px;
+    right: -8px;
+    font-size: 35px;
+    opacity: 0.21;
+    pointer-events: none;
+    animation: float2 19s ease-in-out infinite reverse;
+}
+
+@keyframes float1 {
+
+    0%,
+    100% {
+        transform: translate(0, 0) rotate(0deg);
+    }
+
+    25% {
+        transform: translate(12px, -8px) rotate(8deg);
+    }
+
+    50% {
+        transform: translate(-10px, 6px) rotate(-5deg);
+    }
+
+    75% {
+        transform: translate(8px, -10px) rotate(6deg);
+    }
+}
+
+@keyframes float2 {
+
+    0%,
+    100% {
+        transform: translate(0, 0) rotate(0deg);
+    }
+
+    33% {
+        transform: translate(-8px, 10px) rotate(-6deg);
+    }
+
+    66% {
+        transform: translate(10px, -8px) rotate(7deg);
+    }
+}
+
+@keyframes float3 {
+
+    0%,
+    100% {
+        transform: translate(0, 0) rotate(0deg) scale(1);
+    }
+
+    50% {
+        transform: translate(5px, -12px) rotate(-8deg) scale(1.1);
+    }
+}
+
+@keyframes float4 {
+
+    0%,
+    100% {
+        transform: translate(0, 0) rotate(0deg);
+    }
+
+    40% {
+        transform: translate(10px, 8px) rotate(10deg);
+    }
+
+    80% {
+        transform: translate(-12px, -6px) rotate(-7deg);
+    }
+}
+
+.game-content>* {
+    position: relative;
+    z-index: 1;
+}
+
+.input-area {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    position: relative;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+@media (max-width: 480px) {
+    .input-area {
+        padding: 0 5px;
+    }
+}
+
+.thai-keyboard {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    max-width: 500px;
+    width: 100%;
+    margin: 0 auto;
+    position: relative;
+    padding: 15px 10px;
+}
+
+/* Tablet & smaller devices */
+@media (max-width: 1024px) {
+    .thai-keyboard {
+        gap: 4px;
+        padding: 4px 2px;
+        max-width: 85%;
+    }
+
+    .thai-key {
+        font-size: 0.9em;
+        border-radius: 9px;
+    }
+}
+
+/* Mobile devices */
+@media (max-width: 480px) {
+    .thai-keyboard {
+        gap: 6px;
+        padding: 8px 5px;
+    }
+
+    .thai-key {
+        font-size: 1.2em;
+        border-radius: 10px;
+    }
+}
+
+.thai-key {
+    background: linear-gradient(145deg, #f4b235 0%, #f39c12 100%);
+    color: white;
+    font-size: 1.5em;
+    font-weight: bold;
+    width: 100%;
+    aspect-ratio: 1;
+    border: none;
+    border-radius: 15px;
+    cursor: pointer;
+    box-shadow:
+        0 6px 12px rgba(243, 156, 18, 0.4),
+        0 2px 4px rgba(0, 0, 0, 0.2),
+        inset 0 -2px 4px rgba(0, 0, 0, 0.1),
+        inset 0 1px 2px rgba(255, 255, 255, 0.3);
+    position: relative;
+    transition: all 0.2s ease;
+    animation: slideInUp 0.3s ease-out;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.thai-key:hover:not(.disabled) {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow:
+        0 8px 20px rgba(243, 156, 18, 0.6),
+        0 4px 8px rgba(0, 0, 0, 0.3),
+        inset 0 -2px 4px rgba(0, 0, 0, 0.1),
+        inset 0 1px 2px rgba(255, 255, 255, 0.4);
+    filter: brightness(1.1);
+}
+
+.thai-key:active {
+    transform: scale(0.95);
+    animation: bounce 0.5s;
+}
+
+.thai-key.selected {
+    background: linear-gradient(145deg, #4fb848 0%, #7fb83e 100%);
+    animation: bounce 0.5s;
+    box-shadow:
+        0 6px 16px rgba(79, 184, 72, 0.5),
+        0 2px 4px rgba(0, 0, 0, 0.2),
+        inset 0 -2px 4px rgba(0, 0, 0, 0.1),
+        inset 0 1px 2px rgba(255, 255, 255, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.thai-key.disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    transform: scale(0.9);
+}
+
+.thai-key-sound {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    font-size: 0.18em;
+    color: white;
+}
+
+@media (max-width: 480px) {
+
+    /* Reduce speaker icon size specifically on mobile */
+    .thai-key-sound {
+        top: 3px;
+        right: 3px;
+        font-size: 0.14em;
+    }
+}
+
+.image-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    position: relative;
+    width: 100%;
+    justify-content: center;
+}
+
+@media (max-width: 480px) {
+    .image-area {
+        padding: 0 5px;
+    }
+}
+
+.word-image {
+    width: 100%;
+    max-width: 280px;
+    height: 180px;
+    object-fit: contain;
+    border-radius: 16px;
+    animation: fadeIn 0.5s ease-in;
+    transition: transform 0.3s ease;
+    image-orientation: from-image;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    padding: 10px;
+}
+
+.word-image:hover {
+    transform: scale(1.05);
+}
+
+.answer-slots {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    position: relative;
+    flex-wrap: wrap;
+    padding: 10px;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.answer-slot {
+    background: linear-gradient(135deg, #e85d9e 0%, #d64a8a 100%);
+    color: white;
+    font-size: 4em;
+    font-weight: 900;
+    width: auto;
+    min-width: 180px;
+    height: 90px;
+    padding: 15px 25px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 30px rgba(232, 93, 158, 0.8),
+        0 0 50px rgba(232, 93, 158, 0.5),
+        inset 0 -4px 15px rgba(0, 0, 0, 0.3),
+        0 0 20px rgba(255, 255, 255, 0.4);
+    animation: slideInUp 0.3s ease-out;
+    transition: all 0.3s ease;
+    border: 5px solid rgba(255, 255, 255, 0.7);
+    text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.6),
+        -2px -2px 4px rgba(255, 255, 255, 0.3),
+        0 0 20px rgba(255, 255, 255, 0.5),
+        0 0 30px rgba(232, 93, 158, 0.8);
+    letter-spacing: 4px;
+    font-family: 'Kanit', sans-serif;
+}
+
+.answer-slot:not(:empty) {
+    animation: bounce 0.5s;
+    background: linear-gradient(135deg, #e85d9e 0%, #d64a8a 100%);
+}
+
+.answer-slot.correct {
+    animation: bounce 0.5s, glow 1s;
+    background: linear-gradient(135deg, #4fb848 0%, #7fb83e 100%);
+}
+
+/* Unlock button and status */
+.unlock-button {
+    margin-left: 8px;
+    background: linear-gradient(135deg, #4fb848 0%, #6fcf5a 100%);
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 700;
+}
+
+.unlock-button:hover {
+    transform: translateY(-2px);
+}
+
+.unlock-status {
+    display: inline-block;
+    margin-left: 8px;
+    color: #2f8a2f;
+    font-weight: 700;
+}
+
+/* Visual state for a level card that is unlockable but not yet unlocked */
+.level-card.unlockable .level-card-title,
+.level-card.unlockable .word-grid,
+.level-card.unlockable .level-score {
+    opacity: 0.55;
+    filter: grayscale(10%);
+}
+
+/* Visual state for a level card that is locked */
+.level-card.locked .level-card-title,
+.level-card.locked .word-grid,
+.level-card.locked .level-score {
+    opacity: 0.55;
+    filter: grayscale(20%);
+}
+
+/* Ensure start button stays fully visible when acting as unlock */
+.level-card .start-button.unlock-action {
+    opacity: 1 !important;
+    transform: translateY(-2px);
+    position: relative;
+    z-index: 5;
+}
+
+/* Start button when it's acting as an unlock action */
+[id^="startLevel"].unlock-action,
+.start-button.unlock-action {
+    background: linear-gradient(135deg, #31c14a 0%, #4fb848 100%);
+    box-shadow: 0 8px 20px rgba(79, 184, 72, 0.45);
+    transform: translateY(-2px);
+}
+
+.answer-slot.wrong {
+    animation: shake 0.5s;
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+}
+
+.game-controls {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+    margin-top: 0;
+    flex-wrap: wrap;
+    width: 100%;
+    align-items: center;
+}
+
+/* ปุ่มตรวจสอบขึ้นบรรทัดใหม่ อยู่กึ่งกลาง ชิด 3 ปุ่มบน */
+.game-controls .check-button-img {
+    flex-basis: 100%;
+    display: flex;
+    justify-content: center;
+    margin-top: 2px;
+    max-width: 100%;
+}
+
+@media (max-width: 480px) {
+    .game-controls {
+        gap: 5px;
+        margin-top: 3px;
+        padding: 0 5px;
+    }
+}
+
+/* Speaker icon inside keys (created by JS as .sound-btn-char) */
+@media (max-width: 768px) {
+    .sound-btn-char {
+        width: 16px !important;
+        height: 16px !important;
+        font-size: 0.55em !important;
+        bottom: 3px !important;
+        right: 3px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .sound-btn-char {
+        width: 14px !important;
+        height: 14px !important;
+        font-size: 0.5em !important;
+        bottom: 3px !important;
+        right: 3px !important;
+    }
+}
+
+/* Hide old text-based buttons (replaced by image buttons) */
+.play-sound-button,
+.spelling-button,
+.delete-char-button {
+    display: none;
+}
+
+/* Image Buttons Formatting */
+.img-button {
+    background: transparent;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    transition: transform 0.2s ease, filter 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    outline: none;
+    flex-shrink: 1;
+    max-width: 28%;
+}
+
+.img-button:hover {
+    transform: scale(1.05);
+    filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.2)) brightness(1.05);
+}
+
+.img-button:active {
+    transform: scale(0.95);
+}
+
+.img-button img.btn-top {
+    height: 90px;
+    width: auto;
+    object-fit: contain;
+}
+
+.img-button.check-button-img img.btn-bottom {
+    height: 125px;
+    width: auto;
+    object-fit: contain;
+}
+
+@media (max-width: 480px) {
+    .img-button img.btn-top {
+        height: 60px;
+    }
+
+    .img-button.check-button-img img.btn-bottom {
+        height: 60px;
+    }
+}
+
+/* Spelling Display - ซ่อนถาวรแล้ว เหลือแค่เสียง */
+.spelling-display {
+    display: none !important;
+}
+
+@media (max-width: 480px) {
+    .spelling-display {
+        font-size: 1.3em;
+        padding: 14px 20px;
+        letter-spacing: 2px;
+    }
+}
+
+/* ============================================ */
+/* 2D Cluster Layout for Thai Answer Slots       */
+/* ============================================ */
+
+.cluster-layout {
+    display: flex !important;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.cluster-column {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+}
+
+.cluster-zone {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+/* กล่องหลัก - พยัญชนะ/สระหน้า/สระหลัง */
+.answer-slot.slot-main {
+    min-width: 50px;
+    width: 65px;
+    height: 65px;
+    font-size: 2.2em;
+    font-weight: 900;
+    background: linear-gradient(135deg, #e85d9e 0%, #d64a8a 100%);
+    color: white;
+    border-radius: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 5px 15px rgba(232, 93, 158, 0.5),
+        inset 0 -2px 6px rgba(0, 0, 0, 0.2);
+    border: 3px solid rgba(255, 255, 255, 0.5);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
+    transition: all 0.3s ease;
+    font-family: 'Kanit', sans-serif;
+    padding: 4px;
+}
+
+/* กล่องเล็ก - สระบน/วรรณยุกต์ */
+.answer-slot.slot-above {
+    min-width: 32px;
+    width: 40px;
+    height: 35px;
+    font-size: 1.4em;
+    font-weight: 800;
+    background: linear-gradient(135deg, #a78bfa 0%, #8b5cf6 100%);
+    color: white;
+    border-radius: 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 3px 8px rgba(139, 92, 246, 0.4),
+        inset 0 -2px 4px rgba(0, 0, 0, 0.15);
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+    font-family: 'Kanit', sans-serif;
+    padding: 2px;
+}
+
+/* กล่องเล็ก - สระล่าง */
+.answer-slot.slot-below {
+    min-width: 32px;
+    width: 40px;
+    height: 35px;
+    font-size: 1.4em;
+    font-weight: 800;
+    background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%);
+    color: white;
+    border-radius: 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 3px 8px rgba(14, 165, 233, 0.4),
+        inset 0 -2px 4px rgba(0, 0, 0, 0.15);
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+    font-family: 'Kanit', sans-serif;
+    padding: 2px;
+}
+
+/* Placeholder สำหรับจัดตำแหน่งให้สมมาตร */
+.slot-placeholder-above,
+.slot-placeholder-below {
+    width: 40px;
+    height: 35px;
+    visibility: hidden;
+}
+
+/* Bounce animation when character is filled */
+.answer-slot.slot-main:not(:empty),
+.answer-slot.slot-above:not(:empty),
+.answer-slot.slot-below:not(:empty) {
+    animation: bounce 0.4s ease;
+}
+
+@media (max-width: 480px) {
+    .cluster-layout {
+        gap: 4px;
+    }
+
+    .answer-slot.slot-main {
+        min-width: 42px;
+        width: 55px;
+        height: 55px;
+        font-size: 1.8em;
+    }
+
+    .answer-slot.slot-above,
+    .answer-slot.slot-below {
+        min-width: 28px;
+        width: 35px;
+        height: 30px;
+        font-size: 1.2em;
+    }
+
+    .slot-placeholder-above,
+    .slot-placeholder-below {
+        width: 35px;
+        height: 30px;
+    }
+}
+
+/* Ripple effect for check-button-img */
+.check-button-img {
+    position: relative;
+    overflow: hidden;
+}
+
+.next-button {
+    background: linear-gradient(135deg, #4fb848 0%, #7fb83e 100%);
+    color: white;
+    font-size: 1.2em;
+    font-weight: 700;
+    padding: 12px 30px;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(79, 184, 72, 0.4);
+    display: none;
+    transition: all 0.3s ease;
+    animation: bounce 0.5s;
+    position: relative;
+    z-index: 3;
+}
+
+@media (max-width: 768px) {
+    .next-button {
+        font-size: 1.1em;
+        padding: 11px 26px;
+    }
+}
+
+@media (max-width: 480px) {
+    .next-button {
+        font-size: 1.2em;
+        padding: 13px 32px;
+        border-radius: 42px;
+    }
+}
+
+.next-button:hover {
+    transform: scale(1.05) translateX(5px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+}
+
+.next-button:active {
+    transform: scale(0.95);
+}
+
+.hint-button {
+    background: transparent;
+    color: #f4b235;
+    font-size: 1.2em;
+    font-weight: bold;
+    padding: 12px 30px;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: none;
+    transition: all 0.3s ease;
+}
+
+@media (max-width: 480px) {
+    .hint-button {
+        font-size: 1em;
+        padding: 10px 20px;
+        border-radius: 35px;
+    }
+}
+
+/* Modal/Popup */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    justify-content: center;
+    align-items: flex-start;
+    padding-top: 100px;
+    backdrop-filter: blur(5px);
+    overflow: hidden;
+}
+
+.modal.active {
+    display: flex;
+    animation: fadeIn 0.3s;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 30px;
+    padding: 40px;
+    text-align: center;
+    max-width: 500px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    position: relative;
+    animation: slideInModal 0.4s ease-out;
+    transform: translateY(0);
+}
+
+@media (max-width: 480px) {
+    .modal-content {
+        padding: 30px 25px;
+        border-radius: 25px;
+        max-width: 90%;
+    }
+
+    .modal-icon {
+        font-size: 4em;
+        margin-bottom: 15px;
+    }
+
+    .modal-title {
+        font-size: 2em;
+        margin-bottom: 15px;
+    }
+
+    .modal-close {
+        font-size: 1.2em;
+        padding: 12px 32px;
+        border-radius: 18px;
+    }
+}
+
+@keyframes slideInModal {
+    0% {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.modal-icon {
+    font-size: 5em;
+    margin-bottom: 20px;
+    animation: bounce 0.5s ease-out;
+}
+
+.modal-correct .modal-icon {
+    color: #4fb848;
+}
+
+.modal-wrong .modal-icon {
+    color: #ff6b6b;
+}
+
+.modal-title {
+    font-size: 2.5em;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.modal-correct .modal-title {
+    color: #4fb848;
+}
+
+.modal-wrong .modal-title {
+    color: #ff6b6b;
+}
+
+.modal-close {
+    background: #4fb848;
+    color: white;
+    font-size: 1.5em;
+    font-weight: bold;
+    padding: 15px 40px;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: all 0.3s ease;
+}
+
+.modal-close:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+}
+
+.modal-close:active {
+    transform: scale(0.95);
+}
+
+.close-modal {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: #ff6b6b;
+    color: white;
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.5em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.close-modal:hover {
+    transform: rotate(90deg) scale(1.2);
+    background: #ff5252;
+}
+
+.close-modal:active {
+    transform: rotate(90deg) scale(0.9);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .game-content {
+        grid-template-columns: 1fr;
+        padding: 30px 20px;
+        gap: 30px;
+    }
+
+    .game-left {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .game-right {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .game-subtitle {
+        font-size: 2.8em;
+    }
+
+    .thai-subtitle {
+        font-size: 2em;
+    }
+
+    .start-button {
+        font-size: 1.8em;
+        padding: 16px 50px;
+    }
+
+    .levels-grid {
+        grid-template-columns: 1fr;
+        gap: 25px;
+    }
+
+    .answer-slot {
+        width: auto;
+        min-width: 150px;
+        height: 70px;
+        font-size: 3em;
+        padding: 10px 20px;
+        text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.6),
+            -1px -1px 3px rgba(255, 255, 255, 0.3),
+            0 0 15px rgba(255, 255, 255, 0.5),
+            0 0 25px rgba(232, 93, 158, 0.8);
+        letter-spacing: 3px;
+    }
+}
+
+.confetti {
+    position: fixed;
+    width: 10px;
+    height: 10px;
+    background: #f4b235;
+    position: absolute;
+    animation: confetti-fall 3s linear;
+    z-index: 999;
+}
+
+@keyframes confetti-fall {
+    0% {
+        transform: translateY(-100px) rotate(0deg);
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateY(100vh) rotate(720deg);
+        opacity: 0;
+    }
+}
+
+/* Custom Alert Modal */
+.custom-alert-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px);
+    z-index: 10000;
+    justify-content: center;
+    align-items: center;
+    animation: fadeIn 0.3s ease;
+}
+
+.custom-alert-overlay.active {
+    display: flex;
+}
+
+.custom-alert-box {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    border-radius: 30px;
+    padding: 40px 50px;
+    max-width: 450px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3),
+        0 0 0 1px rgba(255, 255, 255, 0.5) inset;
+    animation: slideInAlert 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.custom-alert-box::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg,
+            transparent 30%,
+            rgba(255, 255, 255, 0.3) 50%,
+            transparent 70%);
+    animation: shimmer 3s infinite;
+}
+
+.answer-section {
+    padding: 10px;
+    margin-bottom: 5px;
+}
+
+/* ============================================ */
+/* Smooth Word Transitions (WOW Feature) */
+/* ============================================ */
+.game-right {
+    transition: opacity 0.4s ease-out, transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.game-right.transitioning {
+    opacity: 0;
+    transform: translateY(20px) scale(0.98);
+}
+
+.word-transition-enter {
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+.word-transition-enter-active {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+}
+
+.custom-alert-icon {
+    font-size: 80px;
+    margin-bottom: 20px;
+    animation: bounceIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+}
+
+.custom-alert-message {
+    font-size: 1.4em;
+    color: #2c3e50;
+    margin-bottom: 30px;
+    font-weight: 600;
+    line-height: 1.5;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    position: relative;
+    z-index: 1;
+}
+
+.custom-alert-button {
+    background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+    color: white;
+    border: none;
+    padding: 15px 50px;
+    font-size: 1.3em;
+    font-weight: 700;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 20px rgba(76, 175, 80, 0.4),
+        0 0 0 3px rgba(255, 255, 255, 0.3) inset;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+    margin: 5px;
+}
+
+@media (max-width: 480px) {
+    .custom-alert-box {
+        padding: 30px 35px;
+        border-radius: 25px;
+    }
+
+    .custom-alert-icon {
+        font-size: 70px;
+        margin-bottom: 18px;
+    }
+
+    .custom-alert-message {
+        font-size: 1.2em;
+        margin-bottom: 25px;
+    }
+
+    .custom-alert-button {
+        padding: 13px 38px;
+        font-size: 1.15em;
+        margin: 8px;
+        min-width: 130px;
+    }
+
+    .cancel-button {
+        margin-top: 5px !important;
+    }
+}
+
+.custom-alert-button::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.custom-alert-button:hover::before {
+    width: 300px;
+    height: 300px;
+}
+
+.custom-alert-button:hover {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 12px 30px rgba(76, 175, 80, 0.5),
+        0 0 0 4px rgba(255, 255, 255, 0.4) inset;
+}
+
+.custom-alert-button:active {
+    transform: translateY(0) scale(0.98);
+}
+
+@keyframes slideInAlert {
+    0% {
+        transform: translateY(-100px) scale(0.5);
+        opacity: 0;
+    }
+
+    100% {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes bounceIn {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+
+    50% {
+        transform: scale(1.2);
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes shimmer {
+    0% {
+        transform: translateX(-100%) translateY(-100%) rotate(45deg);
+    }
+
+    100% {
+        transform: translateX(100%) translateY(100%) rotate(45deg);
+    }
+}
+
+/* ============================================ */
+/* Word Counter Display */
+/* ============================================ */
+.word-counter-display {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 8px 18px;
+    border-radius: 50px;
+    font-size: 1.1em;
+    font-weight: bold;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    animation: pulse 2s infinite;
+}
+
+.word-counter-label {
+    opacity: 0.9;
+    font-size: 0.85em;
+}
+
+.word-counter-value {
+    font-size: 1.2em;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* ============================================ */
+/* Results Button (Main Menu) */
+/* ============================================ */
+.results-button {
+    background: linear-gradient(145deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 16px 40px;
+    font-size: 1.4em;
+    font-weight: 700;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4),
+        0 4px 8px rgba(0, 0, 0, 0.15),
+        inset 0 -3px 0 rgba(0, 0, 0, 0.2);
+    font-family: 'Kanit', 'Prompt', sans-serif;
+    margin-top: 35px;
+    /* ขยับปุ่มลงมาด้านล่างมากขึ้น */
+    position: relative;
+    overflow: hidden;
+}
+
+.results-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.5s;
+}
+
+.results-button:hover::before {
+    left: 100%;
+}
+
+.results-button:hover {
+    transform: translateY(-4px) scale(1.05);
+    box-shadow: 0 12px 28px rgba(102, 126, 234, 0.6),
+        0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+.results-button:active {
+    transform: translateY(-1px) scale(0.98);
+}
+
+@media (max-width: 480px) {
+    .results-button {
+        font-size: 1.1em;
+        padding: 14px 30px;
+        margin-top: 25px;
+        /* ขยับปุ่มลงมาในมือถือด้วย */
+    }
+}
+
+/* ============================================ */
+/* Score Display (Game Screen) */
+/* ============================================ */
+.score-display {
+    font-size: 0.95em;
+    color: #555;
+}
+
+.score-display .player-value {
+    font-weight: bold;
+    color: #4fb848;
+    font-size: 1.1em;
+}
+
+/* ============================================ */
+/* Combo Streak Display (WOW Feature)           */
+/* ============================================ */
+.combo-display {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(135deg, #ff4e50 0%, #f9d423 100%);
+    padding: 5px 15px;
+    border-radius: 30px;
+    box-shadow: 0 0 15px rgba(255, 78, 80, 0.6), inset 0 0 10px rgba(255, 255, 255, 0.5);
+    margin-left: auto;
+    border: 2px solid #fff;
+    transform: scale(0);
+}
+
+.combo-text {
+    color: white;
+    font-size: 1.1em;
+    font-weight: 900;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+    letter-spacing: 2px;
+}
+
+.combo-multiplier {
+    color: #fff;
+    font-size: 1.5em;
+    font-weight: 900;
+    text-shadow: 2px 2px 0px #ff4e50, -1px -1px 0px #f9d423;
+}
+
+.animate-combo {
+    animation: comboPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards, comboPulse 1.5s infinite alternate ease-in-out;
+}
+
+@keyframes comboPop {
+    0% {
+        transform: scale(0) rotate(-10deg);
+        opacity: 0;
+    }
+
+    80% {
+        transform: scale(1.1) rotate(5deg);
+        opacity: 1;
+    }
+
+    100% {
+        transform: scale(1) rotate(0deg);
+        opacity: 1;
+    }
+}
+
+@keyframes comboPulse {
+    0% {
+        filter: drop-shadow(0 0 5px rgba(255, 78, 80, 0.6));
+    }
+
+    100% {
+        filter: drop-shadow(0 0 15px #f9d423);
+        transform: scale(1.05);
+    }
+}
+
+/* ============================================ */
+/* Users Summary Modal */
+/* ============================================ */
+.users-summary-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px);
+    z-index: 10000;
+    animation: fadeIn 0.3s ease;
+}
+
+.users-summary-modal.active {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.users-summary-content {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    border-radius: 24px;
+    width: 95%;
+    max-width: 1000px;
+    max-height: 90vh;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3),
+        0 8px 24px rgba(0, 0, 0, 0.15);
+    display: flex;
+    flex-direction: column;
+    animation: slideInUp 0.4s ease;
+}
+
+.users-summary-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 28px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.users-summary-header h2 {
+    font-size: 1.4em;
+    margin: 0;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.close-summary-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    color: white;
+    font-size: 1.3em;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.close-summary-btn:hover {
+    background: rgba(255, 255, 255, 0.4);
+    transform: rotate(90deg) scale(1.1);
+}
+
+/* Loading */
+.summary-loading {
+    display: none;
+    text-align: center;
+    padding: 40px;
+    color: #666;
+    font-size: 1.1em;
+}
+
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid rgba(102, 126, 234, 0.2);
+    border-top: 4px solid #667eea;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 15px;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Summary Table */
+.summary-table-wrapper {
+    overflow-y: auto;
+    max-height: calc(90vh - 80px);
+    padding: 0;
+}
+
+.summary-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95em;
+}
+
+.summary-table thead {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.summary-table th {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    padding: 14px 12px;
+    text-align: center;
+    font-weight: 700;
+    color: #2563a8;
+    border-bottom: 3px solid #667eea;
+    white-space: nowrap;
+    font-size: 0.9em;
+}
+
+.summary-table td {
+    padding: 12px 10px;
+    text-align: center;
+    border-bottom: 1px solid #eee;
+    vertical-align: middle;
+}
+
+.summary-table tbody tr {
+    transition: background 0.2s ease;
+}
+
+.summary-table tbody tr:hover {
+    background: rgba(102, 126, 234, 0.08);
+}
+
+.summary-table tbody tr:nth-child(even) {
+    background: rgba(248, 249, 250, 0.5);
+}
+
+.summary-table tbody tr:nth-child(even):hover {
+    background: rgba(102, 126, 234, 0.1);
+}
+
+/* User info in summary table */
+.summary-user-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: flex-start;
+}
+
+.summary-user-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 2px solid #f4b235;
+    object-fit: cover;
+}
+
+.summary-user-name {
+    font-weight: 600;
+    color: #333;
+    font-size: 0.95em;
+    text-align: left;
+}
+
+.summary-user-id {
+    font-size: 0.75em;
+    color: #999;
+    text-align: left;
+}
+
+/* Grade colors */
+.grade-excellent {
+    color: #4fb848;
+    font-weight: bold;
+}
+
+.grade-good {
+    color: #f4b235;
+    font-weight: bold;
+}
+
+.grade-improve {
+    color: #e85d9e;
+    font-weight: bold;
+}
+
+/* Level badges */
+.level-details-cell {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    justify-content: center;
+}
+
+.level-badge {
+    display: inline-block;
+    padding: 3px 7px;
+    border-radius: 8px;
+    font-size: 0.75em;
+    font-weight: 600;
+    min-width: 32px;
+    text-align: center;
+}
+
+.level-complete {
+    background: linear-gradient(135deg, #4fb848, #3d8b40);
+    color: white;
+}
+
+.level-progress {
+    background: linear-gradient(135deg, #f4b235, #e0a030);
+    color: white;
+}
+
+.level-none {
+    background: #e9ecef;
+    color: #aaa;
+}
+
+/* Spelling button pulse animation */
+.spelling-button {
+    animation: none;
+    transition: all 0.3s ease;
+}
+
+.spelling-button:hover {
+    animation: pulseGlow 1s infinite;
+}
+
+@keyframes pulseGlow {
+
+    0%,
+    100% {
+        box-shadow: 0 4px 8px rgba(244, 178, 53, 0.3);
+    }
+
+    50% {
+        box-shadow: 0 4px 20px rgba(244, 178, 53, 0.7);
+    }
+}
+
+/* Responsive - Summary Modal */
+@media (max-width: 768px) {
+    .users-summary-content {
+        width: 98%;
+        max-height: 95vh;
+        border-radius: 16px;
+    }
+
+    .users-summary-header {
+        padding: 15px 18px;
+    }
+
+    .users-summary-header h2 {
+        font-size: 1.1em;
+    }
+
+    .summary-table th,
+    .summary-table td {
+        padding: 8px 6px;
+        font-size: 0.8em;
+    }
+
+    .summary-user-avatar {
+        width: 28px;
+        height: 28px;
+    }
+
+    .level-badge {
+        font-size: 0.65em;
+        padding: 2px 5px;
+    }
+}
+
+@media (max-width: 480px) {
+    .users-summary-header h2 {
+        font-size: 0.95em;
+    }
+
+    .summary-table th:nth-child(6),
+    .summary-table td:nth-child(6) {
+        display: none;
+        /* Hide level details on very small screens */
+    }
+
+    .word-counter-display {
+        padding: 5px 12px;
+        font-size: 0.9em;
+    }
+}
