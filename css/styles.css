@@ -2321,7 +2321,7 @@ body::before {
 
 .game-controls {
     display: flex;
-    gap: 12px;
+    gap: 6px;
     justify-content: center;
     margin-top: 0;
     flex-wrap: wrap;
@@ -2382,7 +2382,7 @@ body::before {
     justify-content: center;
     outline: none;
     flex-shrink: 1;
-    max-width: 32%;
+    max-width: 30%;
 }
 
 .img-button:hover {
@@ -2395,23 +2395,23 @@ body::before {
 }
 
 .img-button img.btn-top {
-    height: 125px;
+    height: 100px;
     width: auto;
     object-fit: contain;
 }
 
 .img-button.check-button-img img.btn-bottom {
-    height: 125px;
+    height: 100px;
     width: auto;
     object-fit: contain;
 }
 
 @media (max-width: 480px) {
     .img-button img.btn-top {
-        height: 85px;
+        height: 70px;
     }
     .img-button.check-button-img img.btn-bottom {
-        height: 85px;
+        height: 70px;
     }
 }
 
@@ -2457,36 +2457,36 @@ body::before {
 
 /* กล่องหลัก - พยัญชนะ/สระหน้า/สระหลัง */
 .answer-slot.slot-main {
-    min-width: 56px;
-    width: 70px;
-    height: 70px;
-    font-size: 2.2em;
+    min-width: 80px;
+    width: 100px;
+    height: 100px;
+    font-size: 3.2em;
     font-weight: 900;
     background: linear-gradient(135deg, #e85d9e 0%, #d64a8a 100%);
     color: white;
-    border-radius: 14px;
+    border-radius: 18px;
     display: flex;
     justify-content: center;
     align-items: center;
-    box-shadow: 0 4px 12px rgba(232, 93, 158, 0.5),
-                inset 0 -2px 4px rgba(0, 0, 0, 0.2);
-    border: 2px solid rgba(255, 255, 255, 0.5);
+    box-shadow: 0 5px 15px rgba(232, 93, 158, 0.5),
+                inset 0 -2px 6px rgba(0, 0, 0, 0.2);
+    border: 3px solid rgba(255, 255, 255, 0.5);
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
     transition: all 0.3s ease;
     font-family: 'Kanit', sans-serif;
-    padding: 3px;
+    padding: 4px;
 }
 
 /* กล่องเล็ก - สระบน/วรรณยุกต์ */
 .answer-slot.slot-above {
-    min-width: 42px;
-    width: 49px;
-    height: 42px;
-    font-size: 1.5em;
+    min-width: 60px;
+    width: 70px;
+    height: 60px;
+    font-size: 2.2em;
     font-weight: 800;
     background: linear-gradient(135deg, #a78bfa 0%, #8b5cf6 100%);
     color: white;
-    border-radius: 9px;
+    border-radius: 12px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -2501,14 +2501,14 @@ body::before {
 
 /* กล่องเล็ก - สระล่าง */
 .answer-slot.slot-below {
-    min-width: 42px;
-    width: 49px;
-    height: 42px;
-    font-size: 1.5em;
+    min-width: 60px;
+    width: 70px;
+    height: 60px;
+    font-size: 2.2em;
     font-weight: 800;
     background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%);
     color: white;
-    border-radius: 9px;
+    border-radius: 12px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -2524,8 +2524,8 @@ body::before {
 /* Placeholder สำหรับจัดตำแหน่งให้สมมาตร */
 .slot-placeholder-above,
 .slot-placeholder-below {
-    width: 49px;
-    height: 42px;
+    width: 70px;
+    height: 60px;
     visibility: hidden;
 }
 
@@ -2538,25 +2538,25 @@ body::before {
 
 @media (max-width: 480px) {
     .cluster-layout {
-        gap: 4px;
+        gap: 6px;
     }
     .answer-slot.slot-main {
-        min-width: 46px;
-        width: 56px;
-        height: 56px;
-        font-size: 1.8em;
+        min-width: 65px;
+        width: 80px;
+        height: 80px;
+        font-size: 2.6em;
     }
     .answer-slot.slot-above,
     .answer-slot.slot-below {
-        min-width: 34px;
-        width: 39px;
-        height: 35px;
-        font-size: 1.3em;
+        min-width: 48px;
+        width: 56px;
+        height: 50px;
+        font-size: 1.8em;
     }
     .slot-placeholder-above,
     .slot-placeholder-below {
-        width: 39px;
-        height: 35px;
+        width: 56px;
+        height: 50px;
     }
 }
 
