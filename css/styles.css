@@ -2392,7 +2392,7 @@ body::before {
 }
 
 .img-button img.btn-top {
-    height: 110px;
+    height: 150px;
     width: auto;
     object-fit: contain;
 }
