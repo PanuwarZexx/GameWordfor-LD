@@ -2481,7 +2481,7 @@ body::before {
     flex-wrap: nowrap;
     width: 100%;
     align-items: center;
-    margin-top: 5px;
+    margin-top: -10px;
     padding: 5px 5px;
     overflow: hidden;
 }
@@ -2556,14 +2556,14 @@ body::before {
 }
 
 .img-button img.btn-top {
-    height: 200px;
+    height: 180px;
     width: auto;
     max-width: 100%;
     object-fit: contain;
 }
 
 .img-button.check-button-img img.btn-bottom {
-    height: 200px;
+    height: 180px;
     width: auto;
     max-width: 100%;
     object-fit: contain;

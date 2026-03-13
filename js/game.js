@@ -1625,9 +1625,9 @@ function checkAnswer() {
         }
         
         if (errorParts.length > 0) {
-            errorType = errorParts.join(' และ') + 'ครับ';
+            errorType = errorParts.join(' และ');
         } else {
-            errorType = 'คำตอบไม่ถูกต้องครับ';
+            errorType = 'คำตอบไม่ถูกต้อง';
         }
 
         showResultModal(false, errorType);
