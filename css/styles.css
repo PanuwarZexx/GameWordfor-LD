@@ -2447,14 +2447,14 @@ body::before {
 
 /* กล่องหลัก - พยัญชนะ/สระหน้า/สระหลัง */
 .answer-slot.slot-main {
-    min-width: 70px;
-    width: 75px;
-    height: 80px;
-    font-size: 2.8em;
+    min-width: 100px;
+    width: 110px;
+    height: 110px;
+    font-size: 3.5em;
     font-weight: 900;
     background: linear-gradient(135deg, #e85d9e 0%, #d64a8a 100%);
     color: white;
-    border-radius: 14px;
+    border-radius: 18px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -2469,14 +2469,14 @@ body::before {
 
 /* กล่องเล็ก - สระบน/วรรณยุกต์ */
 .answer-slot.slot-above {
-    min-width: 50px;
-    width: 55px;
-    height: 50px;
-    font-size: 2.0em;
+    min-width: 65px;
+    width: 75px;
+    height: 65px;
+    font-size: 2.4em;
     font-weight: 800;
     background: linear-gradient(135deg, #a78bfa 0%, #8b5cf6 100%);
     color: white;
-    border-radius: 10px;
+    border-radius: 12px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -2491,14 +2491,14 @@ body::before {
 
 /* กล่องเล็ก - สระล่าง */
 .answer-slot.slot-below {
-    min-width: 50px;
-    width: 55px;
-    height: 50px;
-    font-size: 2.0em;
+    min-width: 65px;
+    width: 75px;
+    height: 65px;
+    font-size: 2.4em;
     font-weight: 800;
     background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%);
     color: white;
-    border-radius: 10px;
+    border-radius: 12px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -2514,8 +2514,8 @@ body::before {
 /* Placeholder สำหรับจัดตำแหน่งให้สมมาตร */
 .slot-placeholder-above,
 .slot-placeholder-below {
-    width: 55px;
-    height: 50px;
+    width: 75px;
+    height: 65px;
     visibility: hidden;
 }
 
@@ -2531,22 +2531,22 @@ body::before {
         gap: 6px;
     }
     .answer-slot.slot-main {
-        min-width: 55px;
-        width: 60px;
-        height: 65px;
-        font-size: 2.2em;
+        min-width: 80px;
+        width: 90px;
+        height: 90px;
+        font-size: 2.8em;
     }
     .answer-slot.slot-above,
     .answer-slot.slot-below {
-        min-width: 42px;
-        width: 46px;
-        height: 42px;
-        font-size: 1.6em;
+        min-width: 55px;
+        width: 62px;
+        height: 55px;
+        font-size: 2.0em;
     }
     .slot-placeholder-above,
     .slot-placeholder-below {
-        width: 46px;
-        height: 42px;
+        width: 62px;
+        height: 55px;
     }
 }
 
