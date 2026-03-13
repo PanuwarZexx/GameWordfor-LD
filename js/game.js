@@ -928,9 +928,14 @@ function loadWordDirect() {
     if (gameRight) {
         gameRight.classList.add('transitioning');
         setTimeout(() => {
-            setupWordDisplay(wordData);
+            try {
+                setupWordDisplay(wordData);
+            } catch (e) {
+                console.error('setupWordDisplay error:', e);
+            }
+            // Always remove transitioning class even if setupWordDisplay fails
             gameRight.classList.remove('transitioning');
-        }, 400); // 400ms matches the CSS transition time
+        }, 400);
     } else {
         setupWordDisplay(wordData);
     }
@@ -1058,7 +1063,7 @@ function setupWordDisplay(wordData) {
     
     // Hide next button, show check button
     document.getElementById('nextButton').style.display = 'none';
-    const checkBtn = document.querySelector('.check-button') || document.querySelector('.check-button-img');
+    const checkBtn = document.querySelector('.check-button-img') || document.querySelector('.check-button');
     if (checkBtn) checkBtn.style.display = 'inline-block';
     hideSpelling();
     
@@ -1511,8 +1516,8 @@ function checkAnswer() {
         updateGameTotalScore();
         
         document.getElementById('nextButton').style.display = 'inline-block';
-        const checkBtn = document.querySelector('.check-button') || document.querySelector('.check-button-img');
-        if (checkBtn) checkBtn.style.display = 'none';
+        const checkBtn2 = document.querySelector('.check-button-img') || document.querySelector('.check-button');
+        if (checkBtn2) checkBtn2.style.display = 'none';
         
         // ตรวจสอบว่าตอบได้ 5 ข้อหรือยัง — ถ้าครบแล้ว ให้แสดงปุ่มให้ผู้เล่นปลดล็อคเอง
         if (answeredWords[levelKey].length >= 5 && currentLevel === unlockedLevels && currentLevel < 10) {
