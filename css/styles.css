@@ -1870,7 +1870,6 @@ body::before {
     gap: 8px;
     align-items: center;
     width: 100%;
-    padding-bottom: 130px;
 }
 
 @media (max-width: 480px) {
@@ -2477,19 +2476,13 @@ body::before {
 
 .game-controls {
     display: flex;
-    gap: 6px;
+    gap: 12px;
     justify-content: center;
     flex-wrap: nowrap;
     width: 100%;
     align-items: center;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: rgba(255, 255, 255, 0.95);
-    padding: 8px 10px;
-    z-index: 100;
-    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+    margin-top: 5px;
+    padding: 5px 10px;
 }
 
 /* ปุ่มตรวจสอบอยู่ในแถวเดียวกับ 3 ปุ่มบน */
@@ -2562,13 +2555,13 @@ body::before {
 }
 
 .img-button img.btn-top {
-    height: 110px;
+    height: 120px;
     width: auto;
     object-fit: contain;
 }
 
 .img-button.check-button-img img.btn-bottom {
-    height: 110px;
+    height: 120px;
     width: auto;
     object-fit: contain;
 }
