@@ -2321,19 +2321,20 @@ body::before {
 
 .game-controls {
     display: flex;
-    gap: 8px;
+    gap: 5px;
     justify-content: center;
-    margin-top: 5px;
+    margin-top: 0;
     flex-wrap: wrap;
     width: 100%;
     align-items: center;
 }
 
-/* ปุ่มตรวจสอบขึ้นบรรทัดใหม่ อยู่กึ่งกลาง */
+/* ปุ่มตรวจสอบขึ้นบรรทัดใหม่ อยู่กึ่งกลาง ชิด 3 ปุ่มบน */
 .game-controls .check-button-img {
     flex-basis: 100%;
     display: flex;
     justify-content: center;
+    margin-top: -2px;
 }
 
 @media (max-width: 480px) {
@@ -2391,7 +2392,7 @@ body::before {
 }
 
 .img-button img.btn-top {
-    height: 80px;
+    height: 110px;
     width: auto;
     object-fit: contain;
 }
@@ -2404,10 +2405,10 @@ body::before {
 
 @media (max-width: 480px) {
     .img-button img.btn-top {
-        height: 65px;
+        height: 85px;
     }
     .img-button.check-button-img img.btn-bottom {
-        height: 90px;
+        height: 85px;
     }
 }
 
