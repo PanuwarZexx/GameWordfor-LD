@@ -2401,7 +2401,7 @@ body::before {
 }
 
 .img-button.check-button-img img.btn-bottom {
-    height: 80px;
+    height: 125px;
     width: auto;
     object-fit: contain;
 }
@@ -2457,10 +2457,10 @@ body::before {
 
 /* กล่องหลัก - พยัญชนะ/สระหน้า/สระหลัง */
 .answer-slot.slot-main {
-    min-width: 160px;
-    width: 200px;
-    height: 200px;
-    font-size: 6em;
+    min-width: 100px;
+    width: 130px;
+    height: 130px;
+    font-size: 4em;
     font-weight: 900;
     background: linear-gradient(135deg, #e85d9e 0%, #d64a8a 100%);
     color: white;
