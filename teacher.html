@@ -684,8 +684,8 @@
         }
 
         function confirmResetStudent(studentId, studentName) {
-            if (!confirm('⚠️ ต้องการลบข้อมูลการเล่นทั้งหมดของ "' + studentName + '" หรือไม่?\n\nคะแนน ด่านที่ปลดล็อค และประวัติการเล่นจะถูกลบทั้งหมด!')) return;
-            if (!confirm('❗ ยืนยันอีกครั้ง: ลบข้อมูลการเล่นของ "' + studentName + '" จริงๆ?')) return;
+            if (!confirm('⚠️ ต้องการลบนักเรียน "' + studentName + '" และข้อมูลการเล่นทั้งหมดหรือไม่?\n\nบัญชี คะแนน และประวัติการเล่นจะถูกลบทั้งหมด!')) return;
+            if (!confirm('❗ ยืนยันอีกครั้ง: ลบ "' + studentName + '" จริงๆ?')) return;
             resetStudentProgress(studentId, studentName);
         }
 

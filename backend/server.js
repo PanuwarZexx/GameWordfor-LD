@@ -627,7 +627,7 @@ app.get('/api/admin/activity', authenticateToken, requireRole('admin'), async (r
 
 // ==================== TEACHER ROUTES ====================
 
-// Reset student progress (teacher/admin)
+// Delete student and all their data (teacher/admin)
 app.delete('/api/teacher/students/:id/progress', authenticateToken, requireRole('teacher', 'admin'), async (req, res) => {
     try {
         const studentId = req.params.id;
@@ -636,30 +636,18 @@ app.delete('/api/teacher/students/:id/progress', authenticateToken, requireRole(
             return res.status(404).json({ error: 'Student not found' });
         }
 
-        // Reset progress
-        await Progress.findOneAndUpdate(
-            { userId: studentId },
-            {
-                answeredWords: {},
-                levelScores: {},
-                unlockedLevels: [1],
-                completedLevels: [],
-                currentLevel: 1,
-                totalStars: 0,
-                updatedAt: new Date()
-            },
-            { upsert: true }
-        );
+        // Delete progress
+        await Progress.deleteMany({ userId: studentId });
 
         // Delete all play logs
         await PlayLog.deleteMany({ userId: studentId });
 
-        // Reset user totalScore
-        await User.findByIdAndUpdate(studentId, { totalScore: 0 });
+        // Delete user account
+        await User.findByIdAndDelete(studentId);
 
-        res.json({ message: `Reset progress for ${student.displayName}` });
+        res.json({ message: `Deleted ${student.displayName} and all data` });
     } catch (error) {
-        console.error('Teacher reset progress error:', error);
+        console.error('Teacher delete student error:', error);
         res.status(500).json({ error: 'Server error' });
     }
 });
