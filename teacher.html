@@ -316,12 +316,12 @@
         function updateOverview(students) {
             document.getElementById('sTotal').textContent = students.length;
             if (students.length > 0) {
-                const avgScore = Math.round(students.reduce((s, st) => s + st.totalScore, 0) / students.length);
+                const avgScore = Math.round(students.reduce((s, st) => s + st.totalAnswered, 0) / students.length);
                 const avgLevel = (students.reduce((s, st) => s + st.maxUnlocked, 0) / students.length).toFixed(1);
-                const passCount = students.filter(st => (st.totalScore / MAX_SCORE * 100) >= 60).length;
+                const passCount = students.filter(st => (st.totalAnswered / MAX_SCORE * 100) >= 60).length;
                 const passRate = Math.round((passCount / students.length) * 100);
-                const topScore = Math.max(...students.map(st => st.totalScore));
-                const avgAccuracy = Math.round(students.reduce((s, st) => s + Math.min((st.totalScore / MAX_SCORE * 100), 100), 0) / students.length);
+                const topScore = Math.max(...students.map(st => st.totalAnswered));
+                const avgAccuracy = Math.round(students.reduce((s, st) => s + Math.min((st.totalAnswered / MAX_SCORE * 100), 100), 0) / students.length);
                 document.getElementById('sAvgScore').textContent = avgScore;
                 document.getElementById('sAvgLevel').textContent = avgLevel;
                 document.getElementById('sPassRate').textContent = passRate + '%';
@@ -344,7 +344,7 @@
                 return;
             }
             container.innerHTML = students.map(st => {
-                const pct = Math.min(Math.round((st.totalScore / MAX_SCORE) * 100), 100);
+                const pct = Math.min(Math.round((st.totalAnswered / MAX_SCORE) * 100), 100);
                 const fillClass = pct >= 60 ? 'good' : pct >= 40 ? 'mid' : 'low';
                 const avatarSrc = `css/${characterImages[st.characterId] || '01.jpg'}`;
                 const lastLogin = st.lastLoginAt ? new Date(st.lastLoginAt).toLocaleDateString('th-TH', { day:'numeric', month:'short' }) : '-';
@@ -360,7 +360,7 @@
                     </div>
                     <div class="progress-bar"><div class="fill ${fillClass}" style="width:${pct}%"></div></div>
                     <div class="sc-stats">
-                        <span>ตอบถูก ${st.totalScore}/${MAX_SCORE} คำ (${pct}%)</span>
+                        <span>ตอบถูก ${st.totalAnswered}/${MAX_SCORE} คำ (${pct}%)</span>
                         <span>ด่าน ${st.maxUnlocked}/10</span>
                         <span>${lastLogin}</span>
                     </div>
@@ -391,14 +391,22 @@
 
                 const s = detail.student;
                 const avatarSrc = `css/${characterImages[s.characterId] || '01.jpg'}`;
-                const pct = MAX_SCORE > 0 ? Math.min(Math.round((s.totalScore / MAX_SCORE) * 100), 100) : 0;
-                const perf = getPerformanceLevel(pct);
                 const joinDate = new Date(s.createdAt).toLocaleDateString('th-TH', { day:'numeric', month:'long', year:'numeric' });
                 const lastLogin = s.lastLoginAt ? new Date(s.lastLoginAt).toLocaleDateString('th-TH', { day:'numeric', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit' }) : '-';
                 const dailyKeys = Object.keys(history.dailyStats || {});
                 const totalPlayDays = dailyKeys.length;
 
                 let html = '';
+
+                // คำนวณจำนวนคำที่ตอบถูกจาก Progress.answeredWords (แหล่งข้อมูลหลัก)
+                const progressAW = detail.progress?.answeredWords || {};
+                let totalAnsweredWords = 0;
+                for (const key of Object.keys(progressAW)) {
+                    if (Array.isArray(progressAW[key])) totalAnsweredWords += progressAW[key].length;
+                }
+                // ใช้จำนวนคำที่ตอบถูกจาก Progress เป็นหลัก
+                const realPct = Math.min(Math.round((totalAnsweredWords / MAX_SCORE) * 100), 100);
+                const perf = getPerformanceLevel(realPct);
 
                 // ===== Profile Card + Print Button =====
                 html += `<div class="profile-card">
@@ -428,41 +436,42 @@
                 // ===== Performance Badge =====
                 html += `<div style="text-align:center;margin-bottom:20px;">
                     <div class="perf-badge ${perf.cls}">${perf.label}</div>
-                    <div style="font-size:0.85em;color:#888;margin-top:5px;">ตอบถูก ${s.totalScore}/${MAX_SCORE} คำ คิดเป็น ${pct}%</div>
+                    <div style="font-size:0.85em;color:#888;margin-top:5px;">ตอบถูก ${totalAnsweredWords}/${MAX_SCORE} คำ คิดเป็น ${realPct}%</div>
+                    <div style="font-size:0.75em;color:#aaa;margin-top:3px;">💡 100% = ตอบถูกครบ 100 คำ (10 ด่าน × 10 คำ)</div>
                 </div>`;
 
-                // ===== Score Summary =====
+                // ===== Score Summary — จาก Progress.answeredWords =====
+                const progCorrectByLevel = {};
+                for (const key of Object.keys(progressAW)) {
+                    if (Array.isArray(progressAW[key])) progCorrectByLevel[key] = progressAW[key].length;
+                }
                 html += `<div class="score-summary">
-                    <div class="sc-box correct"><div class="sc-val">${detail.stats.correctAttempts}</div><div class="sc-lbl">ตอบถูก</div></div>
-                    <div class="sc-box wrong"><div class="sc-val">${detail.stats.wrongAttempts}</div><div class="sc-lbl">ตอบผิด</div></div>
-                    <div class="sc-box pct"><div class="sc-val">${detail.stats.accuracy}%</div><div class="sc-lbl">ความแม่นยำ</div></div>
+                    <div class="sc-box correct"><div class="sc-val">${totalAnsweredWords}</div><div class="sc-lbl">ตอบถูก (คำ)</div></div>
+                    <div class="sc-box wrong"><div class="sc-val">${MAX_SCORE - totalAnsweredWords}</div><div class="sc-lbl">ยังไม่ได้ตอบ</div></div>
+                    <div class="sc-box pct"><div class="sc-val">${realPct}%</div><div class="sc-lbl">ความก้าวหน้า</div></div>
                     <div class="sc-box plays"><div class="sc-val">${detail.stats.totalAttempts}</div><div class="sc-lbl">ทำแบบทดสอบ</div></div>
                 </div>`;
 
-                // ===== Donut Chart (ถูก/ผิด) =====
-                const correct = detail.stats.correctAttempts || 0;
-                const wrong = detail.stats.wrongAttempts || 0;
-                const total = correct + wrong || 1;
-                const correctPct = (correct / total) * 100;
-                const correctDash = (correctPct / 100) * 251.2;
+                // ===== Donut Chart (ตอบถูกแล้ว / ยังไม่ได้ตอบ) =====
+                const answered = totalAnsweredWords;
+                const notAnswered = MAX_SCORE - answered;
+                const answeredPct = (answered / MAX_SCORE) * 100;
+                const answeredDash = (answeredPct / 100) * 251.2;
                 html += `<div class="chart-section">
-                    <h4>🎯 สัดส่วนการตอบถูก/ผิด</h4>
+                    <h4>🎯 ความก้าวหน้าการตอบคำ</h4>
                     <div class="donut-chart">
                         <svg class="donut-svg" viewBox="0 0 100 100">
                             <circle cx="50" cy="50" r="40" fill="none" stroke="#f0f0f0" stroke-width="12"/>
                             <circle cx="50" cy="50" r="40" fill="none" stroke="#4fb848" stroke-width="12"
-                                stroke-dasharray="${correctDash} ${251.2 - correctDash}" stroke-dashoffset="62.8"
+                                stroke-dasharray="${answeredDash} ${251.2 - answeredDash}" stroke-dashoffset="62.8"
                                 stroke-linecap="round" style="transition:all 0.5s;"/>
-                            <circle cx="50" cy="50" r="40" fill="none" stroke="#ff6b6b" stroke-width="12"
-                                stroke-dasharray="${((100-correctPct)/100)*251.2} ${correctDash}" stroke-dashoffset="${62.8 - correctDash}"
-                                stroke-linecap="round" style="transition:all 0.5s;"/>
-                            <text x="50" y="48" text-anchor="middle" font-size="14" font-weight="900" fill="#2c3e50">${Math.round(correctPct)}%</text>
-                            <text x="50" y="60" text-anchor="middle" font-size="6" fill="#888">ถูกต้อง</text>
+                            <text x="50" y="48" text-anchor="middle" font-size="14" font-weight="900" fill="#2c3e50">${realPct}%</text>
+                            <text x="50" y="60" text-anchor="middle" font-size="6" fill="#888">ตอบถูกแล้ว</text>
                         </svg>
                         <div class="donut-label">
-                            <div><span class="dot" style="background:#4fb848;"></span> ตอบถูก ${correct} ครั้ง (${Math.round(correctPct)}%)</div>
-                            <div><span class="dot" style="background:#ff6b6b;"></span> ตอบผิด ${wrong} ครั้ง (${Math.round(100-correctPct)}%)</div>
-                            <div><span class="dot" style="background:#667eea;"></span> รวม ${total} ครั้ง</div>
+                            <div><span class="dot" style="background:#4fb848;"></span> ตอบถูกแล้ว ${answered} คำ (${realPct}%)</div>
+                            <div><span class="dot" style="background:#f0f0f0;border:1px solid #ddd;"></span> ยังไม่ได้ตอบ ${notAnswered} คำ (${100 - realPct}%)</div>
+                            <div><span class="dot" style="background:#667eea;"></span> ทั้งหมด ${MAX_SCORE} คำ</div>
                         </div>
                     </div>
                 </div>`;

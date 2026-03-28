@@ -252,6 +252,7 @@
     <div class="admin-header">
         <h1>🛡️ ผู้ดูแลระบบ</h1>
         <div class="header-actions">
+            <button class="btn btn-primary" onclick="recalculateScores()" id="recalcBtn">🔄 คำนวณคะแนนใหม่</button>
             <button class="btn btn-secondary" onclick="window.location.href='teacher.html'">📊 หน้ารายงาน</button>
             <button class="btn btn-secondary" onclick="logout()">🚪 ออกจากระบบ</button>
         </div>
@@ -633,6 +634,20 @@
             } catch (error) {
                 tbody.innerHTML = `<tr><td colspan="5" style="color:#ff6b6b;text-align:center;padding:30px;">${error.message}</td></tr>`;
             }
+        }
+
+        async function recalculateScores() {
+            const btn = document.getElementById('recalcBtn');
+            btn.disabled = true;
+            btn.textContent = '⏳ กำลังคำนวณ...';
+            try {
+                const result = await gameAPI.recalculateScores();
+                showToast(`คำนวณใหม่สำเร็จ ✅ (${result.updated} คน)`);
+            } catch (error) {
+                showToast(error.message || 'เกิดข้อผิดพลาด', 'error');
+            }
+            btn.disabled = false;
+            btn.textContent = '🔄 คำนวณคะแนนใหม่';
         }
 
         function logout() {

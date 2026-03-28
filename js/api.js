@@ -257,6 +257,19 @@ class GameAPI {
         }
     }
 
+    async recalculateScores() {
+        try {
+            const response = await fetch(`${API_BASE_URL}/admin/recalculate`, {
+                method: 'POST',
+                headers: this.getHeaders()
+            });
+            return await this.handleResponse(response);
+        } catch (error) {
+            console.error('Admin recalculate error:', error);
+            throw error;
+        }
+    }
+
     // ==================== TEACHER ====================
 
     async getStudentsList() {

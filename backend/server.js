@@ -556,6 +556,34 @@ app.delete('/api/admin/users/:id', authenticateToken, requireRole('admin'), asyn
     }
 });
 
+// Admin: Recalculate totalScore for all users from answeredWords
+app.post('/api/admin/recalculate', authenticateToken, requireRole('admin'), async (req, res) => {
+    try {
+        const allProgress = await Progress.find().lean();
+        let updated = 0;
+
+        for (const prog of allProgress) {
+            const aw = prog.answeredWords || {};
+            let totalScore = 0;
+
+            // answeredWords อาจเป็น Map หรือ plain object จาก .lean()
+            const keys = aw instanceof Map ? Array.from(aw.keys()) : Object.keys(aw);
+            for (const key of keys) {
+                const words = aw instanceof Map ? aw.get(key) : aw[key];
+                if (Array.isArray(words)) totalScore += words.length;
+            }
+
+            await User.findByIdAndUpdate(prog.userId, { totalScore });
+            updated++;
+        }
+
+        res.json({ message: `Recalculated ${updated} users`, updated });
+    } catch (error) {
+        console.error('Admin recalculate error:', error);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
 // Admin: Get recent activity log (logins + play)
 app.get('/api/admin/activity', authenticateToken, requireRole('admin'), async (req, res) => {
     try {
