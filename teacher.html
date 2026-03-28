@@ -244,7 +244,7 @@
     <div class="header">
         <h1>📊 รายงานผลการเรียน</h1>
         <div class="actions">
-            <button class="btn btn-secondary" onclick="recalculateScores()" id="recalcBtn" style="background:#4fb848;border-color:#4fb848;">🔄 คำนวณคะแนนใหม่</button>
+            <button class="btn btn-secondary" onclick="recalculateScores()" id="recalcBtn" style="background:#4fb848;border-color:#4fb848;">🔄 อัพเดตคะแนน</button>
             <button class="btn btn-secondary" onclick="logout()">🚪 ออกจากระบบ</button>
         </div>
     </div>
@@ -679,7 +679,7 @@
             }
             setTimeout(() => {
                 btn.disabled = false;
-                btn.textContent = '🔄 คำนวณคะแนนใหม่';
+                btn.textContent = '🔄 อัพเดตคะแนน';
             }, 3000);
         }
 
