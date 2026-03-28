@@ -627,6 +627,44 @@ app.get('/api/admin/activity', authenticateToken, requireRole('admin'), async (r
 
 // ==================== TEACHER ROUTES ====================
 
+// Reset student progress (teacher/admin)
+app.delete('/api/teacher/students/:id/progress', authenticateToken, requireRole('teacher', 'admin'), async (req, res) => {
+    try {
+        const studentId = req.params.id;
+        const student = await User.findById(studentId);
+        if (!student) {
+            return res.status(404).json({ error: 'Student not found' });
+        }
+
+        // Reset progress
+        await Progress.findOneAndUpdate(
+            { userId: studentId },
+            {
+                answeredWords: {},
+                levelScores: {},
+                unlockedLevels: [1],
+                completedLevels: [],
+                currentLevel: 1,
+                totalStars: 0,
+                updatedAt: new Date()
+            },
+            { upsert: true }
+        );
+
+        // Delete all play logs
+        await PlayLog.deleteMany({ userId: studentId });
+
+        // Reset user totalScore
+        await User.findByIdAndUpdate(studentId, { totalScore: 0 });
+
+        res.json({ message: `Reset progress for ${student.displayName}` });
+    } catch (error) {
+        console.error('Teacher reset progress error:', error);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
+
 // Get all students with progress summary (teacher/admin)
 app.get('/api/teacher/students', authenticateToken, requireRole('teacher', 'admin'), async (req, res) => {
     try {

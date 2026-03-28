@@ -270,6 +270,19 @@ class GameAPI {
         }
     }
 
+    async resetStudentProgress(studentId) {
+        try {
+            const response = await fetch(`${API_BASE_URL}/teacher/students/${studentId}/progress`, {
+                method: 'DELETE',
+                headers: this.getHeaders()
+            });
+            return await this.handleResponse(response);
+        } catch (error) {
+            console.error('Reset student progress error:', error);
+            throw error;
+        }
+    }
+
     // ==================== TEACHER ====================
 
     async getStudentsList() {
