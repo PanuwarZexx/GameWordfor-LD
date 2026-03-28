@@ -290,7 +290,7 @@
     <script src="js/api.js?v=20260313d"></script>
     <script>
         const characterImages = { 1:'01.jpg', 2:'02.jpg', 3:'03.jpg', 4:'04.jpg', 5:'05.jpg', 6:'06.jpg' };
-        const MAX_SCORE = 1000;
+        const MAX_SCORE = 100; // 100 คำ (10 ด่าน × 10 คำ = 100%)
         let allStudents = [];
 
         if (!localStorage.getItem('authToken')) {
@@ -360,7 +360,7 @@
                     </div>
                     <div class="progress-bar"><div class="fill ${fillClass}" style="width:${pct}%"></div></div>
                     <div class="sc-stats">
-                        <span>คะแนน ${st.totalScore}/${MAX_SCORE} (${pct}%)</span>
+                        <span>ตอบถูก ${st.totalScore}/${MAX_SCORE} คำ (${pct}%)</span>
                         <span>ด่าน ${st.maxUnlocked}/10</span>
                         <span>${lastLogin}</span>
                     </div>
@@ -428,7 +428,7 @@
                 // ===== Performance Badge =====
                 html += `<div style="text-align:center;margin-bottom:20px;">
                     <div class="perf-badge ${perf.cls}">${perf.label}</div>
-                    <div style="font-size:0.85em;color:#888;margin-top:5px;">คะแนนรวม ${s.totalScore}/${MAX_SCORE} คิดเป็น ${pct}%</div>
+                    <div style="font-size:0.85em;color:#888;margin-top:5px;">ตอบถูก ${s.totalScore}/${MAX_SCORE} คำ คิดเป็น ${pct}%</div>
                 </div>`;
 
                 // ===== Score Summary =====

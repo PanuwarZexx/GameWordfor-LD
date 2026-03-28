@@ -276,8 +276,12 @@ app.put('/api/progress', authenticateToken, async (req, res) => {
             { new: true, upsert: true }
         );
 
-        // Update user's total score
-        const totalScore = Object.values(levelScores || {}).reduce((sum, score) => sum + score, 0);
+        // Update user's total score (นับจำนวนคำที่ตอบถูกทั้งหมดจาก answeredWords)
+        let totalScore = 0;
+        const aw = answeredWords || {};
+        for (const key of Object.keys(aw)) {
+            if (Array.isArray(aw[key])) totalScore += aw[key].length;
+        }
         await User.findByIdAndUpdate(req.user.userId, { totalScore });
 
         res.json({

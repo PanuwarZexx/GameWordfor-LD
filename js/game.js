@@ -1,4 +1,4 @@
-﻿// User Management
+// User Management
 let currentUser = null;
 let currentUserData = null;
 let selectedCharacterId = null;
@@ -373,10 +373,12 @@ async function loadUserData() {
         console.log('Loaded from MongoDB (after normalize):');
         console.log('answeredWords:', answeredWords);
         
-        // คำนวณคะแนนรวม
+        // คำนวณคะแนนรวม (นับจากจำนวนคำที่ตอบถูก ไม่ใช่ levelScores)
         score = 0;
-        for (let level in levelScores) {
-            score += levelScores[level] || 0;
+        for (let level in answeredWords) {
+            if (Array.isArray(answeredWords[level])) {
+                score += answeredWords[level].length;
+            }
         }
         
         // อัพเดทคะแนนใน level select
@@ -859,7 +861,7 @@ function startLevel(level) {
     }
     
     currentLevel = level;
-    score = levelScores[level] || 0;
+    score = answeredWords[String(level)] ? answeredWords[String(level)].length : 0;
     
     // หาข้อที่ยังไม่ได้ทำ
     const levelWords = gameData[level].words;
@@ -898,7 +900,7 @@ function startLevelAtWord(level, wordIndex) {
 
     currentLevel = level;
     currentWordIndex = wordIndex;
-    score = levelScores[level] || 0;
+    score = answeredWords[String(level)] ? answeredWords[String(level)].length : 0;
     
     // Update game screen user info
     updateGameUserInfo();
@@ -1528,8 +1530,8 @@ function checkAnswer() {
         const isFirstTime = !answeredWords[levelKey].includes(currentWordIndex);
         
         if (isFirstTime) {
-            // บวกคะแนนพื้นฐาน 1 พร้อมคะแนนโบนัสคอมโบ
-            score += (1 + bonusPoints);
+            // บวกคะแนน 1 คำ = 1 คะแนน (ไม่รวม combo bonus)
+            score += 1;
             answeredWords[levelKey].push(currentWordIndex);
             saveUserData();
         }
