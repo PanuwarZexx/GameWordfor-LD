@@ -557,7 +557,7 @@ app.delete('/api/admin/users/:id', authenticateToken, requireRole('admin'), asyn
 });
 
 // Admin: Recalculate totalScore for all users from answeredWords
-app.post('/api/admin/recalculate', authenticateToken, requireRole('admin'), async (req, res) => {
+app.post('/api/admin/recalculate', authenticateToken, requireRole('admin', 'teacher'), async (req, res) => {
     try {
         const allProgress = await Progress.find().lean();
         let updated = 0;

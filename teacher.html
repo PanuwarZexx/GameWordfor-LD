@@ -230,6 +230,7 @@
     <div class="header">
         <h1>📊 รายงานผลการเรียน</h1>
         <div class="actions">
+            <button class="btn btn-secondary" onclick="recalculateScores()" id="recalcBtn" style="background:#4fb848;border-color:#4fb848;">🔄 คำนวณคะแนนใหม่</button>
             <button class="btn btn-secondary" onclick="logout()">🚪 ออกจากระบบ</button>
         </div>
     </div>
@@ -647,6 +648,24 @@
             } catch (e) {
                 console.error('Load teacher info error:', e);
             }
+        }
+
+        async function recalculateScores() {
+            const btn = document.getElementById('recalcBtn');
+            btn.disabled = true;
+            btn.textContent = '⏳ กำลังคำนวณ...';
+            try {
+                const result = await gameAPI.recalculateScores();
+                btn.textContent = `✅ อัปเดตแล้ว ${result.updated} คน`;
+                // รีโหลดข้อมูลนักเรียนใหม่
+                await loadStudents();
+            } catch (error) {
+                btn.textContent = '❌ ' + (error.message || 'เกิดข้อผิดพลาด');
+            }
+            setTimeout(() => {
+                btn.disabled = false;
+                btn.textContent = '🔄 คำนวณคะแนนใหม่';
+            }, 3000);
         }
 
         function closeDetail() { document.getElementById('detailOverlay').classList.remove('active'); }
