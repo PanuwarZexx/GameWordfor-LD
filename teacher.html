@@ -346,6 +346,7 @@
                             <th>เล่นถึงด่าน</th>
                             <th>ตอบถูก</th>
                             <th>แบบทดสอบ</th>
+                            <th>คิดเป็น %</th>
                             <th>สถานะ</th>
                             <th>สรุปพัฒนาการ</th>
                             <th>จัดการ</th>
@@ -819,7 +820,7 @@
             // Table rows
             const tbody = document.getElementById('reportTableBody');
             if (students.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:30px;color:#888;">ไม่พบข้อมูล</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:30px;color:#888;">ไม่พบข้อมูล</td></tr>';
                 return;
             }
             tbody.innerHTML = students.map((st, i) => {
@@ -842,6 +843,7 @@
                     <td><strong>${st.maxUnlocked}/10</strong></td>
                     <td>${st.totalAnswered}/${MAX_SCORE} คำ</td>
                     <td>${quizCount}/100</td>
+                    <td><strong>${pct}%</strong></td>
                     <td><span class="perf-tag ${perfTag}">${perf.label}</span></td>
                     <td style="font-size:0.82em;text-align:left;max-width:160px;">${progressSummary}</td>
                     <td>
