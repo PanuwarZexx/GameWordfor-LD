@@ -242,7 +242,8 @@
         .toast-error { background: #ff6b6b; }
 
         @media (max-width: 768px) {
-            .user-table th:nth-child(4), .user-table td:nth-child(4) { display: none; }
+            .user-table th:nth-child(4), .user-table td:nth-child(4),
+            .user-table th:nth-child(5), .user-table td:nth-child(5) { display: none; }
             .search-box { width: 100%; }
             .card-header { flex-direction: column; gap: 10px; }
         }
@@ -292,12 +293,12 @@
                         <th>#</th>
                         <th>ผู้ใช้</th>
                         <th>สิทธิ์</th>
-                        <th>เข้าใช้ล่าสุด</th>
+                        <th>ด่าน / คะแนน</th><th>เข้าใช้ล่าสุด</th>
                         <th>จัดการ</th>
                     </tr>
                 </thead>
                 <tbody id="usersTableBody">
-                    <tr><td colspan="5" style="text-align:center;padding:40px;">กำลังโหลด...</td></tr>
+                    <tr><td colspan="6" style="text-align:center;padding:40px;">กำลังโหลด...</td></tr>
                 </tbody>
             </table>
         </div>
@@ -323,7 +324,7 @@
                     </tr>
                 </thead>
                 <tbody id="activityTableBody">
-                    <tr><td colspan="5" style="text-align:center;padding:30px;color:#888;">กดปุ่มด้านบนเพื่อโหลดข้อมูล</td></tr>
+                    <tr><td colspan="6" style="text-align:center;padding:30px;color:#888;">กดปุ่มด้านบนเพื่อโหลดข้อมูล</td></tr>
                 </tbody>
             </table>
         </div>
@@ -408,7 +409,7 @@
         </div>
     </div>
 
-    <script src="js/api.js?v=20260313b"></script>
+    <script src="js/api.js?v=20260329a"></script>
     <script>
         const characterImages = { 1:'01.jpg', 2:'02.jpg', 3:'03.jpg', 4:'04.jpg', 5:'05.jpg', 6:'06.jpg' };
         let allUsers = [];
@@ -443,7 +444,7 @@
         function renderUsers(users) {
             const tbody = document.getElementById('usersTableBody');
             if (users.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px;">ไม่พบผู้ใช้</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:40px;">ไม่พบผู้ใช้</td></tr>';
                 return;
             }
             tbody.innerHTML = users.map((user, i) => {
@@ -464,6 +465,7 @@
                             <option value="admin" ${role==='admin'?'selected':''}>ผู้ดูแล</option>
                         </select>
                     </td>
+                    <td>${role==='student' ? `<strong>${user.maxUnlocked||0}/10</strong> | ${user.totalAnswered||0}/100` : '-'}</td>
                     <td>${lastLogin}</td>
                     <td><div class="btn-group">
                         <button class="btn btn-warning btn-sm" onclick="showEditModal('${user._id}', '${user.username}', '${user.displayName}', '${role}')">✏️ แก้ไข</button>
@@ -583,7 +585,7 @@
         let cachedActivity = null;
         async function loadActivity(filter) {
             const tbody = document.getElementById('activityTableBody');
-            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:30px;">กำลังโหลด...</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:30px;">กำลังโหลด...</td></tr>';
             try {
                 if (!cachedActivity) {
                     cachedActivity = await gameAPI.getActivityLog();
@@ -620,7 +622,7 @@
                 events = events.slice(0, 100);
 
                 if (events.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:30px;color:#888;">ไม่พบข้อมูล</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:30px;color:#888;">ไม่พบข้อมูล</td></tr>';
                     return;
                 }
 
@@ -632,7 +634,7 @@
                     <td style="font-size:0.8em;color:#888;">${e.time.toLocaleString('th-TH', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' })}</td>
                 </tr>`).join('');
             } catch (error) {
-                tbody.innerHTML = `<tr><td colspan="5" style="color:#ff6b6b;text-align:center;padding:30px;">${error.message}</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="6" style="color:#ff6b6b;text-align:center;padding:30px;">${error.message}</td></tr>`;
             }
         }
 
