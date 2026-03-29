@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="th">
 <head>
     <meta charset="UTF-8">
@@ -292,7 +292,7 @@
             </div>
             <div class="stat-card">
                 <div class="num" id="sPassCount">-</div>
-                <div class="label">✅ ผ่านเกณฑ์</div>
+                <div class="label">✅ ผ่านเกณฑ์ 60%</div>
             </div>
             <div class="stat-card">
                 <div class="num" id="sCompletedCount">-</div>
@@ -414,7 +414,7 @@
                 const classInfo = st.classroom ? ` | ${st.classroom}` : '';
                 const sidInfo = st.studentId ? `${st.studentId} | ` : '';
                 return `<div class="student-card" onclick="showDetail('${st.id}')">
-                    <button class="sc-delete-btn" onclick="event.stopPropagation(); confirmResetStudent('${st.id}', '${st.displayName.replace(/'/g, "\\'")}')">🗑️</button>
+                    <div style="position:absolute;top:10px;right:10px;display:flex;align-items:center;gap:6px;"><span style="background:${pct>=60?'#4fb848':pct>=40?'#f4b235':'#ff6b6b'};color:white;padding:2px 8px;border-radius:10px;font-size:0.78em;font-weight:700;">${pct}%</span><button class="sc-delete-btn" style="position:static;" onclick="event.stopPropagation(); confirmResetStudent('${st.id}', '${st.displayName.replace(/'/g, "\\'")}')">🗑️</button></div>
                     <div class="sc-header">
                         <img src="${avatarSrc}" class="sc-avatar" onerror="this.src='css/01.jpg'">
                         <div>
@@ -676,7 +676,7 @@
                     const levelCorrect = logs.filter(l => l.isCorrect).length;
                     html += `<div class="level-section">
                         <div class="level-title" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'">
-                            ด่านที่ ${level} — ✅ ${levelCorrect}/${logs.length} (${Math.round(levelCorrect/logs.length*100)}%)
+                            ด่านที่ ${level} — ✅ ${levelCorrect}/10
                         </div>
                         <div class="level-words" style="display:none;">`;
                     for (const [word, attempts] of Object.entries(wordMap)) {
