@@ -342,7 +342,6 @@
                         <tr>
                             <th>#</th>
                             <th>ชื่อนักเรียน</th>
-                            <th>ชั้น/ห้อง</th>
                             <th>เล่นถึงด่าน</th>
                             <th>ตอบถูก</th>
                             <th>แบบทดสอบ</th>
@@ -820,7 +819,7 @@
             // Table rows
             const tbody = document.getElementById('reportTableBody');
             if (students.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:30px;color:#888;">ไม่พบข้อมูล</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:30px;color:#888;">ไม่พบข้อมูล</td></tr>';
                 return;
             }
             tbody.innerHTML = students.map((st, i) => {
@@ -839,7 +838,6 @@
                 return `<tr>
                     <td>${i + 1}</td>
                     <td class="name-cell" id="name-${st.id}">${st.displayName}</td>
-                    <td>${st.classroom || '-'}</td>
                     <td><strong>${st.maxUnlocked}/10</strong></td>
                     <td>${st.totalAnswered}/${MAX_SCORE} คำ</td>
                     <td>${quizCount}/100</td>
