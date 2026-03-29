@@ -640,7 +640,7 @@
                     const barMinW = dates.length <= 3 ? '80px' : '6px';
                     const barGap = dates.length <= 3 ? '20px' : '3px';
                     html += `<div class="history-section">
-                        <h4 style="margin-bottom:15px;font-size:1.1em;color:#1e3a5f;">📅 พัฒนาการในแต่ละรอบที่เล่น (${totalPlayDays} วัน)</h4>
+                        <h4 style="margin-bottom:20px;padding-bottom:10px;font-size:1.1em;color:#1e3a5f;border-bottom:1px solid #eee;">📅 พัฒนาการในแต่ละรอบที่เล่น (${totalPlayDays} วัน)</h4>
                         <div style="display:flex;gap:${barGap};align-items:flex-end;height:120px;padding:10px 0;">`;
                     dates.forEach(date => {
                         const stat = history.dailyStats[date];
