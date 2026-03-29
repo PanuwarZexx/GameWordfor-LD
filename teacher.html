@@ -558,8 +558,8 @@
                         continue;
                     }
                     const levelCorrect = logs.filter(l => l.isCorrect).length;
-                    const levelTotal = logs.length;
-                    const levelPct = Math.round((levelCorrect / levelTotal) * 100);
+                    const levelTotal = 10;
+                    const uniqueCorrect = Object.keys(logs.filter(l => l.isCorrect).reduce((m,l) => { m[l.word]=1; return m; }, {})).length; const levelPct = Math.min(Math.round((uniqueCorrect / 10) * 100), 100);
                     // Build word detail for popup
                     const wordMap = {};
                     logs.forEach(log => {
@@ -582,10 +582,10 @@
                     html += `<div class="level-prog-row" onclick="toggleLevelDetail(this)">
                         <div class="level-prog-label">ด่าน ${level}</div>
                         <div class="level-prog-bar"><div class="level-prog-fill" style="width:${levelPct}%;background:${levelPct>=60?'linear-gradient(90deg,#4fb848,#7fb83e)':levelPct>=40?'linear-gradient(90deg,#f4b235,#f39c12)':'linear-gradient(90deg,#ff6b6b,#ee5a24)'}"></div></div>
-                        <div class="level-prog-val">${levelPct}%</div>
+                        <div class="level-prog-val">${uniqueCorrect}/10</div>
                     </div>
                     <div class="level-detail-popup" style="display:none;">
-                        <div style="margin-bottom:8px;font-weight:600;color:#2563a8;">ด่าน ${level} — ตอบถูก ${levelCorrect}/${levelTotal} คำ = ${levelPct}%</div>
+                        <div style="margin-bottom:8px;font-weight:600;color:#2563a8;">ด่าน ${level} — ตอบถูก ${uniqueCorrect}/10 คำ = ${levelPct}%</div>
                         ${wordDetailHtml}
                     </div>`;
                 }
