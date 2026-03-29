@@ -291,12 +291,12 @@
                 <div class="label">👨‍🎓 นักเรียนทั้งหมด</div>
             </div>
             <div class="stat-card">
-                <div class="num" id="sAvgScore">-</div>
-                <div class="label">📊 ตอบถูกเฉลี่ย</div>
+                <div class="num" id="sPassCount">-</div>
+                <div class="label">✅ ผ่านเกณฑ์</div>
             </div>
             <div class="stat-card">
-                <div class="num" id="sAvgLevel">-</div>
-                <div class="label">🏆 ด่านเฉลี่ย</div>
+                <div class="num" id="sCompletedCount">-</div>
+                <div class="label">🌟 เล่นครบทุกด่าน</div>
             </div>
         </div>
 
@@ -386,10 +386,10 @@
         function updateOverview(students) {
             document.getElementById('sTotal').textContent = students.length;
             if (students.length > 0) {
-                const avgScore = Math.round(students.reduce((s, st) => s + st.totalAnswered, 0) / students.length);
-                const avgLevel = (students.reduce((s, st) => s + st.maxUnlocked, 0) / students.length).toFixed(1);
-                document.getElementById('sAvgScore').textContent = avgScore + '/100';
-                document.getElementById('sAvgLevel').textContent = avgLevel + '/10';
+                const passCount = students.filter(st => (st.totalAnswered / MAX_SCORE * 100) >= 60).length;
+                const completedCount = students.filter(st => st.maxUnlocked >= 10).length;
+                document.getElementById('sPassCount').textContent = passCount + ' คน';
+                document.getElementById('sCompletedCount').textContent = completedCount + ' คน';
             }
         }
 
