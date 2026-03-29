@@ -253,7 +253,8 @@
     <div class="admin-header">
         <h1>🛡️ ผู้ดูแลระบบ</h1>
         <div class="header-actions">
-            <button class="btn btn-primary" onclick="recalculateScores()" id="recalcBtn">🔄 คำนวณคะแนนใหม่</button>
+            <button class="btn btn-primary" onclick="recalculateScores()" id="recalcBtn">🔄 รีเฟรช</button>
+            <button class="btn btn-secondary" onclick="showActivityModal()">📋 บันทึกกิจกรรม</button>
             <button class="btn btn-secondary" onclick="window.location.href='teacher.html'">📊 หน้ารายงาน</button>
             <button class="btn btn-secondary" onclick="logout()">🚪 ออกจากระบบ</button>
         </div>
@@ -304,29 +305,34 @@
         </div>
     </div>
 
-    <!-- Activity Log Section -->
-    <div class="admin-card" style="margin-top:25px;">
-        <h2 style="margin-bottom:15px;">📋 บันทึกกิจกรรมล่าสุด</h2>
-        <div style="display:flex;gap:10px;margin-bottom:15px;flex-wrap:wrap;">
-            <button onclick="loadActivity('all')" style="background:#2563a8;color:white;padding:8px 16px;border-radius:10px;border:none;cursor:pointer;font-family:'Kanit',sans-serif;font-weight:600;">ทั้งหมด</button>
-            <button onclick="loadActivity('login')" style="background:#4fb848;color:white;padding:8px 16px;border-radius:10px;border:none;cursor:pointer;font-family:'Kanit',sans-serif;font-weight:600;">🔑 เข้าสู่ระบบ</button>
-            <button onclick="loadActivity('play')" style="background:#f4b235;color:white;padding:8px 16px;border-radius:10px;border:none;cursor:pointer;font-family:'Kanit',sans-serif;font-weight:600;">🎮 เล่นเกม</button>
-        </div>
-        <div style="max-height:400px;overflow-y:auto;border-radius:12px;">
-            <table class="user-table" style="font-size:0.85em;">
-                <thead>
-                    <tr>
-                        <th>ประเภท</th>
-                        <th>ผู้ใช้</th>
-                        <th>บทบาท</th>
-                        <th>รายละเอียด</th>
-                        <th>เวลา</th>
-                    </tr>
-                </thead>
-                <tbody id="activityTableBody">
-                    <tr><td colspan="6" style="text-align:center;padding:30px;color:#888;">กดปุ่มด้านบนเพื่อโหลดข้อมูล</td></tr>
-                </tbody>
-            </table>
+    <!-- Activity Log Modal -->
+    <div class="modal-overlay" id="activityModal">
+        <div class="modal-box" style="max-width:900px;max-height:85vh;overflow-y:auto;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;">
+                <h3>📋 บันทึกกิจกรรมล่าสุด</h3>
+                <button class="btn btn-secondary" onclick="closeActivityModal()" style="color:#555;padding:6px 14px;">✕</button>
+            </div>
+            <div style="display:flex;gap:10px;margin-bottom:15px;flex-wrap:wrap;">
+                <button onclick="loadActivity('all')" style="background:#2563a8;color:white;padding:8px 16px;border-radius:10px;border:none;cursor:pointer;font-family:'Kanit',sans-serif;font-weight:600;">ทั้งหมด</button>
+                <button onclick="loadActivity('login')" style="background:#4fb848;color:white;padding:8px 16px;border-radius:10px;border:none;cursor:pointer;font-family:'Kanit',sans-serif;font-weight:600;">🔑 เข้าสู่ระบบ</button>
+                <button onclick="loadActivity('play')" style="background:#f4b235;color:white;padding:8px 16px;border-radius:10px;border:none;cursor:pointer;font-family:'Kanit',sans-serif;font-weight:600;">🎮 เล่นเกม</button>
+            </div>
+            <div style="max-height:500px;overflow-y:auto;border-radius:12px;">
+                <table class="user-table" style="font-size:0.85em;">
+                    <thead>
+                        <tr>
+                            <th>ประเภท</th>
+                            <th>ผู้ใช้</th>
+                            <th>บทบาท</th>
+                            <th>รายละเอียด</th>
+                            <th>เวลา</th>
+                        </tr>
+                    </thead>
+                    <tbody id="activityTableBody">
+                        <tr><td colspan="5" style="text-align:center;padding:30px;color:#888;">กดปุ่มด้านบนเพื่อโหลดข้อมูล</td></tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
@@ -641,15 +647,24 @@
         async function recalculateScores() {
             const btn = document.getElementById('recalcBtn');
             btn.disabled = true;
-            btn.textContent = '⏳ กำลังคำนวณ...';
+            btn.textContent = '⏳ กำลังรีเฟรช...';
             try {
                 const result = await gameAPI.recalculateScores();
-                showToast(`คำนวณใหม่สำเร็จ ✅ (${result.updated} คน)`);
+                showToast(`รีเฟรชสำเร็จ ✅ (${result.updated} คน)`);
+                await loadUsers();
             } catch (error) {
                 showToast(error.message || 'เกิดข้อผิดพลาด', 'error');
             }
             btn.disabled = false;
-            btn.textContent = '🔄 คำนวณคะแนนใหม่';
+            btn.textContent = '🔄 รีเฟรช';
+        }
+
+        function showActivityModal() {
+            document.getElementById('activityModal').classList.add('active');
+            loadActivity('all');
+        }
+        function closeActivityModal() {
+            document.getElementById('activityModal').classList.remove('active');
         }
 
         function logout() {
