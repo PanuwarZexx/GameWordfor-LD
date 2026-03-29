@@ -209,8 +209,42 @@
         .level-prog-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; font-size: 0.85em; }
         .level-prog-label { width: 60px; font-weight: 700; }
         .level-prog-bar { flex: 1; height: 18px; background: #f0f0f0; border-radius: 8px; overflow: hidden; }
-        .level-prog-fill { height: 100%; border-radius: 8px; background: linear-gradient(90deg, #667eea, #764ba2); transition: width 0.5s; }
+        .level-prog-fill { height: 100%; border-radius: 8px; background: linear-gradient(90deg, #667eea, #764ba2); transition: width 0.5s; cursor: pointer; }
         .level-prog-val { width: 50px; text-align: right; font-weight: 600; color: #667eea; }
+        .level-prog-row { cursor: pointer; padding: 4px 0; border-radius: 8px; transition: background 0.2s; }
+        .level-prog-row:hover { background: #f0f4ff; }
+        .level-detail-popup { background: #f8f9ff; border-radius: 12px; padding: 12px 16px; margin: 4px 0 8px 70px; border-left: 3px solid #667eea; font-size: 0.85em; animation: slideIn 0.2s ease; }
+        .level-detail-popup .word-item { display: flex; align-items: center; gap: 8px; padding: 4px 0; border-bottom: 1px solid #eee; }
+        .level-detail-popup .word-item:last-child { border-bottom: none; }
+
+        /* Report Modal */
+        .report-overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:2000; justify-content:center; align-items:flex-start; padding:20px; overflow-y:auto; }
+        .report-overlay.active { display:flex; }
+        .report-box { background:white; border-radius:20px; padding:30px; max-width:1200px; width:100%; max-height:92vh; overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,0.3); animation:slideIn 0.3s ease; }
+        .report-box h2 { margin-bottom:20px; font-size:1.3em; display:flex; align-items:center; justify-content:space-between; }
+        .report-table { width:100%; border-collapse:collapse; font-size:0.88em; }
+        .report-table thead th { background:linear-gradient(135deg,#1e3a5f,#2563a8); color:white; padding:12px 10px; text-align:center; font-weight:600; position:sticky; top:0; z-index:1; white-space:nowrap; border:1px solid #1a3350; }
+        .report-table tbody td { padding:10px 8px; border:1px solid #e0e7ff; text-align:center; vertical-align:middle; }
+        .report-table tbody tr:nth-child(even) { background:#f8f9ff; }
+        .report-table tbody tr:hover { background:#eef1ff; }
+        .report-table .name-cell { text-align:left; font-weight:600; }
+        .report-table .action-btns { display:flex; gap:4px; justify-content:center; }
+        .report-table .action-btns button { padding:5px 10px; border:none; border-radius:8px; cursor:pointer; font-family:'Kanit',sans-serif; font-size:0.82em; font-weight:600; transition:all 0.2s; }
+        .report-table .btn-edit-name { background:#f4b235; color:white; }
+        .report-table .btn-edit-name:hover { background:#e6a52e; transform:scale(1.05); }
+        .report-table .btn-delete-student { background:#ff6b6b; color:white; }
+        .report-table .btn-delete-student:hover { background:#e55a5a; transform:scale(1.05); }
+        .perf-tag { display:inline-block; padding:3px 10px; border-radius:20px; font-size:0.82em; font-weight:600; white-space:nowrap; }
+        .perf-tag.excellent { background:#e6f9e6; color:#2d8a2d; }
+        .perf-tag.good { background:#e8e6ff; color:#5a4fcf; }
+        .perf-tag.improve { background:#fff3e0; color:#c77800; }
+        .perf-tag.needhelp { background:#ffe6e6; color:#cc3333; }
+        .report-summary-row { display:flex; gap:15px; margin-bottom:20px; flex-wrap:wrap; }
+        .report-summary-card { background:linear-gradient(135deg,#f8f9ff,#eef1ff); border-radius:16px; padding:15px 20px; flex:1; min-width:120px; text-align:center; border:1px solid #e0e7ff; }
+        .report-summary-card .rs-num { font-size:1.6em; font-weight:900; color:#2563a8; }
+        .report-summary-card .rs-lbl { font-size:0.8em; color:#888; }
+        .btn-report { background:linear-gradient(135deg,#667eea,#764ba2); color:white; border:none; padding:10px 20px; border-radius:12px; cursor:pointer; font-family:'Kanit',sans-serif; font-weight:600; font-size:0.95em; transition:all 0.3s; box-shadow:0 4px 12px rgba(102,126,234,0.4); }
+        .btn-report:hover { transform:translateY(-2px); box-shadow:0 6px 16px rgba(102,126,234,0.5); }
 
         .search-bar {
             padding: 10px 18px; border: 2px solid #e0e7ff; border-radius: 12px;
@@ -244,6 +278,7 @@
     <div class="header">
         <h1>📊 รายงานผลการเรียน</h1>
         <div class="actions">
+            <button class="btn-report" onclick="showReportOverview()">📋 รายงานภาพรวม</button>
             <button class="btn btn-secondary" onclick="recalculateScores()" id="recalcBtn" style="background:#4fb848;border-color:#4fb848;">🔄 อัพเดตคะแนน</button>
             <button class="btn btn-secondary" onclick="logout()">🚪 ออกจากระบบ</button>
         </div>
@@ -253,27 +288,15 @@
         <div class="stats-row">
             <div class="stat-card">
                 <div class="num" id="sTotal">-</div>
-                <div class="label">นักเรียนทั้งหมด</div>
+                <div class="label">👨‍🎓 นักเรียนทั้งหมด</div>
             </div>
             <div class="stat-card">
                 <div class="num" id="sAvgScore">-</div>
-                <div class="label">คะแนนเฉลี่ย</div>
+                <div class="label">📊 ตอบถูกเฉลี่ย</div>
             </div>
             <div class="stat-card">
                 <div class="num" id="sAvgLevel">-</div>
-                <div class="label">ด่านเฉลี่ย</div>
-            </div>
-            <div class="stat-card">
-                <div class="num" id="sPassRate">-</div>
-                <div class="label">ผ่านเกณฑ์ (%)</div>
-            </div>
-            <div class="stat-card">
-                <div class="num" id="sTopScore">-</div>
-                <div class="label">คะแนนสูงสุด</div>
-            </div>
-            <div class="stat-card">
-                <div class="num" id="sAvgAccuracy">-</div>
-                <div class="label">ความแม่นยำเฉลี่ย</div>
+                <div class="label">🏆 ด่านเฉลี่ย</div>
             </div>
         </div>
 
@@ -301,6 +324,38 @@
 
     <!-- Print Area (hidden, used for printing) -->
     <div id="printArea"></div>
+
+    <!-- Report Overview Modal -->
+    <div class="report-overlay" id="reportOverlay" onclick="if(event.target===this)closeReportOverview()">
+        <div class="report-box">
+            <h2>
+                <span>📋 รายงานภาพรวมนักเรียน</span>
+                <div style="display:flex;gap:8px;">
+                    <button class="btn-print" onclick="printReportOverview()">🖨️ ปริ้นตาราง</button>
+                    <button class="close-btn" onclick="closeReportOverview()">✕</button>
+                </div>
+            </h2>
+            <div class="report-summary-row" id="reportSummaryRow"></div>
+            <div style="overflow-x:auto;">
+                <table class="report-table" id="reportTable">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>ชื่อนักเรียน</th>
+                            <th>ชั้น/ห้อง</th>
+                            <th>เล่นถึงด่าน</th>
+                            <th>ตอบถูก</th>
+                            <th>แบบทดสอบ</th>
+                            <th>สถานะ</th>
+                            <th>สรุปพัฒนาการ</th>
+                            <th>จัดการ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="reportTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 
     <script src="js/api.js?v=20260328a"></script>
     <script>
@@ -333,15 +388,8 @@
             if (students.length > 0) {
                 const avgScore = Math.round(students.reduce((s, st) => s + st.totalAnswered, 0) / students.length);
                 const avgLevel = (students.reduce((s, st) => s + st.maxUnlocked, 0) / students.length).toFixed(1);
-                const passCount = students.filter(st => (st.totalAnswered / MAX_SCORE * 100) >= 60).length;
-                const passRate = Math.round((passCount / students.length) * 100);
-                const topScore = Math.max(...students.map(st => st.totalAnswered));
-                const avgAccuracy = Math.round(students.reduce((s, st) => s + Math.min((st.totalAnswered / MAX_SCORE * 100), 100), 0) / students.length);
-                document.getElementById('sAvgScore').textContent = avgScore;
-                document.getElementById('sAvgLevel').textContent = avgLevel;
-                document.getElementById('sPassRate').textContent = passRate + '%';
-                document.getElementById('sTopScore').textContent = topScore;
-                document.getElementById('sAvgAccuracy').textContent = avgAccuracy + '%';
+                document.getElementById('sAvgScore').textContent = avgScore + '/100';
+                document.getElementById('sAvgLevel').textContent = avgLevel + '/10';
             }
         }
 
@@ -376,8 +424,8 @@
                     </div>
                     <div class="progress-bar"><div class="fill ${fillClass}" style="width:${pct}%"></div></div>
                     <div class="sc-stats">
-                        <span>ตอบถูก ${st.totalAnswered}/${MAX_SCORE} คำ (${pct}%)</span>
-                        <span>ด่าน ${st.maxUnlocked}/10</span>
+                        <span>ตอบถูก ${st.totalAnswered}/${MAX_SCORE} คำ</span>
+                        <span>🎮 เล่นถึงด่านที่ ${st.maxUnlocked}/10</span>
                         <span>${lastLogin}</span>
                     </div>
                 </div>`;
@@ -440,7 +488,7 @@
                         </div>
                         <div class="pmeta">
                             <span>🎮 เล่นทั้งหมด ${totalPlayDays} วัน</span>
-                            <span>📊 ทำแบบทดสอบ ${detail.stats.totalAttempts} ครั้ง</span>
+                            <span>📝 ทำแบบทดสอบ ${Math.min(detail.stats.totalAttempts, 100)}/100 ข้อ</span>
                         </div>
                     </div>
                     <div class="profile-actions">
@@ -465,7 +513,7 @@
                     <div class="sc-box correct"><div class="sc-val">${totalAnsweredWords}</div><div class="sc-lbl">ตอบถูก (คำ)</div></div>
                     <div class="sc-box wrong"><div class="sc-val">${MAX_SCORE - totalAnsweredWords}</div><div class="sc-lbl">ยังไม่ได้ตอบ</div></div>
                     <div class="sc-box pct"><div class="sc-val">${realPct}%</div><div class="sc-lbl">ความก้าวหน้า</div></div>
-                    <div class="sc-box plays"><div class="sc-val">${detail.stats.totalAttempts}</div><div class="sc-lbl">ทำแบบทดสอบ</div></div>
+                    <div class="sc-box plays"><div class="sc-val">${Math.min(detail.stats.totalAttempts, 100)}/100</div><div class="sc-lbl">ทำแบบทดสอบ</div></div>
                 </div>`;
 
                 // ===== Donut Chart (ตอบถูกแล้ว / ยังไม่ได้ตอบ) =====
@@ -492,25 +540,53 @@
                     </div>
                 </div>`;
 
-                // ===== Level Progress Bars =====
+                // ===== Level Progress Bars (clickable) =====
                 html += `<div class="level-progress-section">
-                    <h4>📈 ความก้าวหน้าแต่ละด่าน</h4>`;
+                    <h4>📈 ความก้าวหน้าแต่ละด่าน <span style="font-size:0.75em;color:#888;font-weight:400;">(คลิกเพื่อดูรายละเอียด)</span></h4>`;
                 for (let level = 1; level <= 10; level++) {
                     const logs = detail.logsByLevel[String(level)];
+                    const awWords = progressAW[String(level)] || [];
                     if (!logs || logs.length === 0) {
-                        html += `<div class="level-prog-row">
+                        html += `<div class="level-prog-row" onclick="toggleLevelDetail(this)">
                             <div class="level-prog-label">ด่าน ${level}</div>
                             <div class="level-prog-bar"><div class="level-prog-fill" style="width:0%"></div></div>
                             <div class="level-prog-val">-</div>
+                        </div>
+                        <div class="level-detail-popup" style="display:none;">
+                            <div style="color:#888;padding:8px 0;">ยังไม่ได้เล่นด่านนี้</div>
                         </div>`;
                         continue;
                     }
                     const levelCorrect = logs.filter(l => l.isCorrect).length;
-                    const levelPct = Math.round((levelCorrect / logs.length) * 100);
-                    html += `<div class="level-prog-row">
+                    const levelTotal = logs.length;
+                    const levelPct = Math.round((levelCorrect / levelTotal) * 100);
+                    // Build word detail for popup
+                    const wordMap = {};
+                    logs.forEach(log => {
+                        if (!wordMap[log.word]) wordMap[log.word] = { correct: 0, wrong: 0, total: 0 };
+                        wordMap[log.word].total++;
+                        if (log.isCorrect) wordMap[log.word].correct++;
+                        else wordMap[log.word].wrong++;
+                    });
+                    let wordDetailHtml = '';
+                    for (const [word, stat] of Object.entries(wordMap)) {
+                        const icon = stat.correct > 0 ? '✅' : '❌';
+                        wordDetailHtml += `<div class="word-item">
+                            <span>${icon}</span>
+                            <strong>${word}</strong>
+                            <span style="color:#4fb848;">ถูก ${stat.correct}</span>
+                            <span style="color:#ff6b6b;">ผิด ${stat.wrong}</span>
+                            <span style="color:#888;font-size:0.85em;">(${stat.total} ครั้ง)</span>
+                        </div>`;
+                    }
+                    html += `<div class="level-prog-row" onclick="toggleLevelDetail(this)">
                         <div class="level-prog-label">ด่าน ${level}</div>
                         <div class="level-prog-bar"><div class="level-prog-fill" style="width:${levelPct}%;background:${levelPct>=60?'linear-gradient(90deg,#4fb848,#7fb83e)':levelPct>=40?'linear-gradient(90deg,#f4b235,#f39c12)':'linear-gradient(90deg,#ff6b6b,#ee5a24)'}"></div></div>
                         <div class="level-prog-val">${levelPct}%</div>
+                    </div>
+                    <div class="level-detail-popup" style="display:none;">
+                        <div style="margin-bottom:8px;font-weight:600;color:#2563a8;">ด่าน ${level} — ตอบถูก ${levelCorrect}/${levelTotal} คำ = ${levelPct}%</div>
+                        ${wordDetailHtml}
                     </div>`;
                 }
                 html += `</div>`;
@@ -712,6 +788,121 @@
         }
 
         function closeDetail() { document.getElementById('detailOverlay').classList.remove('active'); }
+
+        function toggleLevelDetail(row) {
+            const popup = row.nextElementSibling;
+            if (popup && popup.classList.contains('level-detail-popup')) {
+                popup.style.display = popup.style.display === 'none' ? 'block' : 'none';
+            }
+        }
+
+        function showReportOverview() {
+            document.getElementById('reportOverlay').classList.add('active');
+            const students = allStudents;
+            // Summary cards
+            const total = students.length;
+            const avgAnswered = total > 0 ? Math.round(students.reduce((s,st) => s + st.totalAnswered, 0) / total) : 0;
+            const avgLevel = total > 0 ? (students.reduce((s,st) => s + st.maxUnlocked, 0) / total).toFixed(1) : 0;
+            const excellentCount = students.filter(st => (st.totalAnswered / MAX_SCORE * 100) >= 80).length;
+            const goodCount = students.filter(st => { const p = st.totalAnswered / MAX_SCORE * 100; return p >= 60 && p < 80; }).length;
+            const improveCount = students.filter(st => { const p = st.totalAnswered / MAX_SCORE * 100; return p >= 40 && p < 60; }).length;
+            const needhelpCount = students.filter(st => (st.totalAnswered / MAX_SCORE * 100) < 40).length;
+
+            document.getElementById('reportSummaryRow').innerHTML = `
+                <div class="report-summary-card"><div class="rs-num">${total}</div><div class="rs-lbl">นักเรียนทั้งหมด</div></div>
+                <div class="report-summary-card"><div class="rs-num" style="color:#2d8a2d;">${excellentCount}</div><div class="rs-lbl">⭐ ดีมาก</div></div>
+                <div class="report-summary-card"><div class="rs-num" style="color:#5a4fcf;">${goodCount}</div><div class="rs-lbl">👍 ดี</div></div>
+                <div class="report-summary-card"><div class="rs-num" style="color:#c77800;">${improveCount}</div><div class="rs-lbl">⚠ ควรพัฒนา</div></div>
+                <div class="report-summary-card"><div class="rs-num" style="color:#cc3333;">${needhelpCount}</div><div class="rs-lbl">🔴 ต้องปรับปรุง</div></div>
+            `;
+
+            // Table rows
+            const tbody = document.getElementById('reportTableBody');
+            if (students.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:30px;color:#888;">ไม่พบข้อมูล</td></tr>';
+                return;
+            }
+            tbody.innerHTML = students.map((st, i) => {
+                const pct = Math.min(Math.round((st.totalAnswered / MAX_SCORE) * 100), 100);
+                const perf = getPerformanceLevel(pct);
+                const perfTag = pct >= 80 ? 'excellent' : pct >= 60 ? 'good' : pct >= 40 ? 'improve' : 'needhelp';
+                const quizCount = Math.min(st.totalAnswered, 100);
+                // Progress summary
+                let progressSummary = '';
+                if (pct >= 80) progressSummary = 'เรียนรู้ได้ดี ความเข้าใจดีเยี่ยม';
+                else if (pct >= 60) progressSummary = 'พัฒนาได้ดี ควรเพิ่มการฝึกต่อ';
+                else if (pct >= 40) progressSummary = 'ยังต้องพัฒนาเพิ่มเติม';
+                else if (pct > 0) progressSummary = 'ต้องการการช่วยเหลือเพิ่ม';
+                else progressSummary = 'ยังไม่ได้เริ่มเล่น';
+
+                return `<tr>
+                    <td>${i + 1}</td>
+                    <td class="name-cell" id="name-${st.id}">${st.displayName}</td>
+                    <td>${st.classroom || '-'}</td>
+                    <td><strong>${st.maxUnlocked}/10</strong></td>
+                    <td>${st.totalAnswered}/${MAX_SCORE} คำ</td>
+                    <td>${quizCount}/100</td>
+                    <td><span class="perf-tag ${perfTag}">${perf.label}</span></td>
+                    <td style="font-size:0.82em;text-align:left;max-width:160px;">${progressSummary}</td>
+                    <td>
+                        <div class="action-btns">
+                            <button class="btn-edit-name" onclick="editStudentName('${st.id}', '${st.displayName.replace(/'/g, "\\'")}')">✏️</button>
+                            <button class="btn-delete-student" onclick="confirmResetStudent('${st.id}', '${st.displayName.replace(/'/g, "\\'")}')">🗑️</button>
+                        </div>
+                    </td>
+                </tr>`;
+            }).join('');
+        }
+
+        async function editStudentName(studentId, currentName) {
+            const newName = prompt('แก้ไขชื่อนักเรียน:', currentName);
+            if (!newName || newName.trim() === '' || newName === currentName) return;
+            try {
+                await gameAPI.editUser(studentId, { displayName: newName.trim() });
+                alert('✅ แก้ไขชื่อสำเร็จ');
+                // Update in allStudents
+                const st = allStudents.find(s => s.id === studentId);
+                if (st) st.displayName = newName.trim();
+                renderStudents(allStudents);
+                showReportOverview(); // Refresh table
+            } catch (error) {
+                alert('❌ ' + (error.message || 'เกิดข้อผิดพลาด'));
+            }
+        }
+
+        function closeReportOverview() {
+            document.getElementById('reportOverlay').classList.remove('active');
+        }
+
+        function printReportOverview() {
+            const reportContent = document.querySelector('.report-box').innerHTML;
+            const printWin = window.open('', '_blank');
+            printWin.document.write(`<html><head><title>รายงานภาพรวม</title>
+                <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+                <style>
+                    * { margin:0; padding:0; box-sizing:border-box; }
+                    body { font-family:'Kanit',sans-serif; padding:20px; color:#2c3e50; }
+                    h2 { margin-bottom:15px; }
+                    table { width:100%; border-collapse:collapse; font-size:0.85em; }
+                    th { background:#1e3a5f; color:white; padding:10px 8px; border:1px solid #1a3350; text-align:center; }
+                    td { padding:8px 6px; border:1px solid #ccc; text-align:center; }
+                    tr:nth-child(even) { background:#f5f5f5; }
+                    .name-cell { text-align:left; font-weight:600; }
+                    .perf-tag { padding:2px 8px; border-radius:10px; font-size:0.8em; font-weight:600; }
+                    .perf-tag.excellent { background:#e6f9e6; color:#2d8a2d; }
+                    .perf-tag.good { background:#e8e6ff; color:#5a4fcf; }
+                    .perf-tag.improve { background:#fff3e0; color:#c77800; }
+                    .perf-tag.needhelp { background:#ffe6e6; color:#cc3333; }
+                    .action-btns, .close-btn, .btn-print { display:none !important; }
+                    .report-summary-row { display:flex; gap:10px; margin-bottom:15px; }
+                    .report-summary-card { border:1px solid #ddd; border-radius:10px; padding:10px 15px; flex:1; text-align:center; }
+                    .rs-num { font-size:1.4em; font-weight:900; color:#2563a8; }
+                    .rs-lbl { font-size:0.78em; color:#888; }
+                </style>
+            </head><body>${reportContent}</body></html>`);
+            printWin.document.close();
+            printWin.onload = () => { printWin.print(); };
+        }
 
         function logout() {
             localStorage.removeItem('authToken');
