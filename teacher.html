@@ -609,7 +609,7 @@
                 if (wordList.length > 0) {
                     const maxTotal = Math.max(...wordList.map(w => w.total));
                     html += `<div class="chart-section">
-                        <h4>📊 คำที่ถูก/ผิดบ่อย (กลับมาเล่นซ้ำ)</h4>
+                        <h4 style="cursor:pointer;user-select:none;" onclick="const w=this.nextElementSibling;const l=w.nextElementSibling;w.style.display=w.style.display==='none'?'':'none';if(l)l.style.display=l.style.display==='none'?'':'none';this.querySelector('span').textContent=w.style.display==='none'?'▶':'▼'"><span>▼</span> 📊 คำที่ถูก/ผิดบ่อย (กลับมาเล่นซ้ำ) <span style="font-size:0.7em;color:#888;font-weight:400;">คลิกเพื่อพับ/ขยาย</span></h4>
                         <div class="word-bars">`;
                     wordList.forEach(w => {
                         const cPct = (w.correct / maxTotal) * 100;
