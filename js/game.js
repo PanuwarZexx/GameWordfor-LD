@@ -1377,7 +1377,7 @@ function generateKeyboard(word) {
         if (imageNumber && folderName) {
             // สร้าง container สำหรับรูปภาพและปุ่มลำโพง
             button.innerHTML = `
-                <img src="${folderName}/${imageNumber}.png" alt="${char}" style="width: 100%; height: 100%; object-fit: contain; pointer-events: none;">
+                <img src="${folderName}/${imageNumber}.png?v=20260330" alt="${char}" style="width: 100%; height: 100%; object-fit: contain; pointer-events: none;">
                 <span class="sound-btn-char" style="position: absolute; bottom: 2px; right: 2px; font-size: 0.7em; opacity: 0.8; cursor: pointer; z-index: 10; background: rgba(255,255,255,0.7); border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center;">🔊</span>
             `;
         } else {
